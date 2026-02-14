@@ -47,7 +47,7 @@ namespace HREngine.Bots
         private string choiceCardId = "";
         DateTime starttime = DateTime.Now;
         bool enemyConcede = false;
-
+        // public int 连续执行操作数 = 0;
         bool firstMove = true;
         bool firstTurn = true;
         bool canBeDelay = false;
@@ -811,25 +811,28 @@ def Execute():
             Log.InfoFormat("[表情] 使用表情 [{0}].", data.Emote);
             if (data.Emote == EmoteType.GREETINGS)
             {
-                GameState.Get().GetCurrentPlayer().GetHeroCard().PlayEmote(EmoteType.THANKS);
+                GameState.Get().GetCurrentPlayer().GetHeroCard().PlayEmote(EmoteType.GREETINGS);
             }
             else if (data.Emote == EmoteType.WELL_PLAYED)
             {
-                GameState.Get().GetCurrentPlayer().GetHeroCard().PlayEmote(EmoteType.THANKS);
+                GameState.Get().GetCurrentPlayer().GetHeroCard().PlayEmote(EmoteType.WELL_PLAYED);
             }
             else if (data.Emote == EmoteType.OOPS)
             {
-                GameState.Get().GetCurrentPlayer().GetHeroCard().PlayEmote(EmoteType.WELL_PLAYED);
+                GameState.Get().GetCurrentPlayer().GetHeroCard().PlayEmote(EmoteType.OOPS);
             }
             else if (data.Emote == EmoteType.THREATEN)
             {
-                GameState.Get().GetCurrentPlayer().GetHeroCard().PlayEmote(EmoteType.THANKS);
+                GameState.Get().GetCurrentPlayer().GetHeroCard().PlayEmote(EmoteType.THREATEN);
             }
             else if (data.Emote == EmoteType.THANKS)
             {
+                GameState.Get().GetCurrentPlayer().GetHeroCard().PlayEmote(EmoteType.THANKS);
+
             }
             else if (data.Emote == EmoteType.SORRY)
             {
+                GameState.Get().GetCurrentPlayer().GetHeroCard().PlayEmote(EmoteType.SORRY);
             }
         }
 
@@ -840,12 +843,11 @@ def Execute():
         public async Task OurTurnCombatLogic()
         {
             Log.InfoFormat("[我方回合]");
-            await Coroutine.Sleep(555 + makeChoice());
+            await Coroutine.Sleep(222 + makeChoice());
             ChooseOneClick(dirtychoice);
             dirtychoice = -1;
-            await Coroutine.Sleep(555);
+            await Coroutine.Sleep(222);
             Silverfish.Instance.lastpf = null;
-            return;
         }
 
         public async Task OpponentTurnCombatLogic()
@@ -859,22 +861,102 @@ def Execute():
         /// <param name="dirty"></param>
         public void ChooseOneClick(int dirty)
         {
-            if (dirty >= 0)
+            // if (dirty >= 0)
+            // {
+            //     switch (dirtychoice)
+            //     {
+            //     case 0:
+            // TritonHs.ChooseOneClickMiddle(); break;
+            //         case 1: TritonHs.ChooseOneClickLeft(); break;
+            //         default:
+            //             {
+            //                 List<Card> friendlyCards = ChoiceCardMgr.Get().GetFriendlyCards();
+            //                 if (friendlyCards.Count > dirty)
+            //                     Client.LeftClickAt(Client.CardInteractPoint(friendlyCards[dirty]));
+            //                 else
+            //                     TritonHs.ChooseOneClickRight();//抉择
+            //                 break;
+            //             }
+            //     }
+            // }
+            try
             {
-                switch (dirtychoice)
+                // 添加全面的空值检查
+                if (dirty < 0)
                 {
-                    case 0: TritonHs.ChooseOneClickMiddle(); break;
-                    case 1: TritonHs.ChooseOneClickLeft(); break;
-                    default:
-                        {
-                            List<Card> friendlyCards = ChoiceCardMgr.Get().GetFriendlyCards();
-                            if (friendlyCards.Count > dirty)
-                                Client.LeftClickAt(Client.CardInteractPoint(friendlyCards[dirty]));
-                            else
-                                TritonHs.ChooseOneClickRight();//抉择
-                            break;
-                        }
+                    Log.WarnFormat("[ChooseOneClick] dirty 参数无效: {0}", dirty);
+                    return;
                 }
+
+                var choiceMgr = ChoiceCardMgr.Get();
+                if (choiceMgr == null)
+                {
+                    Log.ErrorFormat("[ChooseOneClick] ChoiceCardMgr.Get() 返回 null");
+                    return;
+                }
+
+                List<Card> friendlyCards = choiceMgr.GetFriendlyCards();
+                if (friendlyCards == null)
+                {
+                    Log.ErrorFormat("[ChooseOneClick] GetFriendlyCards() 返回 null");
+                    return;
+                }
+
+                int cardCount = friendlyCards.Count;
+                if (cardCount == 0)
+                {
+                    Log.WarnFormat("[ChooseOneClick] 没有可选的友好卡牌");
+                    return;
+                }
+
+                // 验证卡牌列表中的元素不为null
+                for (int i = 0; i < cardCount; i++)
+                {
+                    if (friendlyCards[i] == null)
+                    {
+                        //Log.ErrorFormat("[ChooseOneClick] 友好卡牌列表中的第 {0} 个元素为 null", i);
+                        return;
+                    }
+                }
+
+                // 根据卡牌数量处理不同的抉择情况
+                int selectedIndex = 0;
+
+                switch (cardCount)
+                {
+                    case 2: // 2选1
+                        selectedIndex = (dirty == 2) ? 1 : 0;
+                        break;
+
+                    case 3: // 3选1
+                        selectedIndex = (dirty >= 1 && dirty <= 3) ? dirty - 1 : 0;
+                        break;
+
+                    case 4: // 4选1
+                        selectedIndex = (dirty >= 1 && dirty <= 4) ? dirty - 1 : cardCount - 1;
+                        break;
+
+                    default: // 其他情况
+                        selectedIndex = (dirty >= 1 && dirty <= cardCount) ? dirty - 1 : 0;
+                        break;
+                }
+
+                // 确保索引在有效范围内
+                if (selectedIndex < 0 || selectedIndex >= cardCount)
+                {
+                    //Log.WarnFormat("[ChooseOneClick] 计算的选择索引超出范围: {0}, 使用默认值0", selectedIndex);
+                    selectedIndex = 0;
+                }
+
+                // 执行点击操作
+                Client.LeftClickAt(Client.CardInteractPoint(friendlyCards[dirty]));
+
+                //Log.InfoFormat("[ChooseOneClick] 成功选择第 {0} 个选项 (dirty={1}, 总选项={2})",
+                //selectedIndex + 1, dirty, cardCount);
+            }
+            catch (Exception ex)
+            {
+                Log.ErrorFormat("[ChooseOneClick] 执行过程中发生异常: {0}", ex);
             }
         }
 
@@ -885,7 +967,8 @@ def Execute():
         /// </summary>
         public async Task OurTurnLogic()
         {
-            /* 
+
+
             switch (printUtils.emoteMode)
             {
                 case "嘴臭模式":
@@ -935,9 +1018,9 @@ def Execute():
                     }
                     break;
                 default: break;
-            } */
+            }
             // 首回合播放表情，根据不同模式选择不同的表情类型
-            /* if (firstMove && "嘴臭模式".Equals(printUtils.emoteMode))
+            if (firstMove && "嘴臭模式".Equals(printUtils.emoteMode))
             {
                 firstMove = false;
                 playEmote(EmoteType.WELL_PLAYED);
@@ -967,11 +1050,11 @@ def Execute():
             {
                 EmoteType[] emoteTypes = { EmoteType.GREETINGS, EmoteType.THANKS, EmoteType.OOPS, EmoteType.WELL_PLAYED, EmoteType.WOW, EmoteType.THREATEN };
                 playEmote(emoteTypes[new Random().Next(emoteTypes.Length)]);
-        }
-        */
+            }
+
 
             // 当最佳动作值大于5000时的处理
-            /* if (Ai.Instance.bestmoveValue > 5000)
+            if (Ai.Instance.bestmoveValue > 5000)
             {
                 if ("嘴臭模式".Equals(printUtils.emoteMode))
                 {
@@ -996,7 +1079,7 @@ def Execute():
                 {
                     playEmote(EmoteType.THANKS);
                 }
-            } */
+            }
             //判断是否处于回溯阶段
             if (RewindUIManager.m_isShowingRewindUI)
             {
@@ -1010,35 +1093,36 @@ def Execute():
                         return;
                     }
                     Log.WarnFormat("处于回溯状态");
-
-                    if (rewindUIManager.m_rewindButton == null || rewindUIManager.m_keepButton == null)
+                    //回溯按钮
+                    UIBButton rewindButton = rewindUIManager.m_rewindButton;
+                    //保持时间线按钮
+                    UIBButton keepButton = rewindUIManager.m_keepButton;
+                    if (rewindButton == null || keepButton == null)
                     {
                         Log.WarnFormat("回溯或保持当前时间线按钮位空");
                         return;
                     }
-
                     Log.WarnFormat("开始点击回溯或维持时间线按钮");
-                    if (random.Next(0, 2) > 1)
+
+                    if (random.Next(0, 4) > 2)
                     {
                         Log.WarnFormat("点击维持时间线按钮");
-                        // await TritonHs.KeepTimeline();
-                        rewindUIManager.m_keepButton.TriggerPress();
-                        rewindUIManager.m_keepButton.TriggerRelease();
+                        await Extensions.ClientUiBButton(keepButton);
                     }
                     else
                     {
                         Log.WarnFormat("点击回溯按钮");
-                        // await TritonHs.RewindTimeline();
-                        rewindUIManager.m_rewindButton.TriggerPress();
-                        rewindUIManager.m_rewindButton.TriggerRelease();
+                        await Extensions.ClientUiBButton(rewindButton);
+
                     }
-                    await Coroutine.Sleep(random.Next(100, 500));
 
                 }
                 catch (Exception ex)
                 {
                     Helpfunctions.Instance.ErrorLog("[回溯]异常: " + ex.Message);
                 }
+                Log.WarnFormat("开始随机等待");
+                await Coroutine.Sleep(random.Next(1500, 3000));
                 return;
             }
 
@@ -1089,7 +1173,7 @@ def Execute():
                     else
                         await source.DoTarget(target);
 
-                    await Coroutine.Sleep(555);
+                    await Coroutine.Sleep(222);
                     return;
                 }
 
@@ -1102,163 +1186,16 @@ def Execute():
             else if (GameState.Get().IsInChoiceMode() || GameState.Get().IsInSubOptionMode())
             {
                 Log.Info("处于选择模式...");
-                await Coroutine.Sleep(555 + makeChoice());
-                switch (dirtychoice)
-                {
-                    case 0:
-                        TritonHs.ChooseOneClickMiddle();
-                        break;
-                    case 1:
-                        TritonHs.ChooseOneClickLeft();
-                        break;
-                    case 2:
-                        TritonHs.ChooseOneClickRight();
-                        break;
-                }
+                await Coroutine.Sleep(222 + makeChoice());
+                ChooseOneClick(dirtychoice);
                 dirtychoice = -1;
-                await Coroutine.Sleep(555);
+                await Coroutine.Sleep(222);
                 // 指向泰坦技能的使用目标
                 await TitanAbilityUseOnTagets();
                 return;
             }
-
-            // 处理目标模式
-            // 如果在目标或选择模式，等待
-            // switch case版本，根据Response的值继续
-            /*  if (this.learnmode && (GameState.Get().IsInTargetMode() || GameState.Get().IsInChoiceMode() || GameState.Get().IsInSubOptionMode()))
-             {
-                 await Coroutine.Sleep(30);
-                 return;
-             }
-
-             switch (GameState.Get().GetResponseMode())
-             {
-
-                 case GameState.ResponseMode.OPTION_TARGET:
-                     // case GameState.Get().ResponseMode.OPTION_REVERSE_TARGET:
-                     {
-                         if (dirtytarget >= 0)
-                         {
-                             Log.Info("瞄准中...");
-                             HSCard source = dirtyTargetSource == 9000 ? TritonHs.OurHeroPowerCard : getEntityWithNumber(dirtyTargetSource);
-                             HSCard target = getEntityWithNumber(dirtytarget);
-
-                             if (target == null)
-                             {
-                                 Log.Error("目标为空...");
-                                 TritonHs.CancelTargetingMode();
-                                 return;
-                             }
-
-                             dirtytarget = -1;
-                             dirtyTargetSource = -1;
-
-                             if (source == null)
-                                 await TritonHs.DoTarget(target);
-                             else
-                                 await source.DoTarget(target);
-
-                             await Coroutine.Sleep(555);
-                             return;
-                         }
-
-                         Log.Error("目标丢失...");
-                         TritonHs.CancelTargetingMode();
-                         return;
-                     }
-                 case GameState.ResponseMode.SUB_OPTION:
-                 case GameState.ResponseMode.CHOICE:
-                     // Log.DebugFormat("选择：{0}", responseMode);
-                     {
-                         await Coroutine.Sleep(555 + makeChoice());
-                         switch (dirtychoice)
-                         {
-                             case 0:
-                                 TritonHs.ChooseOneClickMiddle();
-                                 break;
-                             case 1:
-                                 TritonHs.ChooseOneClickLeft();
-                                 break;
-                             case 2:
-                                 TritonHs.ChooseOneClickRight();
-                                 break;
-                         }
-
-                         dirtychoice = -1;
-                         await Coroutine.Sleep(555);
-                         // 指向泰坦技能的使用目标
-                         await TitanAbilityUseOnTagets();
-                         return;
-                     }
-                 // case GameState.Get().ResponseMode.OPTION:
-                 default:
-                     {
-                         Log.DebugFormat("当前responseModeL:{0}", "option");
-                     }
-                     break;
-             } */
-
-
-
-
-            /* if (TritonHs.IsInTargetMode())
-            {
-                if (dirtytarget >= 0)
-                {
-                    Log.Info("瞄准中...");
-                    HSCard source = dirtyTargetSource == 9000 ? TritonHs.OurHeroPowerCard : getEntityWithNumber(dirtyTargetSource);
-                    HSCard target = getEntityWithNumber(dirtytarget);
-
-                    if (target == null)
-                    {
-                        Log.Error("目标为空...");
-                        TritonHs.CancelTargetingMode();
-                        return;
-                    }
-
-                    dirtytarget = -1;
-                    dirtyTargetSource = -1;
-
-                    if (source == null)
-                        await TritonHs.DoTarget(target);
-                    else
-                        await source.DoTarget(target);
-
-                    await Coroutine.Sleep(555);
-                    return;
-                }
-
-                Log.Error("目标丢失...");
-                TritonHs.CancelTargetingMode();
-                return;
-            }
-
-            // 处理选择模式
-            if (TritonHs.IsInChoiceMode())
-            {
-                await Coroutine.Sleep(555 + makeChoice());
-                switch (dirtychoice)
-                {
-                    case 0:
-                        TritonHs.ChooseOneClickMiddle();
-                        break;
-                    case 1:
-                        TritonHs.ChooseOneClickLeft();
-                        break;
-                    case 2:
-                        TritonHs.ChooseOneClickRight();
-                        break;
-                }
-
-                dirtychoice = -1;
-                await Coroutine.Sleep(555);
-                // 指向泰坦技能的使用目标
-                await TitanAbilityUseOnTagets();
-                return;
-            } */
         actions:
 
-            // 更新一切
             bool sleepRetry = false;
             bool templearn = Silverfish.Instance.updateEverything(behave, 0, out sleepRetry);
             if (sleepRetry)
@@ -1337,28 +1274,15 @@ def Execute():
                         doEndTurn = true;
                 }
 
-                if (doEndTurn)
-                {
-                    Helpfunctions.Instance.ErrorLog("回合结束");
-                    //地标减少冷却回合
-                    Playfield doEndTurnPlay = Ai.Instance.bestplay;
-                    foreach (Minion m in doEndTurnPlay.ownMinions)
-                    {
-                        if (m.handcard.card.type == CardDB.cardtype.LOCATION && m.CooldownTurn > 0)
-                        {
-                            m.CooldownTurn -= 1;
-                            m.handcard.card.CooldownTurn -= 1;
-                            if (m.CooldownTurn <= 0)
-                            {
-                                m.Ready = true;
-                            }
-                            Helpfunctions.Instance.logg("卡牌名称 - " + m.handcard.card.nameCN + " 地标冷却回合 - " + m.CooldownTurn);
-                        }
-                    }
-                    await TritonHs.EndTurn();
-                    return;
-                }
-                else if (doConcede)
+                // if (doEndTurn)
+                // {
+                //     Helpfunctions.Instance.ErrorLog("回合结束");
+                //     //地标减少冷却回合
+                //     await TritonHs.EndTurn();
+                //     return;
+                // }
+                // else 
+                if (doConcede)
                 {
                     playEmote(EmoteType.WELL_PLAYED);
                     Helpfunctions.Instance.ErrorLog("我方败局已定. 投降...");
@@ -1371,79 +1295,129 @@ def Execute():
             Helpfunctions.Instance.ErrorLog("开始行动");
             if (moveTodo == null)
             {
-                playEmote(EmoteType.OOPS);
-                Helpfunctions.Instance.ErrorLog("实在支不出招啦. 结束当前回合");
-                await Coroutine.Sleep(500);
-                Thread.Sleep(2000);
-                //地标减少冷却回合
-                Playfield nullPlay = Ai.Instance.bestplay;
-                foreach (Minion m in nullPlay.ownMinions)
-                {
-                    if (m.handcard.card.type == CardDB.cardtype.LOCATION && m.CooldownTurn > 0)
-                    {
-                        m.CooldownTurn -= 1;
-                        m.handcard.card.CooldownTurn -= 1;
-                        if (m.CooldownTurn <= 0)
-                        {
-                            m.Ready = true;
-                        }
-                        Helpfunctions.Instance.logg("卡牌名称 - " + m.handcard.card.nameCN + " 地标冷却回合 - " + m.CooldownTurn);
-                    }
-                }
+                // playEmote(EmoteType.OOPS);
+                // Helpfunctions.Instance.ErrorLog("实在支不出招啦. 结束当前回合");
+                // await Coroutine.Sleep(500);
+                // Thread.Sleep(2000);
+                // //地标减少冷却回合
+                // Playfield nullPlay = Ai.Instance.bestplay;
+                // foreach (Minion m in nullPlay.ownMinions)
+                // {
+                //     if (m.handcard.card.type == CardDB.cardtype.LOCATION && m.CooldownTurn > 0)
+                //     {
+                //         m.CooldownTurn -= 1;
+                //         m.handcard.card.CooldownTurn -= 1;
+                //         if (m.CooldownTurn <= 0)
+                //         {
+                //             m.Ready = true;
+                //         }
+                //         Helpfunctions.Instance.logg("卡牌名称 - " + m.handcard.card.nameCN + " 地标冷却回合 - " + m.CooldownTurn);
+                //     }
+                // }
                 await TritonHs.EndTurn();
                 return;
             }
-
             // 执行当前的行动逻辑
             moveTodo.print();
 
             switch (moveTodo.actionType)
             {
                 case actionEnum.playcard:
-                    await PlayCard(moveTodo);
-                    return;
+                    {
+                        await PlayCard(moveTodo);
+                        if (moveTodo.target == null)
+                        {
+                            await ToEndTurnButton();
+
+                        }
+                        break;
+                    }
                 case actionEnum.attackWithMinion:
+
                     await AttackWithMinion(moveTodo);
-                    return;
+                    await ToEndTurnButton();
+                    break;
+
                 case actionEnum.attackWithHero:
                     await AttackWithHero(moveTodo);
-                    return;
+                    await ToEndTurnButton();
+                    break;
+
                 case actionEnum.useHeroPower:
                     await UseHeroPower(moveTodo);
-                    return;
+                    Vector3 position = EndTurnButton.Get().Transform.Position;
+                    await ToEndTurnButton();
+                    break;
                 case actionEnum.trade:
                     await HandleTrade(moveTodo);
-                    return;
+                    break;
                 case actionEnum.useLocation:
                     await UseLocation(moveTodo);
-                    return;
+                    await ToEndTurnButton();
+                    break;
                 case actionEnum.useTitanAbility:
                     await UseTitanAbility(moveTodo);
-                    return;
+                    break;
                 case actionEnum.forge:
                     await HandleForge(moveTodo);
+                    break;
+                case actionEnum.endturn:
+                    {
+                        await TritonHs.EndTurn();
+                        return;
+                    }
+                default:
+                    break;
+            }
+
+        }
+
+
+        public async Task doAtcion(Action moveTodo)
+        {
+
+            switch (moveTodo.actionType)
+            {
+                case actionEnum.playcard:
+                    await PlayCard(moveTodo);
+                    break;
+                case actionEnum.attackWithMinion:
+                    await AttackWithMinion(moveTodo);
+                    break;
+                case actionEnum.attackWithHero:
+                    await AttackWithHero(moveTodo);
+                    break;
+                case actionEnum.useHeroPower:
+                    await UseHeroPower(moveTodo);
+                    break;
+                case actionEnum.trade:
+                    await HandleTrade(moveTodo);
+                    break;
+                case actionEnum.useLocation:
+                    await UseLocation(moveTodo);
+                    break;
+                case actionEnum.useTitanAbility:
+                    await UseTitanAbility(moveTodo);
+                    break;
+                case actionEnum.forge:
+                    await HandleForge(moveTodo);
+                    break;
+                case actionEnum.endturn:
+                    await TritonHs.EndTurn();
                     return;
                 default:
                     break;
             }
-            //地标减少冷却回合
-            /* Playfield lastPlay = Ai.Instance.bestplay;
-            foreach (Minion m in lastPlay.ownMinions)
-            {
-                if (m.handcard.card.type == CardDB.cardtype.LOCATION && m.CooldownTurn > 0)
-                {
-                    m.CooldownTurn -= 1;
-                    m.handcard.card.CooldownTurn -= 1;
-                    if (m.CooldownTurn <= 0)
-                    {
-                        m.Ready = true;
-                    }
-                    Helpfunctions.Instance.logg("卡牌名称 - " + m.handcard.card.nameCN + " 地标冷却回合 - " + m.CooldownTurn);
-                }
-            } */
-            await TritonHs.EndTurn();
-        }
+            Vector3 position = EndTurnButton.Get().Transform.Position;
+            await Client.MoveCursorHumanLike(position);
 
+        }
+        public async Task ToEndTurnButton()
+        {
+            Vector3 position = EndTurnButton.Get().Transform.Position;
+            await Client.MoveCursorHumanLike(position);
+
+        }
         /// <summary>
         /// 指向泰坦技能的使用目标
         /// </summary>
@@ -1515,7 +1489,7 @@ def Execute():
                     Helpfunctions.Instance.ErrorLog("[AI] 目标丢失，再试一次...");
                     await Coroutine.Sleep(3000);
                 }
-                await Coroutine.Sleep(500);
+                await Coroutine.Sleep(50);
             }
             else
             {
@@ -1530,7 +1504,7 @@ def Execute():
                 await cardtoplay.Pickup();
                 await cardtoplay.UseAt(moveTodo.place);
             }
-            await Coroutine.Sleep(500);
+            await Coroutine.Sleep(50);
         }
 
         /// <summary>
@@ -1551,7 +1525,7 @@ def Execute():
                 Helpfunctions.Instance.ErrorLog("[AI] 随从攻击失败，再次重试...");
                 await Coroutine.Sleep(2000);
             }
-            await Coroutine.Sleep(250);
+            await Coroutine.Sleep(50);
         }
 
         /// <summary>
@@ -1607,9 +1581,9 @@ def Execute():
                 {
                     playEmote(EmoteType.OOPS);
                     Helpfunctions.Instance.ErrorLog("[AI] 目标丢失，再次重试...");
-                    await Coroutine.Sleep(3000);
+                    await Coroutine.Sleep(2000);
                 }
-                await Coroutine.Sleep(500);
+                await Coroutine.Sleep(200);
             }
             else
             {
@@ -1711,6 +1685,7 @@ def Execute():
             HSCard titan = getEntityWithNumber(moveTodo.own.entitiyID);
             if (titan != null)
             {
+                Minion own = moveTodo.own;
                 CardDB.Card card = moveTodo.own.handcard.card;
                 StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.Append("使用泰坦 " + titan.Name + " 技能 " + moveTodo.titanAbilityNO + " 目标为 " + "    惩罚值：" + moveTodo.penalty);
@@ -1722,18 +1697,18 @@ def Execute():
                 switch (moveTodo.titanAbilityNO)
                 {
                     case 1:
-                        card.TitanAbilityUsed1 = true;
+                        own.TitanAbilityUsed1 = true;
                         break;
                     case 2:
-                        card.TitanAbilityUsed2 = true;
+                        own.TitanAbilityUsed2 = true;
                         break;
                     case 3:
-                        card.TitanAbilityUsed3 = true;
+                        own.TitanAbilityUsed3 = true;
                         break;
                 }
-                if (card.TitanAbilityUsed1 && card.TitanAbilityUsed2 && card.TitanAbilityUsed3)
+                if (own.TitanAbilityUsed1 && own.TitanAbilityUsed2 && own.TitanAbilityUsed3)
                 {
-                    moveTodo.own.Ready = true;
+                    own.Ready = true;
                 }
                 //保存使用的技能编号，以及技能使用目标
                 titanAction = moveTodo;
@@ -1794,17 +1769,11 @@ def Execute():
                                 choiceMode = GAME_TAG.TITAN;
                                 dirtychoice = -1;
                             }
-                            /*
-                            else if (sourceCard.GetEntity().GetName() == "调酒师鲍勃")
-                            }
-                            else if (sourceCard.GetEntity().GetName() == "玛润")
-                            {
-                                choiceMode = GAME_TAG.TARGETING_ARROW_TYPE;
-                                dirtychoice = -1;
-                            } 
-                            */
+
                         }
                     }
+                    if (choiceMode == GAME_TAG.CHOOSE_ONE)
+                        dirtychoice--;
                 }
 
                 Ai ai = Ai.Instance;
@@ -1827,11 +1796,12 @@ def Execute():
                     hc.manacost = hc.card.calculateManaCost(ai.nextMoveGuess);
                     if (entity.HasTag(GAME_TAG.HAS_DARK_GIFT))
                     {
-                        int darkGiftEntityId = entity.GetTag(GAME_TAG.DARK_GIFT);
+                        int darkGiftEntityId = entity.GetTag(GAME_TAG.HAS_DARK_GIFT);
                         if (darkGiftEntityId != 0)
                         {
                             Entity darkGiftEntity = GameState.Get().GetEntity(darkGiftEntityId);
-                            hc.enchs.Add(CardDB.Instance.cardIdstringToEnum(darkGiftEntity.GetCardId()));
+                            // hc.enchs.Add(CardDB.Instance.cardIdstringToEnum(darkGiftEntity.GetCardId()));
+                            hc.HAS_DARK_GIFT = CardDB.Instance.cardIdstringToEnum(darkGiftEntity.GetCardId());
                         }
                     }
                     discoverCards.Add(hc);
@@ -1901,18 +1871,18 @@ def Execute():
                                                     Minion featurePlfMinion = featurePlf.callKidAndReturn(discoverCards[i].card, tmpPlf.ownMinions.Count - 1, true);
                                                     if (tmpPlfMinion != null)
                                                     {
-                                                        tmpPlf.minionSetAngrToX(tmpPlfMinion, 10);
-                                                        tmpPlf.minionSetLifetoX(tmpPlfMinion, 10);
+                                                        tmpPlf.minionSetAttackToX(tmpPlfMinion, 10);
+                                                        tmpPlf.minionSetHealthtoX(tmpPlfMinion, 10);
                                                     }
                                                     if (nextPlfMinion != null)
                                                     {
-                                                        nextPlf.minionSetAngrToX(nextPlfMinion, 10);
-                                                        nextPlf.minionSetLifetoX(nextPlfMinion, 10);
+                                                        nextPlf.minionSetAttackToX(nextPlfMinion, 10);
+                                                        nextPlf.minionSetHealthtoX(nextPlfMinion, 10);
                                                     }
                                                     if (featurePlfMinion != null)
                                                     {
-                                                        featurePlf.minionSetAngrToX(featurePlfMinion, 10);
-                                                        featurePlf.minionSetLifetoX(featurePlfMinion, 10);
+                                                        featurePlf.minionSetAttackToX(featurePlfMinion, 10);
+                                                        featurePlf.minionSetHealthtoX(featurePlfMinion, 10);
                                                     }
                                                     bestval = ai.mainTurnSimulator.doallmoves(tmpPlf) * 0.5f + ai.mainTurnSimulator.doallmoves(nextPlf) * 0.3f + ai.mainTurnSimulator.doallmoves(featurePlf) * 0.2f;
                                                 }
@@ -2077,9 +2047,7 @@ def Execute():
                                         }
                                     }
                                     break;
-                                // case GAME_TAG.TARGETING_ARROW_TYPE:
-                                //     bestval += 200;
-                                //     break;
+
                                 default:
                                     bestval = ai.botBase.getDiscoverVal(discoverCards[i].card, tmpPlf);
                                     break;
@@ -2093,18 +2061,20 @@ def Execute():
                     }
                     ai.mainTurnSimulator.setSecondTurnSimu(true, dirtyTwoTurnSim);
                 }
-                if (sourceEntityCId == CardDB.cardIDEnum.UNG_035) dirtychoice = random.Next(0, 2);
+                // if (sourceEntityCId == CardDB.cardIDEnum.UNG_035) dirtychoice = random.Next(0, 2);
                 if (dirtychoice > -1)
                 {
                     Hrtprozis.Instance.enchs.Add(discoverCards[dirtychoice].card.cardIDenum);
                 }
+
                 if (dirtychoice == 0) dirtychoice = 1;
                 else if (dirtychoice == 1) dirtychoice = 0;
                 int ttf = (int)(DateTime.Now - tmp).TotalMilliseconds;
                 Helpfunctions.Instance.ErrorLog("发现卡牌: " + dirtychoice + (discoverCardsCount > 1 ? " " + discoverCards[1].card.nameCN : "") + (discoverCardsCount > 0 ? " " + discoverCards[0].card.nameCN : "") + (discoverCardsCount > 2 ? " " + discoverCards[2].card.nameCN : ""));
-                // Helpfunctions.Instance.logg("发现卡牌: " + dirtychoice + (discoverCardsCount > 1 ? " " + discoverCards[1].card.cardIDenum : "") + (discoverCardsCount > 0 ? " " + discoverCards[0].card.cardIDenum : "") + (discoverCardsCount > 2 ? " " + discoverCards[2].card.cardIDenum : ""));
-                Log.Warn("发现卡牌: " + dirtychoice + (discoverCardsCount > 1 ? " " + discoverCards[1].card.cardIDenum : "") + (discoverCardsCount > 0 ? " " + discoverCards[0].card.cardIDenum : "") + (discoverCardsCount > 2 ? " " + discoverCards[2].card.cardIDenum : ""));
-
+                for (int i = 0; i < discoverCardsCount; i++)
+                {
+                    Log.WarnFormat("卡牌{0} {1} {2} {3}", i, discoverCards[i].card.nameCN, discoverCards[i].card.cardIDenum, discoverCards[i].HAS_DARK_GIFT.ToString());
+                }
                 if (ttf < 3000) return (random.Next(ttf < 1300 ? 1300 - ttf : 0, 3100 - ttf));
 
             }
@@ -2125,7 +2095,33 @@ def Execute():
         {
             Log.InfoFormat("[对手回合]");
 
+            //await 随机摸牌();
 
+        }
+        public async Task 随机摸牌()
+        {
+            int NumberOfTimesToDrawCards = random.Next(0, 4);
+            int i = random.Next(0, 3);
+
+
+                HashSet<Card> cards = GameState.Get().GetFriendlySidePlayer().GetHandZone().GetCards().ToHashSet();
+                if (cards.Count <= 3)
+                {
+                    Log.WarnFormat("牌太少了摸个毛");
+                    return;
+                }
+                Log.WarnFormat("准备摸{0}张牌", NumberOfTimesToDrawCards);
+                foreach (Card c in cards)
+                {
+                    if (i > NumberOfTimesToDrawCards)
+                        break;
+                    await Client.MoveCursorHumanLike(Client.CardInteractPoint(c));
+                    await Coroutine.Sleep(random.Next(300, 2200));
+                    i++;
+                }
+            
+            Vector3 position = EndTurnButton.Get().Transform.Position;
+            await Client.MoveCursorHumanLike(position);
         }
 
         #endregion
