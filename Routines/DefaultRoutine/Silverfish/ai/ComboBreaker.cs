@@ -5,25 +5,56 @@ namespace HREngine.Bots
     using System.IO;
 
 
+    /// <summary>
+    /// 连招破坏者类，用于管理和处理游戏中的连招系统
+    /// 包括读取连招配置、检查连招是否被破坏、计算连招惩罚值等功能
+    /// </summary>
     public class ComboBreaker
     {
 
+        /// <summary>
+        /// 连招类型枚举
+        /// </summary>
         enum combotype
         {
+            /// <summary>普通连招</summary>
             combo,
+            /// <summary>目标连招</summary>
             target,
+            /// <summary>武器使用连招</summary>
             weaponuse
         }
 
+        /// <summary>
+        /// 存储卡牌ID和对应的值
+        /// </summary>
         private Dictionary<CardDB.cardIDEnum, int> playByValue = new Dictionary<CardDB.cardIDEnum, int>();
+        /// <summary>
+        /// 存储连招列表
+        /// </summary>
         private List<combo> combos = new List<combo>();
+        /// <summary>
+        /// 攻击面部的HP值
+        /// </summary>
         public int attackFaceHP = -1;
 
+        /// <summary>
+        /// 帮助函数实例
+        /// </summary>
         Helpfunctions help;
+        /// <summary>
+        /// 卡牌数据库实例
+        /// </summary>
         CardDB cdb;
 
+        /// <summary>
+        /// 单例实例
+        /// </summary>
         private static ComboBreaker instance;
 
+        /// <summary>
+        /// 获取ComboBreaker的单例实例
+        /// </summary>
         public static ComboBreaker Instance
         {
             get
@@ -32,36 +63,101 @@ namespace HREngine.Bots
             }
         }
 
-
+        /// <summary>
+        /// 设置实例
+        /// </summary>
         public void setInstances()
         {
             help = Helpfunctions.Instance;
             cdb = CardDB.Instance;
         }
 
-
+        /// <summary>
+        /// 连招类，用于表示一个具体的连招
+        /// </summary>
         class combo
         {
+            /// <summary>
+            /// ComboBreaker实例
+            /// </summary>
             private ComboBreaker cb;
+            /// <summary>
+            /// 连招类型
+            /// </summary>
             public combotype type = combotype.combo;
+            /// <summary>
+            /// 需要的 mana
+            /// </summary>
             public int neededMana = 0;
+            /// <summary>
+            /// 连招中的卡牌
+            /// </summary>
             public Dictionary<CardDB.cardIDEnum, int> combocards = new Dictionary<CardDB.cardIDEnum, int>();
+            /// <summary>
+            /// 卡牌惩罚值
+            /// </summary>
             public Dictionary<CardDB.cardIDEnum, int> cardspen = new Dictionary<CardDB.cardIDEnum, int>();
+            /// <summary>
+            /// 第0回合的随从卡牌
+            /// </summary>
             public Dictionary<CardDB.cardIDEnum, int> combocardsTurn0Mobs = new Dictionary<CardDB.cardIDEnum, int>();
+            /// <summary>
+            /// 第0回合的所有卡牌
+            /// </summary>
             public Dictionary<CardDB.cardIDEnum, int> combocardsTurn0All = new Dictionary<CardDB.cardIDEnum, int>();
+            /// <summary>
+            /// 第1回合的卡牌
+            /// </summary>
             public Dictionary<CardDB.cardIDEnum, int> combocardsTurn1 = new Dictionary<CardDB.cardIDEnum, int>();
+            /// <summary>
+            /// 惩罚值
+            /// </summary>
             public int penality = 0;
+            /// <summary>
+            /// 连招长度
+            /// </summary>
             public int combolength = 0;
+            /// <summary>
+            /// 第0回合的长度
+            /// </summary>
             public int combot0len = 0;
+            /// <summary>
+            /// 第1回合的长度
+            /// </summary>
             public int combot1len = 0;
+            /// <summary>
+            /// 第0回合的所有长度
+            /// </summary>
             public int combot0lenAll = 0;
+            /// <summary>
+            /// 是否为两回合连招
+            /// </summary>
             public bool twoTurnCombo = false;
+            /// <summary>
+            /// 播放奖励
+            /// </summary>
             public int bonusForPlaying = 0;
+            /// <summary>
+            /// 第0回合播放奖励
+            /// </summary>
             public int bonusForPlayingT0 = 0;
+            /// <summary>
+            /// 第1回合播放奖励
+            /// </summary>
             public int bonusForPlayingT1 = 0;
+            /// <summary>
+            /// 需要的武器
+            /// </summary>
             public CardDB.cardNameEN requiredWeapon = CardDB.cardNameEN.unknown;
+            /// <summary>
+            /// 英雄枚举
+            /// </summary>
             public HeroEnum oHero = HeroEnum.None;
 
+            /// <summary>
+            /// 构造函数，从字符串解析连招
+            /// </summary>
+            /// <param name="s">连招字符串</param>
             public combo(string s)
             {
                 //int i = 0;
@@ -221,6 +317,12 @@ namespace HREngine.Bots
                 this.bonusForPlayingT1 = Math.Max(bonusForPlayingT1, 1);
             }
 
+            /// <summary>
+            /// 检查手牌是否在连招中
+            /// </summary>
+            /// <param name="hand">手牌列表</param>
+            /// <param name="omm">可用 mana</param>
+            /// <returns>0: 不在连招中, 1: 在连招中但 mana 不足, 2: 在连招中且 mana 充足</returns>
             public int isInCombo(List<Handmanager.Handcard> hand, int omm)
             {
                 int cardsincombo = 0;
@@ -239,6 +341,14 @@ namespace HREngine.Bots
                 return 0;
             }
 
+            /// <summary>
+            /// 检查多回合连招的第一回合
+            /// </summary>
+            /// <param name="hand">手牌列表</param>
+            /// <param name="omm">可用 mana</param>
+            /// <param name="ownmins">己方随从列表</param>
+            /// <param name="weapon">当前武器</param>
+            /// <returns>0: 不在连招中, 1: 在连招中但条件不满足, 2: 在连招中且条件满足</returns>
             public int isMultiTurnComboTurn1(List<Handmanager.Handcard> hand, int omm, List<Minion> ownmins, CardDB.cardNameEN weapon)
             {
                 if (!twoTurnCombo) return 0;
@@ -280,6 +390,12 @@ namespace HREngine.Bots
                 return 0;
             }
 
+            /// <summary>
+            /// 检查多回合连招的第零回合
+            /// </summary>
+            /// <param name="hand">手牌列表</param>
+            /// <param name="omm">可用 mana</param>
+            /// <returns>0: 不在连招中, 1: 在连招中但 mana 不足, 2: 在连招中且 mana 充足</returns>
             public int isMultiTurnComboTurn0(List<Handmanager.Handcard> hand, int omm)
             {
                 if (!twoTurnCombo) return 0;
@@ -303,7 +419,11 @@ namespace HREngine.Bots
                 return 0;
             }
 
-
+            /// <summary>
+            /// 检查卡牌是否是多回合连招的第一回合卡牌
+            /// </summary>
+            /// <param name="card">卡牌</param>
+            /// <returns>是否是多回合连招的第一回合卡牌</returns>
             public bool isMultiTurn1Card(CardDB.Card card)
             {
                 if (this.combocardsTurn1.ContainsKey(card.cardIDenum))
@@ -313,6 +433,11 @@ namespace HREngine.Bots
                 return false;
             }
 
+            /// <summary>
+            /// 检查卡牌是否在连招中
+            /// </summary>
+            /// <param name="card">卡牌</param>
+            /// <returns>是否在连招中</returns>
             public bool isCardInCombo(CardDB.Card card)
             {
                 if (this.combocards.ContainsKey(card.cardIDenum))
@@ -322,6 +447,11 @@ namespace HREngine.Bots
                 return false;
             }
 
+            /// <summary>
+            /// 检查是否播放了连招
+            /// </summary>
+            /// <param name="hand">手牌列表</param>
+            /// <returns>播放奖励</returns>
             public int hasPlayedCombo(List<Handmanager.Handcard> hand)
             {
                 int cardsincombo = 0;
@@ -339,6 +469,11 @@ namespace HREngine.Bots
                 return 0;
             }
 
+            /// <summary>
+            /// 检查是否播放了第零回合的连招
+            /// </summary>
+            /// <param name="hand">手牌列表</param>
+            /// <returns>播放奖励</returns>
             public int hasPlayedTurn0Combo(List<Handmanager.Handcard> hand)
             {
                 if (this.combocardsTurn0All.Count == 0) return 0;
@@ -357,6 +492,11 @@ namespace HREngine.Bots
                 return 0;
             }
 
+            /// <summary>
+            /// 检查是否播放了第一回合的连招
+            /// </summary>
+            /// <param name="hand">手牌列表</param>
+            /// <returns>播放奖励</returns>
             public int hasPlayedTurn1Combo(List<Handmanager.Handcard> hand)
             {
                 if (this.combocardsTurn1.Count == 0) return 0;
@@ -377,6 +517,9 @@ namespace HREngine.Bots
 
         }
         
+        /// <summary>
+        /// 私有构造函数
+        /// </summary>
         private ComboBreaker()
         {
             if (attackFaceHP != -1)
@@ -385,6 +528,11 @@ namespace HREngine.Bots
             }
         }
 
+        /// <summary>
+        /// 读取连招配置
+        /// </summary>
+        /// <param name="behavName">行为名称或路径</param>
+        /// <param name="nameIsPath">名称是否为路径</param>
         public void readCombos(string behavName, bool nameIsPath = false)
         {
             string pathToCombo = behavName;
@@ -474,6 +622,12 @@ namespace HREngine.Bots
             help.ErrorLog("[连招功能] " + combos.Count + " “连招”功能激活成功, " + playByValue.Count + " 个权重值已加载");
         }
 
+        /// <summary>
+        /// 获取破坏连招的惩罚值
+        /// </summary>
+        /// <param name="crd">卡牌</param>
+        /// <param name="p">游戏场状态</param>
+        /// <returns>惩罚值</returns>
         public int getPenalityForDestroyingCombo(CardDB.Card crd, Playfield p)
         {
             if (this.combos.Count == 0) return 0;
@@ -503,6 +657,11 @@ namespace HREngine.Bots
 
         }
 
+        /// <summary>
+        /// 检查连招是否被播放
+        /// </summary>
+        /// <param name="p">游戏场状态</param>
+        /// <returns>惩罚值或奖励</returns>
         public int checkIfComboWasPlayed(Playfield p)
         {
             if (this.combos.Count == 0) return 0;
@@ -561,6 +720,11 @@ namespace HREngine.Bots
 
         }
 
+        /// <summary>
+        /// 获取卡牌的播放值
+        /// </summary>
+        /// <param name="ce">卡牌ID枚举</param>
+        /// <returns>播放值</returns>
         public int getPlayValue(CardDB.cardIDEnum ce)
         {
             if (this.playByValue.Count == 0) return 0;

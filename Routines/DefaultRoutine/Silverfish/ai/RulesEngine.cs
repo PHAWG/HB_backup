@@ -90,346 +90,841 @@ namespace HREngine.Bots
          
      */
 
+    /*
+     摘要
+     1) 比较运算符 (=, !=, >, <) !仅数值值!
+     (= - 等于, != - 不等于, > - 大于, < - 小于)
+     
+     tm - 回合 mana (本回合的默认 mana);
+     am - 可用 mana (本回合);
+     t - 回合;
+     overload - 过载，可能导致当前回合的卡牌;
+     owncarddraw - 本回合额外抽牌
+     ohhp - 己方英雄生命值;
+     ehhp - 敌方英雄生命值;
+     owa - 己方武器攻击力;
+     ewa - 敌方武器攻击力;
+     owd - 己方武器耐久度;
+     ewd - 敌方武器耐久度;
+     ohc - 己方手牌数量 (己方手牌中的卡牌数量);
+     ehc - 敌方手牌数量 (敌方手牌中的卡牌数量);
+     omc - 己方随从数量 (己方场上的随从数量);
+     emc - 敌方随从数量 (敌方场上的随从数量);
+     对于 "ohc", "omc" 和 "emc"，您可以使用这些扩展名：
+        :Murlocs (己方/敌方场上/己方手牌中的鱼人数量)
+        :Demons (己方/敌方场上/己方手牌中的恶魔数量)
+        :Mechs (己方/敌方场上/己方手牌中的机械数量)
+        :Beasts (己方/敌方场上/己方手牌中的野兽数量)
+        :Totems (己方/敌方场上/己方手牌中的图腾数量)
+        :Pirates (己方/敌方场上/己方手牌中的海盗数量)
+        :Dragons (己方/敌方场上/己方手牌中的龙数量)
+        :Elems (己方/敌方场上/己方手牌中的元素数量)
+        :shields (己方/敌方场上/己方手牌中的圣盾数量)
+        :taunts (己方/敌方场上/己方手牌中的嘲讽数量)
+     仅对于 "ohc"：
+        :Minions (己方手牌中的随从数量)
+        :Spells (己方手牌中的法术数量)
+        :Secrets (己方手牌中的奥秘数量)
+        :Weapons (己方手牌中的武器数量)
+     仅对于 "omc" 和 "emc"：
+        :SHR (己方/敌方场上的白银之手新兵数量)
+        :undamaged (己方/敌方场上未受伤的随从数量)
+        :damaged (己方/敌方场上受伤的随从数量)
+     您还可以比较 "ohc" 与 "ehc" 以及 "omc" 与 "emc"
+     示例:   omc>3 - 表示您必须在场上有超过 3 个随从
+            omc:Murlocs>3 - 表示您必须在场上有超过 3 个鱼人
+            omc>emc - 表示您必须比对手有更多的随从
+     
+     2) 布尔运算符 (=, !=)
+     (= - 等于/包含; != - 不等于/不包含)
+     
+     ob - 己方场 (己方场必须/不得包含此随从 (CardID));
+     eb - 敌方场 (敌方场必须/不得包含此随从 (CardID));
+     oh - 己方手牌 (己方手牌必须/不得包含此卡牌 (CardID));
+     ow - 己方武器 (CardID);
+     ew - 敌方武器 (CardID);
+     ohero - 己方英雄职业 (ALL, DRUID, HUNTER, MAGE, PALADIN, PRIEST, ROGUE, SHAMAN, WARLOCK, WARRIOR);
+     ehero - 敌方英雄职业;
+      
+     3) 特殊：
+     coin - 回合开始时手牌中必须有硬币;
+     !coin - 回合开始时手牌中不得有硬币;
+     noduplicates - 如果您的牌组不包含重复牌
+     p= - 播放 - 必须播放的手牌中的卡牌 (CardID);
+     p2= - 播放 2 张相同的卡牌 - 必须播放的手牌中的 2 张相同卡牌 (CardID);
+     a= - 攻击者 - 场上的随从 (CardID);
+     对于 "p=", "p2=" 和 "a="，您可以使用这些扩展名：
+        :pen= (CardID 之后) - 在本规则之外播放/攻击此卡牌的惩罚;
+        :tgt= - 目标 - 法术或随从/武器的目标 (CardID/hero/!hero);
+        您可以对这些参数使用比较运算符 ( =, !=, >, < !仅数值值!):
+        :aAt - 攻击者的攻击力 (随从/英雄)
+        :aHp - 攻击者的生命值
+        :tAt - 目标的攻击力
+        :tHp - 目标的生命值
+     
+     4) 条件绑定：
+     & - 与 (condition1&condition2 - 仅当条件 1 和条件 2 都为真时为真);
+     || - 或 (condition1||condition2 - 如果条件 1 为真或条件 2 为真则为真);
+     示例: cond_1 & cond_2||cond_3||cond_4 & cond_5 - 如果 condition_1 = 真 且 (condition 2 或 3 或 4) = 真 且 condition_5 = 真 则为真;
+     
+     5) 额外信息 (用逗号书写)
+     bonus=X - 如果所有条件都为 TRUE，则此 Playfield 获得此奖励;
+         
+     */
+
+    /// <summary>
+    /// 规则引擎类，用于管理和处理游戏中的规则系统
+    /// 包括读取规则配置、检查规则条件、计算规则权重等功能
+    /// </summary>
     public class RulesEngine
     {
+        /// <summary>
+        /// 规则堆，存储所有规则
+        /// </summary>
         Dictionary<int, Rule> heapOfRules = new Dictionary<int, Rule>();
+        /// <summary>
+        /// 规则卡牌ID（播放）
+        /// </summary>
         Dictionary<int, List<CardDB.cardIDEnum>> RuleCardIdsPlay = new Dictionary<int, List<CardDB.cardIDEnum>>(); 
+        /// <summary>
+        /// 规则卡牌ID（攻击）
+        /// </summary>
         Dictionary<int, List<CardDB.cardIDEnum>> RuleCardIdsAttack = new Dictionary<int, List<CardDB.cardIDEnum>>(); 
+        /// <summary>
+        /// 规则卡牌ID（手牌）
+        /// </summary>
         Dictionary<int, List<CardDB.cardIDEnum>> RuleCardIdsHand = new Dictionary<int, List<CardDB.cardIDEnum>>(); 
+        /// <summary>
+        /// 规则卡牌ID（己方场）
+        /// </summary>
         Dictionary<int, List<CardDB.cardIDEnum>> RuleCardIdsOwnBoard = new Dictionary<int, List<CardDB.cardIDEnum>>(); 
+        /// <summary>
+        /// 规则卡牌ID（敌方场）
+        /// </summary>
         Dictionary<int, List<CardDB.cardIDEnum>> RuleCardIdsEnemyBoard = new Dictionary<int, List<CardDB.cardIDEnum>>(); 
+        /// <summary>
+        /// 场状态规则
+        /// </summary>
         Dictionary<int, int> BoardStateRules = new Dictionary<int, int>(); 
+        /// <summary>
+        /// 游戏场状态规则
+        /// </summary>
         Dictionary<int, int> BoardStateRulesGame = new Dictionary<int, int>(); 
+        /// <summary>
+        /// 回合场状态规则
+        /// </summary>
         Dictionary<int, int> BoardStateRulesTurn = new Dictionary<int, int>(); 
+        /// <summary>
+        /// 卡牌ID规则
+        /// </summary>
         Dictionary<CardDB.cardIDEnum, List<int>> CardIdRules = new Dictionary<CardDB.cardIDEnum, List<int>>();
+        /// <summary>
+        /// 游戏卡牌ID规则
+        /// </summary>
         Dictionary<CardDB.cardIDEnum, Dictionary<int, int>> CardIdRulesGame = new Dictionary<CardDB.cardIDEnum, Dictionary<int, int>>(); 
+        /// <summary>
+        /// 游戏播放卡牌ID规则
+        /// </summary>
         Dictionary<CardDB.cardIDEnum, Dictionary<int, int>> CardIdRulesPlayGame = new Dictionary<CardDB.cardIDEnum, Dictionary<int, int>>(); 
+        /// <summary>
+        /// 游戏手牌卡牌ID规则
+        /// </summary>
         Dictionary<CardDB.cardIDEnum, Dictionary<int, int>> CardIdRulesHandGame = new Dictionary<CardDB.cardIDEnum, Dictionary<int, int>>(); 
+        /// <summary>
+        /// 游戏己方场卡牌ID规则
+        /// </summary>
         Dictionary<CardDB.cardIDEnum, Dictionary<int, int>> CardIdRulesOwnBoardGame = new Dictionary<CardDB.cardIDEnum, Dictionary<int, int>>(); 
+        /// <summary>
+        /// 游戏敌方场卡牌ID规则
+        /// </summary>
         Dictionary<CardDB.cardIDEnum, Dictionary<int, int>> CardIdRulesEnemyBoardGame = new Dictionary<CardDB.cardIDEnum, Dictionary<int, int>>(); 
+        /// <summary>
+        /// 游戏攻击者ID规则
+        /// </summary>
         Dictionary<CardDB.cardIDEnum, Dictionary<int, int>> AttackerIdRulesGame = new Dictionary<CardDB.cardIDEnum, Dictionary<int, int>>(); 
+        /// <summary>
+        /// 回合播放卡牌ID规则
+        /// </summary>
         Dictionary<CardDB.cardIDEnum, List<int>> CardIdRulesTurnPlay = new Dictionary<CardDB.cardIDEnum, List<int>>(); 
+        /// <summary>
+        /// 回合手牌卡牌ID规则
+        /// </summary>
         Dictionary<CardDB.cardIDEnum, List<int>> CardIdRulesTurnHand = new Dictionary<CardDB.cardIDEnum, List<int>>();
+        /// <summary>
+        /// 游戏手牌种族规则
+        /// </summary>
         Dictionary<TAG_RACE, List<int>> hcRaceRulesGame = new Dictionary<TAG_RACE, List<int>>();
+        /// <summary>
+        /// 回合手牌种族规则
+        /// </summary>
         Dictionary<TAG_RACE, List<int>> hcRaceRulesTurn = new Dictionary<TAG_RACE, List<int>>();
+        /// <summary>
+        /// 游戏场状态规则列表
+        /// </summary>
         List<int> pfStateRulesGame = new List<int>();
+        /// <summary>
+        /// 己方英雄职业规则
+        /// </summary>
         Dictionary<TAG_CLASS, Dictionary<int, int>> RuleOwnClass = new Dictionary<TAG_CLASS, Dictionary<int, int>>();
+        /// <summary>
+        /// 敌方英雄职业规则
+        /// </summary>
         Dictionary<TAG_CLASS, Dictionary<int, int>> RuleEnemyClass = new Dictionary<TAG_CLASS, Dictionary<int, int>>();
+        /// <summary>
+        /// 替换规则
+        /// </summary>
         Dictionary<int, int> replacedRules = new Dictionary<int, int>();
+        /// <summary>
+        /// 规则路径
+        /// </summary>
         string pathToRules = "";
 
+        /// <summary>
+        /// 是否加载了 mulligan 规则
+        /// </summary>
         public bool mulliganRulesLoaded = false;
+        /// <summary>
+        /// Mulligan 规则
+        /// </summary>
         Dictionary<string, string> MulliganRules = new Dictionary<string, string>();
+        /// <summary>
+        /// Mulligan 规则数据库
+        /// </summary>
         Dictionary<string, Dictionary<string, string>> MulliganRulesDB = new Dictionary<string, Dictionary<string, string>>();
+        /// <summary>
+        /// 手动 Mulligan 规则
+        /// </summary>
         Dictionary<CardDB.cardIDEnum, string> MulliganRulesManual = new Dictionary<CardDB.cardIDEnum, string>();
+        /// <summary>
+        /// 临时条件
+        /// </summary>
         Condition condTmp;
+        /// <summary>
+        /// 条件错误
+        /// </summary>
         string condErr;
+        /// <summary>
+        /// 目标
+        /// </summary>
         Minion target;
+        /// <summary>
+        /// 临时计数器
+        /// </summary>
         int tmp_counter;
+        /// <summary>
+        /// 打印规则
+        /// </summary>
         int printRules = Settings.Instance.printRules;
 
+        /// <summary>
+        /// 进程实例
+        /// </summary>
         Hrtprozis prozis = Hrtprozis.Instance;
 
 
+        /// <summary>
+        /// 参数枚举
+        /// </summary>
         public enum param
         {
+            /// <summary>无</summary>
             None,
+            /// <summary>或条件</summary>
             orcond,
+            /// <summary>回合 mana 等于</summary>
             tm_equal,
+            /// <summary>回合 mana 不等于</summary>
             tm_notequal,
+            /// <summary>回合 mana 大于</summary>
             tm_greater,
+            /// <summary>回合 mana 小于</summary>
             tm_less,
+            /// <summary>可用 mana 等于</summary>
             am_equal,
+            /// <summary>可用 mana 不等于</summary>
             am_notequal,
+            /// <summary>可用 mana 大于</summary>
             am_greater,
+            /// <summary>可用 mana 小于</summary>
             am_less,
+            /// <summary>己方武器攻击力等于</summary>
             owa_equal,
+            /// <summary>己方武器攻击力不等于</summary>
             owa_notequal,
+            /// <summary>己方武器攻击力大于</summary>
             owa_greater,
+            /// <summary>己方武器攻击力小于</summary>
             owa_less,
+            /// <summary>敌方武器攻击力等于</summary>
             ewa_equal,
+            /// <summary>敌方武器攻击力不等于</summary>
             ewa_notequal,
+            /// <summary>敌方武器攻击力大于</summary>
             ewa_greater,
+            /// <summary>敌方武器攻击力小于</summary>
             ewa_less,
+            /// <summary>己方武器耐久度等于</summary>
             owd_equal,
+            /// <summary>己方武器耐久度不等于</summary>
             owd_notequal,
+            /// <summary>己方武器耐久度大于</summary>
             owd_greater,
+            /// <summary>己方武器耐久度小于</summary>
             owd_less,
+            /// <summary>敌方武器耐久度等于</summary>
             ewd_equal,
+            /// <summary>敌方武器耐久度不等于</summary>
             ewd_notequal,
+            /// <summary>敌方武器耐久度大于</summary>
             ewd_greater,
+            /// <summary>敌方武器耐久度小于</summary>
             ewd_less,
+            /// <summary>己方随从数量等于</summary>
             omc_equal,
+            /// <summary>己方随从数量不等于</summary>
             omc_notequal,
+            /// <summary>己方随从数量大于</summary>
             omc_greater,
+            /// <summary>己方随从数量小于</summary>
             omc_less,
+            /// <summary>敌方随从数量等于</summary>
             emc_equal,
+            /// <summary>敌方随从数量不等于</summary>
             emc_notequal,
+            /// <summary>敌方随从数量大于</summary>
             emc_greater,
+            /// <summary>敌方随从数量小于</summary>
             emc_less,
+            /// <summary>己方随从数量等于敌方</summary>
             omc_equal_emc,
+            /// <summary>己方随从数量不等于敌方</summary>
             omc_notequal_emc,
+            /// <summary>己方随从数量大于敌方</summary>
             omc_greater_emc,
+            /// <summary>己方随从数量小于敌方</summary>
             omc_less_emc,
+            /// <summary>己方鱼人数量等于</summary>
             omc_murlocs_equal,
+            /// <summary>己方鱼人数量不等于</summary>
             omc_murlocs_notequal,
+            /// <summary>己方鱼人数量大于</summary>
             omc_murlocs_greater,
+            /// <summary>己方鱼人数量小于</summary>
             omc_murlocs_less,
+            /// <summary>敌方鱼人数量等于</summary>
             emc_murlocs_equal,
+            /// <summary>敌方鱼人数量不等于</summary>
             emc_murlocs_notequal,
+            /// <summary>敌方鱼人数量大于</summary>
             emc_murlocs_greater,
+            /// <summary>敌方鱼人数量小于</summary>
             emc_murlocs_less,
+            /// <summary>己方恶魔数量等于</summary>
             omc_demons_equal,
+            /// <summary>己方恶魔数量不等于</summary>
             omc_demons_notequal,
+            /// <summary>己方恶魔数量大于</summary>
             omc_demons_greater,
+            /// <summary>己方恶魔数量小于</summary>
             omc_demons_less,
+            /// <summary>敌方恶魔数量等于</summary>
             emc_demons_equal,
+            /// <summary>敌方恶魔数量不等于</summary>
             emc_demons_notequal,
+            /// <summary>敌方恶魔数量大于</summary>
             emc_demons_greater,
+            /// <summary>敌方恶魔数量小于</summary>
             emc_demons_less,
+            /// <summary>己方机械数量等于</summary>
             omc_mechs_equal,
+            /// <summary>己方机械数量不等于</summary>
             omc_mechs_notequal,
+            /// <summary>己方机械数量大于</summary>
             omc_mechs_greater,
+            /// <summary>己方机械数量小于</summary>
             omc_mechs_less,
+            /// <summary>敌方机械数量等于</summary>
             emc_mechs_equal,
+            /// <summary>敌方机械数量不等于</summary>
             emc_mechs_notequal,
+            /// <summary>敌方机械数量大于</summary>
             emc_mechs_greater,
+            /// <summary>敌方机械数量小于</summary>
             emc_mechs_less,
+            /// <summary>己方野兽数量等于</summary>
             omc_beasts_equal,
+            /// <summary>己方野兽数量不等于</summary>
             omc_beasts_notequal,
+            /// <summary>己方野兽数量大于</summary>
             omc_beasts_greater,
+            /// <summary>己方野兽数量小于</summary>
             omc_beasts_less,
+            /// <summary>敌方野兽数量等于</summary>
             emc_beasts_equal,
+            /// <summary>敌方野兽数量不等于</summary>
             emc_beasts_notequal,
+            /// <summary>敌方野兽数量大于</summary>
             emc_beasts_greater,
+            /// <summary>敌方野兽数量小于</summary>
             emc_beasts_less,
+            /// <summary>己方图腾数量等于</summary>
             omc_totems_equal,
+            /// <summary>己方图腾数量不等于</summary>
             omc_totems_notequal,
+            /// <summary>己方图腾数量大于</summary>
             omc_totems_greater,
+            /// <summary>己方图腾数量小于</summary>
             omc_totems_less,
+            /// <summary>敌方图腾数量等于</summary>
             emc_totems_equal,
+            /// <summary>敌方图腾数量不等于</summary>
             emc_totems_notequal,
+            /// <summary>敌方图腾数量大于</summary>
             emc_totems_greater,
+            /// <summary>敌方图腾数量小于</summary>
             emc_totems_less,
+            /// <summary>己方海盗数量等于</summary>
             omc_pirates_equal,
+            /// <summary>己方海盗数量不等于</summary>
             omc_pirates_notequal,
+            /// <summary>己方海盗数量大于</summary>
             omc_pirates_greater,
+            /// <summary>己方海盗数量小于</summary>
             omc_pirates_less,
+            /// <summary>敌方海盗数量等于</summary>
             emc_pirates_equal,
+            /// <summary>敌方海盗数量不等于</summary>
             emc_pirates_notequal,
+            /// <summary>敌方海盗数量大于</summary>
             emc_pirates_greater,
+            /// <summary>敌方海盗数量小于</summary>
             emc_pirates_less,
+            /// <summary>己方龙数量等于</summary>
             omc_Dragons_equal,
+            /// <summary>己方龙数量不等于</summary>
             omc_Dragons_notequal,
+            /// <summary>己方龙数量大于</summary>
             omc_Dragons_greater,
+            /// <summary>己方龙数量小于</summary>
             omc_Dragons_less,
+            /// <summary>敌方龙数量等于</summary>
             emc_Dragons_equal,
+            /// <summary>敌方龙数量不等于</summary>
             emc_Dragons_notequal,
+            /// <summary>敌方龙数量大于</summary>
             emc_Dragons_greater,
+            /// <summary>敌方龙数量小于</summary>
             emc_Dragons_less,
+            /// <summary>己方元素数量等于</summary>
             omc_elems_equal,
+            /// <summary>己方元素数量不等于</summary>
             omc_elems_notequal,
+            /// <summary>己方元素数量大于</summary>
             omc_elems_greater,
+            /// <summary>己方元素数量小于</summary>
             omc_elems_less,
+            /// <summary>敌方元素数量等于</summary>
             emc_elems_equal,
+            /// <summary>敌方元素数量不等于</summary>
             emc_elems_notequal,
+            /// <summary>敌方元素数量大于</summary>
             emc_elems_greater,
+            /// <summary>敌方元素数量小于</summary>
             emc_elems_less,
+            /// <summary>己方白银之手新兵数量等于</summary>
             omc_shr_equal,
+            /// <summary>己方白银之手新兵数量不等于</summary>
             omc_shr_notequal,
+            /// <summary>己方白银之手新兵数量大于</summary>
             omc_shr_greater,
+            /// <summary>己方白银之手新兵数量小于</summary>
             omc_shr_less,
+            /// <summary>敌方白银之手新兵数量等于</summary>
             emc_shr_equal,
+            /// <summary>敌方白银之手新兵数量不等于</summary>
             emc_shr_notequal,
+            /// <summary>敌方白银之手新兵数量大于</summary>
             emc_shr_greater,
+            /// <summary>敌方白银之手新兵数量小于</summary>
             emc_shr_less,
+            /// <summary>己方未受伤随从数量等于</summary>
             omc_undamaged_equal,
+            /// <summary>己方未受伤随从数量不等于</summary>
             omc_undamaged_notequal,
+            /// <summary>己方未受伤随从数量大于</summary>
             omc_undamaged_greater,
+            /// <summary>己方未受伤随从数量小于</summary>
             omc_undamaged_less,
+            /// <summary>敌方未受伤随从数量等于</summary>
             emc_undamaged_equal,
+            /// <summary>敌方未受伤随从数量不等于</summary>
             emc_undamaged_notequal,
+            /// <summary>敌方未受伤随从数量大于</summary>
             emc_undamaged_greater,
+            /// <summary>敌方未受伤随从数量小于</summary>
             emc_undamaged_less,
+            /// <summary>己方受伤随从数量等于</summary>
             omc_damaged_equal,
+            /// <summary>己方受伤随从数量不等于</summary>
             omc_damaged_notequal,
+            /// <summary>己方受伤随从数量大于</summary>
             omc_damaged_greater,
+            /// <summary>己方受伤随从数量小于</summary>
             omc_damaged_less,
+            /// <summary>敌方受伤随从数量等于</summary>
             emc_damaged_equal,
+            /// <summary>敌方受伤随从数量不等于</summary>
             emc_damaged_notequal,
+            /// <summary>敌方受伤随从数量大于</summary>
             emc_damaged_greater,
+            /// <summary>敌方受伤随从数量小于</summary>
             emc_damaged_less,
+            /// <summary>己方圣盾随从数量等于</summary>
             omc_shields_equal,
+            /// <summary>己方圣盾随从数量不等于</summary>
             omc_shields_notequal,
+            /// <summary>己方圣盾随从数量大于</summary>
             omc_shields_greater,
+            /// <summary>己方圣盾随从数量小于</summary>
             omc_shields_less,
+            /// <summary>敌方圣盾随从数量等于</summary>
             emc_shields_equal,
+            /// <summary>敌方圣盾随从数量不等于</summary>
             emc_shields_notequal,
+            /// <summary>敌方圣盾随从数量大于</summary>
             emc_shields_greater,
+            /// <summary>敌方圣盾随从数量小于</summary>
             emc_shields_less,
+            /// <summary>己方嘲讽随从数量等于</summary>
             omc_taunts_equal,
+            /// <summary>己方嘲讽随从数量不等于</summary>
             omc_taunts_notequal,
+            /// <summary>己方嘲讽随从数量大于</summary>
             omc_taunts_greater,
+            /// <summary>己方嘲讽随从数量小于</summary>
             omc_taunts_less,
+            /// <summary>敌方嘲讽随从数量等于</summary>
             emc_taunts_equal,
+            /// <summary>敌方嘲讽随从数量不等于</summary>
             emc_taunts_notequal,
+            /// <summary>敌方嘲讽随从数量大于</summary>
             emc_taunts_greater,
+            /// <summary>敌方嘲讽随从数量小于</summary>
             emc_taunts_less,
+            /// <summary>攻击者攻击力等于</summary>
             aAt_equal,
+            /// <summary>攻击者攻击力不等于</summary>
             aAt_notequal,
+            /// <summary>攻击者攻击力大于</summary>
             aAt_greater,
+            /// <summary>攻击者攻击力小于</summary>
             aAt_less,
+            /// <summary>攻击者生命值等于</summary>
             aHp_equal,
+            /// <summary>攻击者生命值不等于</summary>
             aHp_notequal,
+            /// <summary>攻击者生命值大于</summary>
             aHp_greater,
+            /// <summary>攻击者生命值小于</summary>
             aHp_less,
+            /// <summary>目标攻击力等于</summary>
             tAt_equal,
+            /// <summary>目标攻击力不等于</summary>
             tAt_notequal,
+            /// <summary>目标攻击力大于</summary>
             tAt_greater,
+            /// <summary>目标攻击力小于</summary>
             tAt_less,
+            /// <summary>目标生命值等于</summary>
             tHp_equal,
+            /// <summary>目标生命值不等于</summary>
             tHp_notequal,
+            /// <summary>目标生命值大于</summary>
             tHp_greater,
+            /// <summary>目标生命值小于</summary>
             tHp_less,
+            /// <summary>己方手牌数量等于</summary>
             ohc_equal,
+            /// <summary>己方手牌数量不等于</summary>
             ohc_notequal,
+            /// <summary>己方手牌数量大于</summary>
             ohc_greater,
+            /// <summary>己方手牌数量小于</summary>
             ohc_less,
+            /// <summary>敌方手牌数量等于</summary>
             ehc_equal,
+            /// <summary>敌方手牌数量不等于</summary>
             ehc_notequal,
+            /// <summary>敌方手牌数量大于</summary>
             ehc_greater,
+            /// <summary>敌方手牌数量小于</summary>
             ehc_less,
+            /// <summary>己方手牌数量等于敌方</summary>
             ohc_equal_ehc,
+            /// <summary>己方手牌数量不等于敌方</summary>
             ohc_notequal_ehc,
+            /// <summary>己方手牌数量大于敌方</summary>
             ohc_greater_ehc,
+            /// <summary>己方手牌数量小于敌方</summary>
             ohc_less_ehc,
+            /// <summary>己方手牌中随从数量等于</summary>
             ohc_minions_equal,
+            /// <summary>己方手牌中随从数量不等于</summary>
             ohc_minions_notequal,
+            /// <summary>己方手牌中随从数量大于</summary>
             ohc_minions_greater,
+            /// <summary>己方手牌中随从数量小于</summary>
             ohc_minions_less,
+            /// <summary>己方手牌中法术数量等于</summary>
             ohc_spells_equal,
+            /// <summary>己方手牌中法术数量不等于</summary>
             ohc_spells_notequal,
+            /// <summary>己方手牌中法术数量大于</summary>
             ohc_spells_greater,
+            /// <summary>己方手牌中法术数量小于</summary>
             ohc_spells_less,
+            /// <summary>己方手牌中奥秘数量等于</summary>
             ohc_secrets_equal,
+            /// <summary>己方手牌中奥秘数量不等于</summary>
             ohc_secrets_notequal,
+            /// <summary>己方手牌中奥秘数量大于</summary>
             ohc_secrets_greater,
+            /// <summary>己方手牌中奥秘数量小于</summary>
             ohc_secrets_less,
+            /// <summary>己方手牌中武器数量等于</summary>
             ohc_weapons_equal,
+            /// <summary>己方手牌中武器数量不等于</summary>
             ohc_weapons_notequal,
+            /// <summary>己方手牌中武器数量大于</summary>
             ohc_weapons_greater,
+            /// <summary>己方手牌中武器数量小于</summary>
             ohc_weapons_less,
+            /// <summary>己方手牌中鱼人数量等于</summary>
             ohc_murlocs_equal,
+            /// <summary>己方手牌中鱼人数量不等于</summary>
             ohc_murlocs_notequal,
+            /// <summary>己方手牌中鱼人数量大于</summary>
             ohc_murlocs_greater,
+            /// <summary>己方手牌中鱼人数量小于</summary>
             ohc_murlocs_less,
+            /// <summary>己方手牌中恶魔数量等于</summary>
             ohc_demons_equal,
+            /// <summary>己方手牌中恶魔数量不等于</summary>
             ohc_demons_notequal,
+            /// <summary>己方手牌中恶魔数量大于</summary>
             ohc_demons_greater,
+            /// <summary>己方手牌中恶魔数量小于</summary>
             ohc_demons_less,
+            /// <summary>己方手牌中机械数量等于</summary>
             ohc_mechs_equal,
+            /// <summary>己方手牌中机械数量不等于</summary>
             ohc_mechs_notequal,
+            /// <summary>己方手牌中机械数量大于</summary>
             ohc_mechs_greater,
+            /// <summary>己方手牌中机械数量小于</summary>
             ohc_mechs_less,
+            /// <summary>己方手牌中野兽数量等于</summary>
             ohc_beasts_equal,
+            /// <summary>己方手牌中野兽数量不等于</summary>
             ohc_beasts_notequal,
+            /// <summary>己方手牌中野兽数量大于</summary>
             ohc_beasts_greater,
+            /// <summary>己方手牌中野兽数量小于</summary>
             ohc_beasts_less,
+            /// <summary>己方手牌中图腾数量等于</summary>
             ohc_totems_equal,
+            /// <summary>己方手牌中图腾数量不等于</summary>
             ohc_totems_notequal,
+            /// <summary>己方手牌中图腾数量大于</summary>
             ohc_totems_greater,
+            /// <summary>己方手牌中图腾数量小于</summary>
             ohc_totems_less,
+            /// <summary>己方手牌中海盗数量等于</summary>
             ohc_pirates_equal,
+            /// <summary>己方手牌中海盗数量不等于</summary>
             ohc_pirates_notequal,
+            /// <summary>己方手牌中海盗数量大于</summary>
             ohc_pirates_greater,
+            /// <summary>己方手牌中海盗数量小于</summary>
             ohc_pirates_less,
+            /// <summary>己方手牌中龙数量等于</summary>
             ohc_Dragons_equal,
+            /// <summary>己方手牌中龙数量不等于</summary>
             ohc_Dragons_notequal,
+            /// <summary>己方手牌中龙数量大于</summary>
             ohc_Dragons_greater,
+            /// <summary>己方手牌中龙数量小于</summary>
             ohc_Dragons_less,
+            /// <summary>己方手牌中元素数量等于</summary>
             ohc_elems_equal,
+            /// <summary>己方手牌中元素数量不等于</summary>
             ohc_elems_notequal,
+            /// <summary>己方手牌中元素数量大于</summary>
             ohc_elems_greater,
+            /// <summary>己方手牌中元素数量小于</summary>
             ohc_elems_less,
+            /// <summary>己方手牌中圣盾数量等于</summary>
             ohc_shields_equal,
+            /// <summary>己方手牌中圣盾数量不等于</summary>
             ohc_shields_notequal,
+            /// <summary>己方手牌中圣盾数量大于</summary>
             ohc_shields_greater,
+            /// <summary>己方手牌中圣盾数量小于</summary>
             ohc_shields_less,
+            /// <summary>己方手牌中嘲讽数量等于</summary>
             ohc_taunts_equal,
+            /// <summary>己方手牌中嘲讽数量不等于</summary>
             ohc_taunts_notequal,
+            /// <summary>己方手牌中嘲讽数量大于</summary>
             ohc_taunts_greater,
+            /// <summary>己方手牌中嘲讽数量小于</summary>
             ohc_taunts_less,
+            /// <summary>回合数等于</summary>
             turn_equal,
+            /// <summary>回合数不等于</summary>
             turn_notequal,
+            /// <summary>回合数大于</summary>
             turn_greater,
+            /// <summary>回合数小于</summary>
             turn_less,
+            /// <summary>过载等于</summary>
             overload_equal,
+            /// <summary>过载不等于</summary>
             overload_notequal,
+            /// <summary>过载大于</summary>
             overload_greater,
+            /// <summary>过载小于</summary>
             overload_less,
+            /// <summary>额外抽牌等于</summary>
             owncarddraw_equal,
+            /// <summary>额外抽牌不等于</summary>
             owncarddraw_notequal,
+            /// <summary>额外抽牌大于</summary>
             owncarddraw_greater,
+            /// <summary>额外抽牌小于</summary>
             owncarddraw_less,
+            /// <summary>己方英雄生命值等于</summary>
             ohhp_equal,
+            /// <summary>己方英雄生命值不等于</summary>
             ohhp_notequal,
+            /// <summary>己方英雄生命值大于</summary>
             ohhp_greater,
+            /// <summary>己方英雄生命值小于</summary>
             ohhp_less,
+            /// <summary>敌方英雄生命值等于</summary>
             ehhp_equal,
+            /// <summary>敌方英雄生命值不等于</summary>
             ehhp_notequal,
+            /// <summary>敌方英雄生命值大于</summary>
             ehhp_greater,
+            /// <summary>敌方英雄生命值小于</summary>
             ehhp_less,
+            /// <summary>己方场包含</summary>
             ownboard_contain,
+            /// <summary>己方场不包含</summary>
             ownboard_notcontain,
+            /// <summary>敌方场包含</summary>
             enboard_contain,
+            /// <summary>敌方场不包含</summary>
             enboard_notcontain,
+            /// <summary>己方手牌包含</summary>
             ownhand_contain,
+            /// <summary>己方手牌不包含</summary>
             ownhand_notcontain,
+            /// <summary>己方武器等于</summary>
             ownweapon_equal,
+            /// <summary>己方武器不等于</summary>
             ownweapon_notequal,
+            /// <summary>敌方武器等于</summary>
             enweapon_equal,
+            /// <summary>敌方武器不等于</summary>
             enweapon_notequal,
+            /// <summary>己方英雄等于</summary>
             ownhero_equal,
+            /// <summary>己方英雄不等于</summary>
             ownhero_notequal,
+            /// <summary>敌方英雄等于</summary>
             enhero_equal,
+            /// <summary>敌方英雄不等于</summary>
             enhero_notequal,
+            /// <summary>目标等于</summary>
             tgt_equal,
+            /// <summary>目标不等于</summary>
             tgt_notequal,
+            /// <summary>无重复</summary>
             noduplicates,
+            /// <summary>播放</summary>
             play,
+            /// <summary>播放2</summary>
             play2,
+            /// <summary>攻击者</summary>
             attacker,
+            /// <summary>终极规则</summary>
             ur,
+            /// <summary>规则编号</summary>
             rn,
+            /// <summary>替换规则</summary>
             rr,
+            /// <summary>奖励</summary>
             bonus
         }
 
+        /// <summary>
+        /// 条件类
+        /// </summary>
         public class Condition
         {
+            /// <summary>参数</summary>
             public param parameter = param.None;
+            /// <summary>数值</summary>
             public int num = int.MinValue;
+            /// <summary>英雄职业</summary>
             public TAG_CLASS hClass = TAG_CLASS.INVALID;
+            /// <summary>卡牌ID</summary>
             public CardDB.cardIDEnum cardID = CardDB.cardIDEnum.None;
+            /// <summary>卡牌数量</summary>
             public int numCards = 0;
+            /// <summary>奖励</summary>
             public int bonus = 0;
+            /// <summary>或条件编号</summary>
             public int orCondNum = -1;
+            /// <summary>或条件列表</summary>
             public List<Condition> orConditions = new List<Condition>();
+            /// <summary>额外条件列表</summary>
             public List<Condition> extraConditions = new List<Condition>();
+            /// <summary>父规则</summary>
             public string parentRule = "";
 
+            /// <summary>
+            /// 构造函数
+            /// </summary>
+            /// <param name="paramtr">参数</param>
+            /// <param name="pnum">数值</param>
+            /// <param name="pRule">父规则</param>
             public Condition(param paramtr, int pnum, string pRule)
             {
                 this.parameter = paramtr;
                 this.num = pnum;
                 this.parentRule = pRule;
             }
+            /// <summary>
+            /// 构造函数
+            /// </summary>
+            /// <param name="paramtr">参数</param>
+            /// <param name="cID">卡牌ID</param>
+            /// <param name="pRule">父规则</param>
             public Condition(param paramtr, CardDB.cardIDEnum cID, string pRule)
             {
                 this.parameter = paramtr;
                 this.cardID = cID;
                 this.parentRule = pRule;
             }
+            /// <summary>
+            /// 构造函数
+            /// </summary>
+            /// <param name="paramtr">参数</param>
+            /// <param name="hClas">英雄职业</param>
+            /// <param name="pRule">父规则</param>
             public Condition(param paramtr, TAG_CLASS hClas, string pRule)
             {
                 this.parameter = paramtr;
@@ -438,21 +933,41 @@ namespace HREngine.Bots
             }
         }
 
+        /// <summary>
+        /// 规则类
+        /// </summary>
         public class Rule
         {
+            /// <summary>是否为终极规则</summary>
             public bool ultimateRule = false;
+            /// <summary>规则编号</summary>
             public int ruleNumber = 0;
+            /// <summary>替换规则</summary>
             public int replacedRule = 0;
+            /// <summary>奖励</summary>
             public int bonus = 0;
+            /// <summary>条件列表</summary>
             public List<Condition> conditions = new List<Condition>();
         }
 
+        /// <summary>
+        /// 动作单元类
+        /// </summary>
         public class actUnit
         {
+            /// <summary>卡牌ID</summary>
             public CardDB.cardIDEnum cardID = CardDB.cardIDEnum.None;
+            /// <summary>动作</summary>
             public Action action = null;
+            /// <summary>实体</summary>
             public int entity = -1;
 
+            /// <summary>
+            /// 构造函数
+            /// </summary>
+            /// <param name="cid">卡牌ID</param>
+            /// <param name="a">动作</param>
+            /// <param name="ent">实体</param>
             public actUnit(CardDB.cardIDEnum cid, Action a, int ent)
             {
                 this.cardID = cid;
@@ -461,8 +976,14 @@ namespace HREngine.Bots
             }
         }
 
+        /// <summary>
+        /// 单例实例
+        /// </summary>
         private static RulesEngine instance;
 
+        /// <summary>
+        /// 获取RulesEngine的单例实例
+        /// </summary>
         public static RulesEngine Instance
         {
             get
@@ -475,12 +996,18 @@ namespace HREngine.Bots
             }
         }
 
+        /// <summary>
+        /// 私有构造函数
+        /// </summary>
         private RulesEngine()
         {
         }
 
-
-
+        /// <summary>
+        /// 获取规则权重
+        /// </summary>
+        /// <param name="p">游戏场状态</param>
+        /// <returns>规则权重</returns>
         public int getRuleWeight(Playfield p)
         {
             int weight = 0;
@@ -671,6 +1198,11 @@ namespace HREngine.Bots
             return weight;
         }
 
+        /// <summary>
+        /// 设置游戏卡牌ID规则
+        /// </summary>
+        /// <param name="ohc">己方英雄职业</param>
+        /// <param name="ehc">敌方英雄职业</param>
         public void setCardIdRulesGame(TAG_CLASS ohc, TAG_CLASS ehc)
         {
             CardIdRulesGame.Clear();
@@ -730,6 +1262,12 @@ namespace HREngine.Bots
             }
         }
 
+        /// <summary>
+        /// 添加卡牌ID规则到游戏
+        /// </summary>
+        /// <param name="baseDct">基础字典</param>
+        /// <param name="targetDct">目标字典</param>
+        /// <param name="ruleNum">规则编号</param>
         private void addCardIdRulesGame(Dictionary<int, List<CardDB.cardIDEnum>> baseDct, Dictionary<CardDB.cardIDEnum, Dictionary<int, int>> targetDct, int ruleNum)
         {
             foreach (CardDB.cardIDEnum cid in baseDct[ruleNum])
@@ -761,6 +1299,10 @@ namespace HREngine.Bots
             }
         }
 
+        /// <summary>
+        /// 添加攻击者ID规则到游戏
+        /// </summary>
+        /// <param name="ruleNum">规则编号</param>
         private void addAttackerIdRulesGame(int ruleNum)
         {
             foreach (CardDB.cardIDEnum cid in RuleCardIdsAttack[ruleNum])
@@ -778,6 +1320,10 @@ namespace HREngine.Bots
             }
         }
 
+        /// <summary>
+        /// 设置回合规则
+        /// </summary>
+        /// <param name="gTurn">游戏回合</param>
         public void setRulesTurn(int gTurn)
         {
             BoardStateRulesTurn.Clear();
@@ -856,6 +1402,11 @@ namespace HREngine.Bots
             }
         }
 
+        /// <summary>
+        /// 读取规则
+        /// </summary>
+        /// <param name="behavName">行为名称或路径</param>
+        /// <param name="nameIsPath">名称是否为路径</param>
         public void readRules(string behavName, bool nameIsPath = false)
         {
             pathToRules = behavName;

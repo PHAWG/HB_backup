@@ -4,13 +4,35 @@ namespace HREngine.Bots
     using System.Collections;
     using System.Collections.Generic;
 
+    /// <summary>
+    /// 墓地物品结构体，用于记录卡牌在墓地中的状态
+    /// </summary>
     public struct GraveYardItem
     {
+        /// <summary>
+        /// 是否为己方卡牌
+        /// </summary>
         public bool own;
+        /// <summary>
+        /// 实体ID，唯一标识游戏中的每个实体
+        /// </summary>
         public int entityId;
+        /// <summary>
+        /// 卡牌ID，对应游戏中的具体卡牌
+        /// </summary>
         public CardDB.cardIDEnum cardid;
+        /// <summary>
+        /// 卡牌在墓地中的状态
+        /// </summary>
         public EnumGraveyardStatus status;
 
+        /// <summary>
+        /// 构造函数，初始化墓地物品
+        /// </summary>
+        /// <param name="id">卡牌ID</param>
+        /// <param name="entityId">实体ID</param>
+        /// <param name="own">是否为己方</param>
+        /// <param name="status">墓地状态</param>
         public GraveYardItem(CardDB.cardIDEnum id, int entityId, bool own, EnumGraveyardStatus status)
         {
             this.own = own;
@@ -19,49 +41,71 @@ namespace HREngine.Bots
             this.status = status;
         }
 
+        /// <summary>
+        /// 墓地状态枚举
+        /// </summary>
         public enum EnumGraveyardStatus
         {
+            /// <summary>未知状态</summary>
             Unknown,
+            /// <summary>已死亡（随从）</summary>
             Died,
+            /// <summary>已使用（法术或英雄技能）</summary>
             Used,
+            /// <summary>已弃置</summary>
             Discard,
+            /// <summary>已烧弃（超过手牌上限）</summary>
             Burnt
         }
     }
 
-    public class SecretItem   // 防奥秘类，通过修改下面的true -> false，可以去掉一些要防的奥秘，防冰箱和aoe足够
+    /// <summary>
+    /// 奥秘管理类，用于处理游戏中各种奥秘的状态和猜测
+    /// 通过修改下面的true -> false，可以去掉一些要防的奥秘，防冰箱和aoe足够
+    /// </summary>
+    public class SecretItem
     {
+        /// <summary>
+        /// 奥秘是否已触发
+        /// </summary>
         public bool triggered = false;
 
+        /// <summary>
+        /// 奥秘数据的位存储
+        /// </summary>
         public BitArray data = new BitArray(60); // Todo: 如果奥秘数多了，要更新这个数
+        
+        /// <summary>
+        /// 奥秘名称枚举，用于标识不同类型的奥秘
+        /// </summary>
         public enum SecretName
         {
-            beartrap = 0,
-            explosive = 1,
-            snaketrap = 2,
-            missdirection = 3,
-            freezing = 4,
-            snipe = 5,
-            darttrap = 6,
-            cattrick = 7,
+            beartrap = 0,       // 捕熊陷阱
+            explosive = 1,      // 爆炸陷阱
+            snaketrap = 2,      // 毒蛇陷阱
+            missdirection = 3,  // 误导
+            freezing = 4,       // 冰冻陷阱
+            snipe = 5,          // 狙击
+            darttrap = 6,       // 毒镖陷阱
+            cattrick = 7,       // 豹子戏法
 
-            counterspell = 8,
-            icebarrier = 9,
-            iceblock = 10,
-            mirrorentity = 11,
-            spellbender = 12,
-            vaporize = 13,
-            duplicate = 14,
-            effigy = 15,
-            flameward = 16,
-            explosiverunes = 17,
+            counterspell = 8,   // 法术反制
+            icebarrier = 9,     // 寒冰护体
+            iceblock = 10,      // 寒冰屏障
+            mirrorentity = 11,  // 镜像实体
+            spellbender = 12,   // 扰咒术
+            vaporize = 13,      // 蒸发
+            duplicate = 14,     // 复制
+            effigy = 15,        // 轮回
+            flameward = 16,     // 火焰结界
+            explosiverunes = 17, // 爆炸符文
 
-            eyeforaneye = 18,
-            noblesacrifice = 19,
-            redemption = 20,
-            repentance = 21,
-            avenge = 22,
-            sacredtrial = 23,
+            eyeforaneye = 18,   // 以眼还眼
+            noblesacrifice = 19, // 崇高牺牲
+            redemption = 20,    // 救赎
+            repentance = 21,    // 忏悔
+            avenge = 22,        // 复仇
+            sacredtrial = 23,   // 神圣审判
         }
         public static SecretItem dataToSecretItem(BitArray ba)
         {
@@ -334,10 +378,17 @@ namespace HREngine.Bots
         public int entityId = 0;
 
 
+        /// <summary>
+        /// 默认构造函数
+        /// </summary>
         public SecretItem()
         {
         }
 
+        /// <summary>
+        /// 复制构造函数
+        /// </summary>
+        /// <param name="sec">要复制的SecretItem对象</param>
         public SecretItem(SecretItem sec)
         {
             this.triggered = sec.triggered;
@@ -376,7 +427,10 @@ namespace HREngine.Bots
 
         }
 
-        // 奥秘的序列化
+        /// <summary>
+        /// 从字符串数据初始化奥秘
+        /// </summary>
+        /// <param name="secdata">奥秘数据字符串</param>
         public SecretItem(string secdata)
         {
             this.entityId = Convert.ToInt32(secdata.Split('.')[0]);
@@ -449,6 +503,9 @@ namespace HREngine.Bots
             this.updateCanBeTriggered();
         }
 
+        /// <summary>
+        /// 更新奥秘的触发条件
+        /// </summary>
         public void updateCanBeTriggered()
         {
             /*not in use temporarily 1
@@ -467,7 +524,12 @@ namespace HREngine.Bots
             */
         }
 
-        // 没有触发奥秘，说明不是爆炸
+        /// <summary>
+        /// 当角色被攻击时更新奥秘状态
+        /// 没有触发奥秘，说明不是爆炸
+        /// </summary>
+        /// <param name="DefenderIsHero">防御者是否为英雄</param>
+        /// <param name="AttackerIsHero">攻击者是否为英雄</param>
         public void usedTrigger_CharIsAttacked(bool DefenderIsHero, bool AttackerIsHero)
         {
             if (DefenderIsHero)
@@ -493,6 +555,10 @@ namespace HREngine.Bots
             updateCanBeTriggered();
         }
 
+        /// <summary>
+        /// 当随从被打出时更新奥秘状态
+        /// </summary>
+        /// <param name="i">打出的随从数量</param>
         public void usedTrigger_MinionIsPlayed(int i)
         {
             this.canBe_snipe = false;
@@ -503,6 +569,10 @@ namespace HREngine.Bots
             updateCanBeTriggered();
         }
 
+        /// <summary>
+        /// 当法术被打出时更新奥秘状态
+        /// </summary>
+        /// <param name="minionIsTarget">法术目标是否为随从</param>
         public void usedTrigger_SpellIsPlayed(bool minionIsTarget)
         {
             this.canBe_counterspell = false;
@@ -511,6 +581,9 @@ namespace HREngine.Bots
             updateCanBeTriggered();
         }
 
+        /// <summary>
+        /// 当随从死亡时更新奥秘状态
+        /// </summary>
         public void usedTrigger_MinionDied()
         {
             this.canBe_avenge = false;
@@ -520,12 +593,19 @@ namespace HREngine.Bots
             updateCanBeTriggered();
         }
 
+        /// <summary>
+        /// 当英雄受到伤害时更新奥秘状态
+        /// </summary>
+        /// <param name="deadly">伤害是否致命</param>
         public void usedTrigger_HeroGotDmg(bool deadly = false)
         {
             this.canBe_eyeforaneye = false;
             if (deadly) this.canBe_iceblock = false;
             updateCanBeTriggered();
         }
+        /// <summary>
+        /// 当英雄技能被使用时更新奥秘状态
+        /// </summary>
         public void usedTrigger_HeroPowerUsed()
         {
             this.canBe_darttrap = false;
@@ -533,6 +613,10 @@ namespace HREngine.Bots
         }
 
 
+        /// <summary>
+        /// 将奥秘状态转换为字符串
+        /// </summary>
+        /// <returns>奥秘状态的字符串表示</returns>
         public string returnAString()
         {
             string retval = "" + this.entityId + ".";
@@ -564,6 +648,11 @@ namespace HREngine.Bots
             return retval + ",";
         }
 
+        /// <summary>
+        /// 比较两个奥秘是否相等
+        /// </summary>
+        /// <param name="s">要比较的奥秘</param>
+        /// <returns>两个奥秘是否相等</returns>
         public bool isEqual(SecretItem s)
         {
             bool result = this.entityId == s.entityId;
@@ -580,25 +669,73 @@ namespace HREngine.Bots
 
     }
 
+    /// <summary>
+    /// 概率计算类，负责管理墓地信息、奥秘猜测和概率计算
+    /// </summary>
     public class Probabilitymaker
     {
+        /// <summary>
+        /// 己方墓地卡牌及其数量
+        /// </summary>
         public Dictionary<CardDB.cardIDEnum, int> ownGraveyard = new Dictionary<CardDB.cardIDEnum, int>();
+        /// <summary>
+        /// 敌方墓地卡牌及其数量
+        /// </summary>
         public Dictionary<CardDB.cardIDEnum, int> enemyGraveyard = new Dictionary<CardDB.cardIDEnum, int>();
+        /// <summary>
+        /// 己方弃置卡牌及其数量
+        /// </summary>
         public Dictionary<CardDB.cardIDEnum, int> ownDiscard = new Dictionary<CardDB.cardIDEnum, int>();
+        /// <summary>
+        /// 敌方弃置卡牌及其数量
+        /// </summary>
         public Dictionary<CardDB.cardIDEnum, int> enemyDiscard = new Dictionary<CardDB.cardIDEnum, int>();
+        /// <summary>
+        /// 己方烧弃卡牌及其数量（超过手牌上限）
+        /// </summary>
         public Dictionary<CardDB.cardIDEnum, int> ownBurnt = new Dictionary<CardDB.cardIDEnum, int>();//目测用不到,就先注释掉了
+        /// <summary>
+        /// 敌方烧弃卡牌及其数量（超过手牌上限）
+        /// </summary>
         public Dictionary<CardDB.cardIDEnum, int> enemyBurnt = new Dictionary<CardDB.cardIDEnum, int>();
+        /// <summary>
+        /// 墓地物品列表
+        /// </summary>
         List<GraveYardItem> graveyard = new List<GraveYardItem>();
+        /// <summary>
+        /// 当前回合的随从墓地（仅随从）
+        /// </summary>
         public List<GraveYardItem> turngraveyard = new List<GraveYardItem>();//MOBS only
+        /// <summary>
+        /// 当前回合的所有卡牌墓地
+        /// </summary>
         public List<GraveYardItem> turngraveyardAll = new List<GraveYardItem>();//All
+        /// <summary>
+        /// 回合开始时的墓地状态
+        /// </summary>
         List<GraveYardItem> graveyartTillTurnStart = new List<GraveYardItem>();
 
+        /// <summary>
+        /// 敌方奥秘列表
+        /// </summary>
         public List<SecretItem> enemySecrets = new List<SecretItem>();
 
+        /// <summary>
+        /// 费根是否死亡
+        /// </summary>
         public bool feugenDead = false;
+        /// <summary>
+        /// 斯塔拉格是否死亡
+        /// </summary>
         public bool stalaggDead = false;
 
+        /// <summary>
+        /// 单例实例
+        /// </summary>
         private static Probabilitymaker instance;
+        /// <summary>
+        /// 获取单例实例
+        /// </summary>
         public static Probabilitymaker Instance
         {
             get
@@ -607,6 +744,9 @@ namespace HREngine.Bots
             }
         }
 
+        /// <summary>
+        /// 私有构造函数，防止外部实例化
+        /// </summary>
         private Probabilitymaker()
         {
 
@@ -635,6 +775,9 @@ namespace HREngine.Bots
         //    }
         //}
 
+        /// <summary>
+        /// 打印当前回合的墓地信息
+        /// </summary>
         public void printTurnGraveYard()
         {
             /*string g = "";
@@ -673,6 +816,11 @@ namespace HREngine.Bots
             Helpfunctions.Instance.logg(s);
         }
 
+        /// <summary>
+        /// 设置墓地信息
+        /// </summary>
+        /// <param name="allGyi">所有墓地物品</param>
+        /// <param name="turnStart">是否为回合开始</param>
         public void setGraveYard(List<GraveYardItem> allGyi, bool turnStart)
         {
             graveyard.Clear();
@@ -789,6 +937,11 @@ namespace HREngine.Bots
             Hrtprozis.Instance.updateOwnLastDiedMinion(OwnLastDiedMinion.cardid);
         }
 
+        /// <summary>
+        /// 设置当前回合的墓地信息
+        /// </summary>
+        /// <param name="listMobs">随从墓地列表</param>
+        /// <param name="listAll">所有卡牌墓地列表</param>
         public void setTurnGraveYard(List<GraveYardItem> listMobs, List<GraveYardItem> listAll)
         {
             this.turngraveyard.Clear();
@@ -797,6 +950,11 @@ namespace HREngine.Bots
             this.turngraveyardAll.AddRange(listAll);
         }
 
+        /// <summary>
+        /// 检查敌方牌库中是否可能还有该卡牌
+        /// </summary>
+        /// <param name="cardid">卡牌ID</param>
+        /// <returns>敌方牌库中是否可能还有该卡牌</returns>
         public bool hasEnemyThisCardInDeck(CardDB.cardIDEnum cardid)
         {
             if (this.enemyGraveyard.ContainsKey(cardid))
@@ -811,6 +969,11 @@ namespace HREngine.Bots
             return true;
         }
 
+        /// <summary>
+        /// 计算敌方牌库中该卡牌的剩余数量
+        /// </summary>
+        /// <param name="cardid">卡牌ID</param>
+        /// <returns>敌方牌库中该卡牌的剩余数量</returns>
         public int anzCardsInDeck(CardDB.cardIDEnum cardid)
         {
             int ret = 2;
@@ -830,6 +993,9 @@ namespace HREngine.Bots
 
         }
 
+        /// <summary>
+        /// 打印墓地信息
+        /// </summary>
         public void printGraveyards()
         {
             string og = "己方坟场: ";
@@ -846,6 +1012,13 @@ namespace HREngine.Bots
             Helpfunctions.Instance.logg(eg);
         }
 
+        /// <summary>
+        /// 计算敌人手牌中拥有指定卡牌的概率
+        /// </summary>
+        /// <param name="cardid">卡牌ID</param>
+        /// <param name="handsize">敌人手牌数量</param>
+        /// <param name="decksize">敌人牌库剩余数量</param>
+        /// <returns>概率值，范围为[0, 100]</returns>
         public int getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum cardid, int handsize, int decksize)
         {
             //calculates probability \in [0,...,100]
@@ -870,6 +1043,11 @@ namespace HREngine.Bots
             return (int)(100.0 * retval);
         }
 
+        /// <summary>
+        /// 检查墓地中是否存在指定卡牌
+        /// </summary>
+        /// <param name="cardid">卡牌ID</param>
+        /// <returns>墓地中是否存在指定卡牌</returns>
         public bool hasCardinGraveyard(CardDB.cardIDEnum cardid)
         {
             foreach (GraveYardItem gyi in this.graveyard)
@@ -879,6 +1057,10 @@ namespace HREngine.Bots
             return false;
         }
 
+        /// <summary>
+        /// 设置敌方奥秘猜测列表
+        /// </summary>
+        /// <param name="enemySecretList">敌方奥秘列表</param>
         public void setEnemySecretGuesses(Dictionary<int, TAG_CLASS> enemySecretList) //赋值enemySecretList
         {
             List<SecretItem> newlist = new List<SecretItem>();
@@ -1051,7 +1233,7 @@ namespace HREngine.Bots
                         {
                             SecretItem sec = enemySecrets[i];
                             sec.canBe_counterspell = false;
-                        }                            
+                        }
                     }
                 }
                 // 火焰结界
@@ -1123,6 +1305,12 @@ namespace HREngine.Bots
                 }
             }
         }
+        /// <summary>
+        /// 根据职业和实体ID创建新的奥秘猜测项
+        /// </summary>
+        /// <param name="entityid">奥秘的实体ID</param>
+        /// <param name="SecClass">奥秘所属的职业</param>
+        /// <returns>新的奥秘猜测项</returns>
         public SecretItem getNewSecretGuessedItem(int entityid, TAG_CLASS SecClass)
         {
             foreach (SecretItem si in this.enemySecrets)
@@ -1433,6 +1621,11 @@ namespace HREngine.Bots
         }
 
 
+        /// <summary>
+        /// 检查是否可以使用指定的奥秘
+        /// </summary>
+        /// <param name="cardID">奥秘卡牌ID</param>
+        /// <returns>是否可以使用该奥秘</returns>
         public bool isAllowedSecret(CardDB.cardIDEnum cardID)
         {
             if (ownGraveyard.ContainsKey(cardID) && ownGraveyard[cardID] >= 2) return false;
@@ -1440,6 +1633,10 @@ namespace HREngine.Bots
         }
 
 
+        /// <summary>
+        /// 获取敌方奥秘数据的字符串表示
+        /// </summary>
+        /// <returns>敌方奥秘数据的字符串表示</returns>
         public string getEnemySecretData()
         {
             string retval = "";
@@ -1452,6 +1649,11 @@ namespace HREngine.Bots
             return retval;
         }
 
+        /// <summary>
+        /// 获取指定奥秘列表的数据字符串表示
+        /// </summary>
+        /// <param name="list">奥秘列表</param>
+        /// <returns>奥秘数据的字符串表示</returns>
         public string getEnemySecretData(List<SecretItem> list)
         {
             string retval = "";
@@ -1465,6 +1667,10 @@ namespace HREngine.Bots
         }
 
 
+        /// <summary>
+        /// 设置敌方奥秘数据
+        /// </summary>
+        /// <param name="enemySecretl">敌方奥秘列表</param>
         public void setEnemySecretData(List<SecretItem> enemySecretl)
         {
             this.enemySecrets.Clear();
@@ -1474,6 +1680,10 @@ namespace HREngine.Bots
             }
         }
 
+        /// <summary>
+        /// 更新奥秘列表，将现有奥秘与新的奥秘列表进行匹配
+        /// </summary>
+        /// <param name="enemySecretl">新的敌方奥秘列表</param>
         public void updateSecretList(List<SecretItem> enemySecretl)
         {
             List<SecretItem> temp = new List<SecretItem>();
@@ -1499,6 +1709,11 @@ namespace HREngine.Bots
         }
 
 
+        /// <summary>
+        /// 根据游戏状态更新奥秘列表，分析回合中触发的奥秘
+        /// </summary>
+        /// <param name="p">当前游戏状态</param>
+        /// <param name="old">上一个游戏状态</param>
         public void updateSecretList(Playfield p, Playfield old)
         {
             if (p.enemySecretCount == 0 || p.optionsPlayedThisTurn == 0) return;

@@ -4,22 +4,54 @@ namespace HREngine.Bots
     using System.Text;
     using System.Collections.Generic;
 
+    /// <summary>
+    /// 任务管理器类，用于管理游戏中的任务系统
+    /// 包括跟踪任务进度、处理任务触发条件、获取任务奖励等功能
+    /// </summary>
     public class Questmanager
     {
+        /// <summary>
+        /// 任务项类，用于存储单个任务的信息和状态
+        /// </summary>
         public class QuestItem
         {
+            /// <summary>
+            /// 本回合played的随从计数
+            /// </summary>
             public Dictionary<CardDB.cardNameEN, int> mobsTurn = new Dictionary<CardDB.cardNameEN, int>();
+            /// <summary>
+            /// 不同攻击力的野兽标记
+            /// </summary>
             public Dictionary<int, bool> anrgPets = new Dictionary<int, bool>() { { 1, false }, { 3, false }, { 5, false }, { 7, false } };
 
+            /// <summary>
+            /// 已played的种族标记
+            /// </summary>
             public Dictionary<CardDB.Race, bool> playedRaces = new Dictionary<CardDB.Race, bool>();
+            /// <summary>
+            /// 任务ID
+            /// </summary>
             public CardDB.cardIDEnum Id = CardDB.cardIDEnum.None;
+            /// <summary>
+            /// 任务进度
+            /// </summary>
             public int questProgress = 0;
+            /// <summary>
+            /// 任务最大进度
+            /// </summary>
             public int maxProgress = 1000;
 
+            /// <summary>
+            /// 默认构造函数
+            /// </summary>
             public QuestItem()
             {
             }
 
+            /// <summary>
+            /// 复制任务项
+            /// </summary>
+            /// <param name="q">要复制的任务项</param>
             public void Copy(QuestItem q)
             {
                 this.Id = q.Id;
@@ -37,6 +69,9 @@ namespace HREngine.Bots
                 }
             }
 
+            /// <summary>
+            /// 重置任务项
+            /// </summary>
             public void Reset()
             {
                 this.Id = CardDB.cardIDEnum.None;
@@ -46,6 +81,10 @@ namespace HREngine.Bots
                 this.anrgPets.Clear();
             }
 
+            /// <summary>
+            /// 从字符串构造任务项
+            /// </summary>
+            /// <param name="s">任务字符串，格式为 "任务ID 进度 最大进度"</param>
             public QuestItem(string s)
             {
                 String[] q = s.Split(' ');
@@ -59,7 +98,7 @@ namespace HREngine.Bots
             /// 随从使用时扳机
             /// 根据当前任务CardIdEnum触发对应case语句,增加任务进度
             /// </summary>
-            /// <param name="m"></param>
+            /// <param name="m">使用的随从对象</param>
             public void trigger_MinionWasPlayed(Minion m)
             {
                 switch (Id)
@@ -96,6 +135,9 @@ namespace HREngine.Bots
 
                 }
             }
+            /// <summary>
+            /// 卡牌使用时扳机
+            /// </summary>
             public void trigger_played()
             {
 
@@ -161,9 +203,9 @@ namespace HREngine.Bots
             }
 
             /// <summary>
-            /// 任务奖励
+            /// 获取任务奖励
             /// </summary>
-            /// <returns></returns>
+            /// <returns>任务奖励的卡牌ID</returns>
             public CardDB.cardIDEnum Reward()
             {
                 switch (Id)
@@ -194,19 +236,52 @@ namespace HREngine.Bots
             }
         }
 
+        /// <summary>
+        /// 字符串构建器，用于构建任务信息字符串
+        /// </summary>
         StringBuilder sb = new StringBuilder("", 500);
+        /// <summary>
+        /// 我方任务
+        /// </summary>
         public QuestItem ownQuest = new QuestItem();
+        /// <summary>
+        /// 敌方任务
+        /// </summary>
         public QuestItem enemyQuest = new QuestItem();
+        /// <summary>
+        /// 支线任务
+        /// </summary>
         public QuestItem sideQuest = new QuestItem();
 
+        /// <summary>
+        /// 游戏中played的随从计数
+        /// </summary>
         public Dictionary<CardDB.cardNameEN, int> mobsGame = new Dictionary<CardDB.cardNameEN, int>();
+        /// <summary>
+        /// 下一个要played的随从名称
+        /// </summary>
         private CardDB.cardNameEN nextMobName = CardDB.cardNameEN.unknown;
+        /// <summary>
+        /// 下一个要played的随从ID
+        /// </summary>
         private int nextMobId = 0;
+        /// <summary>
+        /// 上一个played的随从ID
+        /// </summary>
         private int prevMobId = 0;
+        /// <summary>
+        /// 辅助函数实例
+        /// </summary>
         Helpfunctions help;
 
+        /// <summary>
+        /// 任务管理器单例实例
+        /// </summary>
         private static Questmanager instance;
 
+        /// <summary>
+        /// 任务管理器单例属性
+        /// </summary>
         public static Questmanager Instance
         {
             get
@@ -215,11 +290,22 @@ namespace HREngine.Bots
             }
         }
 
+        /// <summary>
+        /// 私有构造函数，初始化任务管理器
+        /// </summary>
         private Questmanager()
         {
             this.help = Helpfunctions.Instance;
         }
 
+        /// <summary>
+        /// 更新任务信息
+        /// </summary>
+        /// <param name="questID">任务ID</param>
+        /// <param name="curProgr">当前进度</param>
+        /// <param name="maxProgr">最大进度</param>
+        /// <param name="ownplay">是否为我方任务</param>
+        /// <param name="isSideQuest">是否为支线任务</param>
         public void updateQuestStuff(string questID, int curProgr, int maxProgr, bool ownplay, bool isSideQuest = false)
         {
             QuestItem tmp = new QuestItem() { Id = CardDB.Instance.cardIdstringToEnum(questID), questProgress = curProgr, maxProgress = maxProgr };
@@ -231,6 +317,10 @@ namespace HREngine.Bots
             else this.enemyQuest = tmp;
         }
 
+        /// <summary>
+        /// 更新已played的随从信息
+        /// </summary>
+        /// <param name="step">步骤</param>
         public void updatePlayedMobs(int step)
         {
             if (step != 0)
@@ -249,6 +339,10 @@ namespace HREngine.Bots
             }
         }
 
+        /// <summary>
+        /// 更新从手牌played的卡牌信息
+        /// </summary>
+        /// <param name="hc">手牌对象</param>
         public void updatePlayedCardFromHand(Handmanager.Handcard hc)
         {
             nextMobName = CardDB.cardNameEN.unknown;
@@ -260,12 +354,20 @@ namespace HREngine.Bots
             }
         }
 
+        /// <summary>
+        /// 获取从手牌played的卡牌数量
+        /// </summary>
+        /// <param name="name">卡牌名称</param>
+        /// <returns>played的卡牌数量</returns>
         public int getPlayedCardFromHand(CardDB.cardNameEN name)
         {
             if (mobsGame.ContainsKey(name)) return mobsGame[name];
             else return 0;
         }
 
+        /// <summary>
+        /// 重置任务管理器
+        /// </summary>
         public void Reset()
         {
             sb.Clear();
@@ -278,6 +380,10 @@ namespace HREngine.Bots
             prevMobId = 0;
         }
 
+        /// <summary>
+        /// 获取任务信息字符串
+        /// </summary>
+        /// <returns>任务信息字符串</returns>
         public string getQuestsString()
         {
             sb.Clear();
@@ -292,6 +398,11 @@ namespace HREngine.Bots
             return sb.ToString();
         }
 
+        /// <summary>
+        /// 从游戏场获取任务信息字符串
+        /// </summary>
+        /// <param name="p">游戏场对象</param>
+        /// <returns>任务信息字符串</returns>
         public string getQuestsString(Playfield p)
         {
             sb.Clear();

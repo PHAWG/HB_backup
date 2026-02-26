@@ -3,19 +3,45 @@ namespace HREngine.Bots
     using System;
     using System.Collections.Generic;
 
+    /// <summary>
+    /// 敌方回合模拟器类，用于模拟敌方回合的可能行动
+    /// 帮助AI评估不同决策的后果，选择最优策略
+    /// </summary>
     public class EnemyTurnSimulator
     {
 
+        /// <summary>
+        /// 线程ID
+        /// </summary>
         public int thread = 0;
 
+        /// <summary>
+        /// 可能的移动列表，用于存储模拟的游戏状态
+        /// </summary>
         private List<Playfield> posmoves = new List<Playfield>(7000);
         //public int maxwide = 20;
+        /// <summary>
+        /// 移动生成器实例
+        /// </summary>
         Movegenerator movegen = Movegenerator.Instance;
+        /// <summary>
+        /// 最大搜索宽度
+        /// </summary>
         public int maxwide = 20;
+        /// <summary>
+        /// 两回合模拟数量
+        /// </summary>
         private int twotsamount = 0;
+        /// <summary>
+        /// 如果能在下一回合结束游戏则狂暴
+        /// </summary>
         private int berserkIfCanFinishNextTour = 0;
 
 
+        /// <summary>
+        /// 设置最大搜索宽度
+        /// </summary>
+        /// <param name="firstStep">是否为第一步</param>
         public void setMaxwide(bool firstStep)
         {
             twotsamount = Settings.Instance.secondTurnAmount;
@@ -24,6 +50,15 @@ namespace HREngine.Bots
             berserkIfCanFinishNextTour = Settings.Instance.berserkIfCanFinishNextTour;
         }
 
+        /// <summary>
+        /// 模拟敌方回合的可能行动
+        /// </summary>
+        /// <param name="rootfield">根游戏场状态</param>
+        /// <param name="simulateTwoTurns">是否模拟两回合</param>
+        /// <param name="playaround">是否防奥秘</param>
+        /// <param name="print">是否打印输出</param>
+        /// <param name="pprob">防奥秘概率1</param>
+        /// <param name="pprob2">防奥秘概率2</param>
         public void simulateEnemysTurn(Playfield rootfield, bool simulateTwoTurns, bool playaround, bool print, int pprob, int pprob2)
         {
             if (rootfield.bestEnemyPlay == null)
@@ -182,7 +217,7 @@ namespace HREngine.Bots
                 bestplay.ownAbilityReady = false;
                 bestplay.owncarddraw = rootfield.owncarddraw;
                 bestplay.complete = true;
-				bestplay.isLethalCheck = rootfield.isLethalCheck;
+			bestplay.isLethalCheck = rootfield.isLethalCheck;
                 Ai.Instance.botBase.getPlayfieldValue(bestplay);
                 bestval = bestplay.value;
                 rootfield.value = bestplay.value;
@@ -209,10 +244,12 @@ namespace HREngine.Bots
 
 
 
-
             }
         }
         
+        /// <summary>
+        /// 裁剪可能的行动，通过哈希值去重，减少搜索空间
+        /// </summary>
         public void cuttingposibilitiesET()
         {
             Dictionary<Int64, Playfield> tempDict = new Dictionary<Int64, Playfield>();
@@ -233,9 +270,20 @@ namespace HREngine.Bots
             tempDict.Clear();
         }
 
+        /// <summary>
+        /// 火焰卡牌对象
+        /// </summary>
         CardDB.Card flame = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_614t);
+        /// <summary>
+        /// 法术破坏者卡牌对象
+        /// </summary>
         CardDB.Card spellbreaker43 = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_048);
 
+        /// <summary>
+        /// 执行基本的敌方AI行为
+        /// 处理敌方随从的各种特殊能力和触发效果
+        /// </summary>
+        /// <param name="p">游戏场状态</param>
         private void doSomeBasicEnemyAi(Playfield p)
         {
             if (p.enemyHeroName == HeroEnum.mage)

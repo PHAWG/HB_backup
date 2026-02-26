@@ -5,129 +5,431 @@ namespace HREngine.Bots
     using System.IO;
     using IronPython.Runtime.Operations;
 
-    public class BoardTester  // 每一个牌面txt文件会new出一个新的BoardTester对象，不用担心变量复用和初始化问题
+    /// <summary>
+    /// 牌面测试类，用于从测试文件中读取游戏状态并构建牌面
+    /// 每一个牌面txt文件会new出一个新的BoardTester对象，不用担心变量复用和初始化问题
+    /// </summary>
+public class BoardTester
     {
+        /// <summary>
+        /// 机器人行为模式
+        /// </summary>
         public string botBehavior = "None";
+        /// <summary>
+        /// 最大搜索宽度
+        /// </summary>
         int maxwide = 3000;
+        /// <summary>
+        /// 两回合模拟深度
+        /// </summary>
         int twoturnsim = 256;
+        /// <summary>
+        /// 防奥秘概率1
+        /// </summary>
         int pprob1 = 50;
+        /// <summary>
+        /// 防奥秘概率2
+        /// </summary>
         int pprob2 = 80;
+        /// <summary>
+        /// 是否防奥秘
+        /// </summary>
         bool playaround = false;
 
+        /// <summary>
+        /// 我方玩家ID
+        /// </summary>
         int ownPlayer = 1;
+        /// <summary>
+        /// 敌方最大法力值
+        /// </summary>
         int enemmaxman = 0; // enemy Max mana
 
+        /// <summary>
+        /// 我方英雄
+        /// </summary>
         Minion ownHero;
+        /// <summary>
+        /// 敌方英雄
+        /// </summary>
         Minion enemyHero;
 
+        /// <summary>
+        /// 我方武器
+        /// </summary>
         Weapon ownWeapon = new Weapon();
+        /// <summary>
+        /// 敌方武器
+        /// </summary>
         Weapon enemyWeapon = new Weapon();
 
+        /// <summary>
+        /// 我方英雄实体ID
+        /// </summary>
         int ownHEntity = 0;
+        /// <summary>
+        /// 敌方英雄实体ID
+        /// </summary>
         int enemyHEntity = 1;
+        /// <summary>
+        /// 敌方英雄是否潜行
+        /// </summary>
         bool enemyHeroStealth = false;
 
+        /// <summary>
+        /// 我方英雄增益效果
+        /// </summary>
         List<CardDB.cardIDEnum> ownHeroEnchs = new List<CardDB.cardIDEnum>();
+        /// <summary>
+        /// 敌方英雄增益效果
+        /// </summary>
         List<CardDB.cardIDEnum> enemyHeroEnchs = new List<CardDB.cardIDEnum>();
 
+        /// <summary>
+        /// 当前回合数
+        /// </summary>
         int gTurn = 0;
+        /// <summary>
+        /// 当前回合步骤
+        /// </summary>
         int gTurnStep = 0;
+        /// <summary>
+        /// 当前法力值
+        /// </summary>
         int mana = 0;
+        /// <summary>
+        /// 最大法力值
+        /// </summary>
         int maxmana = 0;
+        /// <summary>
+        /// 我方英雄名称
+        /// </summary>
         string ownheroname = "";
+        /// <summary>
+        /// 我方英雄生命值
+        /// </summary>
         int ownherohp = 0;
+        /// <summary>
+        /// 我方英雄最大生命值
+        /// </summary>
         int ownheromaxhp = 30;
+        /// <summary>
+        /// 敌方英雄最大生命值
+        /// </summary>
         int enemyheromaxhp = 30;
+        /// <summary>
+        /// 我方英雄护甲
+        /// </summary>
         int ownherodefence = 0;
+        /// <summary>
+        /// 我方英雄是否准备就绪
+        /// </summary>
         bool ownheroready = false;
+        /// <summary>
+        /// 我方英雄攻击时是否免疫
+        /// </summary>
         bool ownHeroimmunewhileattacking = false;
+        /// <summary>
+        /// 我方英雄本回合攻击次数
+        /// </summary>
         int ownheroattacksThisRound = 0;
+        /// <summary>
+        /// 我方英雄攻击力
+        /// </summary>
         int ownHeroAttack = 0;
+        /// <summary>
+        /// 我方英雄临时攻击力
+        /// </summary>
         int ownHeroTempAttack = 0;
+        /// <summary>
+        /// 我方英雄是否潜行
+        /// </summary>
         bool ownHeroStealth = false;
+        /// <summary>
+        /// 本回合已使用的选项数
+        /// </summary>
         int numOptionPlayedThisTurn = 0;
+        /// <summary>
+        /// 本回合已 played 的随从数
+        /// </summary>
         int numMinionsPlayedThisTurn = 0;
+        /// <summary>
+        /// 本回合已 played 的卡牌数
+        /// </summary>
         int cardsPlayedThisTurn = 0;
+        /// <summary>
+        /// 过载
+        /// </summary>
         int overload = 0;
+        /// <summary>
+        /// 被锁定的法力值
+        /// </summary>
         int lockedMana = 0;
 
+        /// <summary>
+        /// 我方克苏恩生命值加成
+        /// </summary>
         int anzOgOwnCThunHpBonus = 0;
+        /// <summary>
+        /// 我方克苏恩攻击力加成
+        /// </summary>
         int anzOgOwnCThunAngrBonus = 0;
+        /// <summary>
+        /// 我方克苏恩嘲讽状态
+        /// </summary>
         int anzOgOwnCThunTaunt = 0;
+        /// <summary>
+        /// 我方青玉魔像等级
+        /// </summary>
         int anzOwnJadeGolem = 0;
+        /// <summary>
+        /// 敌方青玉魔像等级
+        /// </summary>
         int anzEnemyJadeGolem = 0;
+        /// <summary>
+        /// 本回合我方元素数量
+        /// </summary>
         int anzOwnElementalsThisTurn = 0;
+        /// <summary>
+        /// 上回合我方元素数量
+        /// </summary>
         int anzOwnElementalsLastTurn = 0;
+        /// <summary>
+        /// 我方元素是否具有吸血
+        /// </summary>
         int ownElementalsHaveLifesteal = 0;
+        /// <summary>
+        /// 我方水晶核心状态
+        /// </summary>
         int ownCrystalCore = 0;
+        /// <summary>
+        /// 我方牌库中随从是否0费
+        /// </summary>
         bool ownMinionsInDeckCost0 = false;
+        /// <summary>
+        /// 塔姆辛状态
+        /// </summary>
         bool anzTamsin = false;
 
+        /// <summary>
+        /// 我方牌库大小
+        /// </summary>
         int ownDecksize = 30;
+        /// <summary>
+        /// 敌方牌库大小
+        /// </summary>
         int enemyDecksize = 30;
+        /// <summary>
+        /// 我方疲劳值
+        /// </summary>
         int ownFatigue = 0;
+        /// <summary>
+        /// 敌方疲劳值
+        /// </summary>
         int enemyFatigue = 0;
 
+        /// <summary>
+        /// 我方英雄是否免疫
+        /// </summary>
         bool heroImmune = false;
+        /// <summary>
+        /// 敌方英雄是否免疫
+        /// </summary>
         bool enemyHeroImmune = false;
 
+        /// <summary>
+        /// 我方英雄技能费用
+        /// </summary>
         int ownHeroPowerCost = 2;
+        /// <summary>
+        /// 敌方英雄技能费用
+        /// </summary>
         int enemyHeroPowerCost = 2;
 
+        /// <summary>
+        /// 敌方奥秘数量
+        /// </summary>
         int enemySecretAmount = 0;
+        /// <summary>
+        /// 敌方奥秘列表
+        /// </summary>
         List<SecretItem> enemySecrets = new List<SecretItem>();
 
+        /// <summary>
+        /// 我方英雄是否被冻结
+        /// </summary>
         bool ownHeroFrozen = false;
 
+        /// <summary>
+        /// 我方奥秘列表
+        /// </summary>
         List<string> ownsecretlist = new List<string>();
+        /// <summary>
+        /// 敌方英雄名称
+        /// </summary>
         string enemyheroname = "";
+        /// <summary>
+        /// 敌方英雄生命值
+        /// </summary>
         int enemyherohp = 0;
+        /// <summary>
+        /// 敌方英雄护甲
+        /// </summary>
         int enemyherodefence = 0;
+        /// <summary>
+        /// 敌方英雄是否被冻结
+        /// </summary>
         bool enemyFrozen = false;
+        /// <summary>
+        /// 是否首次运行
+        /// </summary>
         bool fistRun = true;
+        /// <summary>
+        /// 敌方手牌数量
+        /// </summary>
         int enemyNumberHand = 5;
 
+        /// <summary>
+        /// 我方随从列表
+        /// </summary>
         List<Minion> ownminions = new List<Minion>();
+        /// <summary>
+        /// 敌方随从列表
+        /// </summary>
         List<Minion> enemyminions = new List<Minion>();
+        /// <summary>
+        /// 手牌列表
+        /// </summary>
         List<Handmanager.Handcard> handcards = new List<Handmanager.Handcard>();
+        /// <summary>
+        /// 敌方卡牌列表
+        /// </summary>
         List<CardDB.cardIDEnum> enemycards = new List<CardDB.cardIDEnum>();
+        /// <summary>
+        /// 本回合坟场
+        /// </summary>
         List<GraveYardItem> turnGraveYard = new List<GraveYardItem>();
+        /// <summary>
+        /// 所有坟场
+        /// </summary>
         List<GraveYardItem> turnGraveYardAll = new List<GraveYardItem>();
+        /// <summary>
+        /// 发现卡牌列表
+        /// </summary>
         List<string> discover = new List<string>();
+        /// <summary>
+        /// 潜伏者数据库
+        /// </summary>
         Dictionary<int, IDEnumOwner> LurkersDB = new Dictionary<int, IDEnumOwner>();
+        /// <summary>
+        /// 我方坟场
+        /// </summary>
         Dictionary<CardDB.cardIDEnum, int> og = new Dictionary<CardDB.cardIDEnum, int>();
+        /// <summary>
+        /// 敌方坟场
+        /// </summary>
         Dictionary<CardDB.cardIDEnum, int> eg = new Dictionary<CardDB.cardIDEnum, int>();
+        /// <summary>
+        /// 我方牌库
+        /// </summary>
         public Dictionary<CardDB.cardIDEnum, int> od = new Dictionary<CardDB.cardIDEnum, int>();
 
+        /// <summary>
+        /// 费尔根是否死亡
+        /// </summary>
         bool feugendead = false;
+        /// <summary>
+        /// 斯塔拉格是否死亡
+        /// </summary>
         bool stalaggdead = false;
+        /// <summary>
+        /// 数据是否读取完成
+        /// </summary>
         public bool datareaded = false;
 
 
+        /// <summary>
+        /// 武器只攻击随从直到敌方英雄生命值
+        /// </summary>
         int weaponOnlyAttackMobsUntilEnfacehp = 0;
+        /// <summary>
+        /// 如果能在下一回合结束游戏则狂暴
+        /// </summary>
         int berserkIfCanFinishNextTour = 0;
+        /// <summary>
+        /// 面部生命值
+        /// </summary>
         int facehp = 27;
+        /// <summary>
+        /// 放置位置
+        /// </summary>
         int placement = 0;
 
+        /// <summary>
+        /// 敌方回合最大宽度
+        /// </summary>
         int ets = 20;
+        /// <summary>
+        /// 敌方回合最大宽度第二步
+        /// </summary>
         int ets2 = 200;
 
+        /// <summary>
+        /// 下一回合最大宽度
+        /// </summary>
         int ntssw = 10;
+        /// <summary>
+        /// 下一回合深度
+        /// </summary>
         int ntssd = 6;
+        /// <summary>
+        /// 下一回合总牌面数
+        /// </summary>
         int ntssm = 50;
 
+        /// <summary>
+        /// 迭代次数
+        /// </summary>
         int iC = 0;
+        /// <summary>
+        /// 加速等级
+        /// </summary>
         int speedup = 0;
+        /// <summary>
+        /// 调整行动
+        /// </summary>
         int adjustActions = 0;
+        /// <summary>
+        /// 认输模式
+        /// </summary>
         int concedeMode = 0;
 
+        /// <summary>
+        /// 权重
+        /// </summary>
         int alpha = 50;
 
+        /// <summary>
+        /// 是否使用奥秘
+        /// </summary>
         bool dosecrets = false;
+        /// <summary>
+        /// 技能是否准备就绪
+        /// </summary>
         bool abilityReady = true;
+        /// <summary>
+        /// 我方英雄技能
+        /// </summary>
         CardDB.Card heroability = null;
+        /// <summary>
+        /// 敌方英雄技能
+        /// </summary>
         CardDB.Card enemyability = null;
 
+        /// <summary>
+        /// 构造函数，用于从测试数据中初始化牌面
+        /// </summary>
+        /// <param name="data">测试数据字符串，如果为空则从test.txt文件读取</param>
         public BoardTester(string data = "")
         {
             og.Clear();
@@ -303,6 +605,11 @@ namespace HREngine.Bots
             Probabilitymaker.Instance.enemyGraveyard = eg;
         }
 
+        /// <summary>
+        /// 获取英雄技能
+        /// </summary>
+        /// <param name="tc">英雄职业枚举</param>
+        /// <returns>英雄技能卡片对象</returns>
         private CardDB.Card getHeroAbility(TAG_CLASS tc)  //默认英雄技能  Todo:待补充其他英雄技能
         {
             // 考虑升级后的英雄技能
@@ -322,6 +629,14 @@ namespace HREngine.Bots
             return CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.HERO_08bp); //null或者unknown会导致一些运行时空指针报错
         }
 
+        /// <summary>
+        /// 创建新的手牌对象
+        /// </summary>
+        /// <param name="hc">卡片名称</param>
+        /// <param name="attack">攻击力</param>
+        /// <param name="hp">生命值</param>
+        /// <param name="mana_cost">法力值消耗，-1表示使用默认值</param>
+        /// <returns>手牌对象</returns>
         private Handmanager.Handcard createNewHandCard(string hc, int attack, int hp, int mana_cost = -1)
         {
             CardDB.Card c = CardDB.Instance.chnNameToCard(hc);
@@ -335,12 +650,28 @@ namespace HREngine.Bots
             return tmp;
         }
 
+        /// <summary>
+        /// 创建新的随从对象
+        /// </summary>
+        /// <param name="name">随从名称</param>
+        /// <param name="attack">攻击力</param>
+        /// <param name="hp">生命值</param>
+        /// <param name="zonepos">位置</param>
+        /// <param name="own">是否为我方</param>
+        /// <returns>随从对象</returns>
         private Minion createNewMinion(string name, int attack, int hp, int zonepos, bool own)
         {
             return createNewMinion(createNewHandCard(name, attack, hp), zonepos, own);
         }
 
 
+        /// <summary>
+        /// 创建新的随从对象
+        /// </summary>
+        /// <param name="hc">手牌对象</param>
+        /// <param name="zonepos">位置</param>
+        /// <param name="own">是否为我方</param>
+        /// <returns>随从对象</returns>
         private Minion createNewMinion(Handmanager.Handcard hc, int zonepos, bool own)
         {
             Minion m = new Minion
@@ -386,6 +717,11 @@ namespace HREngine.Bots
         }
 
 
+        /// <summary>
+        /// 将英雄名称转换为职业枚举
+        /// </summary>
+        /// <param name="s">英雄名称</param>
+        /// <returns>职业枚举</returns>
         public TAG_CLASS heroNametoClass(string s)
         {
             switch (s)
@@ -413,6 +749,10 @@ namespace HREngine.Bots
             }
         }
 
+        /// <summary>
+        /// 从中文格式的牌面文件中读取游戏状态
+        /// </summary>
+        /// <param name="lines">文件行数组</param>
         private void setupFromChnFile(string[] lines) // 读取中文牌面信息  Todo: 需要增加武器等额外信息
         {
             foreach (string sss in lines)
@@ -512,6 +852,11 @@ namespace HREngine.Bots
                 }
             }
         }
+        /// <summary>
+        /// 从文件行中读取游戏状态并构建牌面
+        /// </summary>
+        /// <param name="lines">文件行数组</param>
+        /// <param name="type">文件类型：0：原始日志类型，1：中文类型</param>
         private void setupPf(string[] lines, int type = 0) // 读取lines，提取构造牌面的重要信息，Type: 0: 默认文本类型，来自运行日志，可读性较差;  1:中文随从，可读性较好
         {
             if (type == 1)
