@@ -486,6 +486,25 @@ def Execute():
                         throw new Exception("The SettingsControl could not be created.");
                     }
 
+
+                    if (
+                        !Wpf.SetupCheckBoxBinding(root, "SetTwoTurnSimulationCheckBox",
+                            "SetTwoTurnSimulation",
+                            BindingMode.TwoWay, DefaultRoutineSettings.Instance))
+                    {
+                        Log.DebugFormat(
+                            "[SettingsControl] SetupCheckBoxBinding failed for 'SetTwoTurnSimulationCheckBox'.");
+                        throw new Exception("The SettingsControl could not be created.");
+                    }
+
+                    if (
+                        !Wpf.SetupTextBoxBinding(root, "SecondTurnAmountTextBox", "SecondTurnAmount",
+                        BindingMode.TwoWay, DefaultRoutineSettings.Instance))
+                    {
+                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'SecondTurnAmountTextBox'.");
+                        throw new Exception("The SettingsControl could not be created.");
+                    }
+
                     var openButton = Wpf.FindControlByName<Button>(root, "lastMatch");
                     openButton.Click += LastMatchOnClick;
 
@@ -969,7 +988,7 @@ def Execute():
         {
 
 
-            switch (printUtils.emoteMode)
+            /* switch (printUtils.emoteMode)
             {
                 case "嘴臭模式":
                     if (firstMove)
@@ -1079,7 +1098,7 @@ def Execute():
                 {
                     playEmote(EmoteType.THANKS);
                 }
-            }
+            } */
             //判断是否处于回溯阶段
             if (RewindUIManager.m_isShowingRewindUI)
             {
@@ -1493,16 +1512,43 @@ def Execute():
             }
             else
             {
-                Helpfunctions.Instance.ErrorLog("使用: " + cardtoplay.Name + " 暂时没有目标");
+                // 记录日志，表明当前使用的卡牌没有目标
+                Log.DebugFormat("使用: " + cardtoplay.Name + " 暂时没有目标");
+
+                bool isChoiceCard = false; // 初始化为 false
+
+                // 如果是德鲁伊的抉择卡牌 (druidchoice >= 1)，则设置全局抉择状态
                 if (moveTodo.druidchoice >= 1)
                 {
+                    Log.DebugFormat("抉择");
+                    // 将AI决策的抉择选项（1=左/随从, 2=右/法术）存入全局变量
                     dirtychoice = moveTodo.druidchoice;
+                    // 记录当前抉择卡牌的ID，用于后续可能的逻辑判断
                     choiceCardId = moveTodo.card.card.cardIDenum.ToString();
+
+                    isChoiceCard = true; // 在 if 块内赋值为 true
                 }
+
+                // 重置与目标选择相关的全局变量，因为此卡牌无目标
                 dirtyTargetSource = -1;
                 dirtytarget = -1;
+
+                // 执行卡牌使用操作：先拾取卡牌，然后放置到指定位置
                 await cardtoplay.Pickup();
                 await cardtoplay.UseAt(moveTodo.place);
+
+                if (isChoiceCard)
+                {
+                    // 等待一小段时间，确保游戏客户端已进入抉择界面
+                    await Coroutine.Sleep(1000);
+
+                    // 执行抉择点击
+                    ChooseOneClick(dirtychoice);
+
+                    // 重置抉择状态
+                    dirtychoice = -1;
+                }
+
             }
             await Coroutine.Sleep(50);
         }
@@ -2104,22 +2150,22 @@ def Execute():
             int i = random.Next(0, 3);
 
 
-                HashSet<Card> cards = GameState.Get().GetFriendlySidePlayer().GetHandZone().GetCards().ToHashSet();
-                if (cards.Count <= 3)
-                {
-                    Log.WarnFormat("牌太少了摸个毛");
-                    return;
-                }
-                Log.WarnFormat("准备摸{0}张牌", NumberOfTimesToDrawCards);
-                foreach (Card c in cards)
-                {
-                    if (i > NumberOfTimesToDrawCards)
-                        break;
-                    await Client.MoveCursorHumanLike(Client.CardInteractPoint(c));
-                    await Coroutine.Sleep(random.Next(300, 2200));
-                    i++;
-                }
-            
+            HashSet<Card> cards = GameState.Get().GetFriendlySidePlayer().GetHandZone().GetCards().ToHashSet();
+            if (cards.Count <= 3)
+            {
+                Log.WarnFormat("牌太少了摸个毛");
+                return;
+            }
+            Log.WarnFormat("准备摸{0}张牌", NumberOfTimesToDrawCards);
+            foreach (Card c in cards)
+            {
+                if (i > NumberOfTimesToDrawCards)
+                    break;
+                await Client.MoveCursorHumanLike(Client.CardInteractPoint(c));
+                await Coroutine.Sleep(random.Next(300, 2200));
+                i++;
+            }
+
             Vector3 position = EndTurnButton.Get().Transform.Position;
             await Client.MoveCursorHumanLike(position);
         }
