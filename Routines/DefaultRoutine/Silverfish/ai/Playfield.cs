@@ -55,6 +55,7 @@ namespace HREngine.Bots
         public int deckAngrBuff = 0;//牌库攻击BUFF
         public int deckHpBuff = 0;//牌库生命值BUFF
         public int nextEntity = 70;
+        //第几个操作的场面
         public int pID = 0;
         public bool isLethalCheck = false;
         public int enemyTurnsCount = 0;
@@ -2600,10 +2601,7 @@ namespace HREngine.Bots
                 }
             }
             //移除地标
-            trgts2.RemoveAll(minion => minion != null &&
-                                       minion.handcard != null &&
-                                       minion.handcard.card != null &&
-                                       minion.handcard.card.type == CardDB.cardtype.LOCATION);
+            trgts2.RemoveAll(minion => minion?.handcard?.card?.type == CardDB.cardtype.LOCATION);
             if (hasTaunts) return tauntTarget;
 
             if (isLethalCheck) trgts2.Clear(); // only target enemy hero during Lethal check!
@@ -9011,35 +9009,22 @@ namespace HREngine.Bots
             // 如果目标是英雄，则直接返回
             if (target.isHero) return;
 
-            // 如果摩尔克的数量大于1，则为每个未被沉默的摩尔克触发抽牌效果
-            // if (this.anzMoorabi > 1)
-            // {
             // 遍历己方随从
-            foreach (Minion m in this.ownMinions)
+            for (int i = 0; i < this.ownMinions.Count; i++)
             {
-                // // 检查随从是否是摩尔克且未被沉默
-                // if (m.name == CardDB.cardNameEN.moorabi && !m.silenced)
-                // {
-                //     // 抽取目标随从的复制牌
-                //     this.drawACard(target.handcard.card.nameEN, m.own, true);
-                // }
+                Minion m = this.ownMinions[0];
+                if (!m.silenced)
+                    m.handcard.card.sim_card.onMinionFrozen(this, m, target);
+            }
+            // 遍历敌方随从
+
+            for (int i = 0; i < this.enemyMinions.Count; i++)
+            {
+                Minion m = this.enemyMinions[0];
                 if (!m.silenced)
                     m.handcard.card.sim_card.onMinionFrozen(this, m, target);
             }
 
-            // 遍历敌方随从
-            foreach (Minion m in this.enemyMinions)
-            {
-                // // 检查随从是否是摩尔克且未被沉默
-                // if (m.name == CardDB.cardNameEN.moorabi && !m.silenced)
-                // {
-                //     // 抽取目标随从的复制牌
-                //     this.drawACard(target.handcard.card.nameEN, m.own, true);
-                // }
-                if (!m.silenced)
-                    m.handcard.card.sim_card.onMinionFrozen(this, m, target);
-            }
-            // }
         }
 
         /// <summary>
@@ -9071,7 +9056,115 @@ namespace HREngine.Bots
                 m.becomeSilence(this); // 调用随从的沉默方法，移除其所有能力和增益效果
             }
         }
+        public Handmanager.Handcard drawACardAndReturn(CardDB.cardNameEN cardNameEn, bool own, bool nopen = false)
+        {
+            
+            CardDB.cardNameEN s = cardNameEn;
+            // 检查是否为己方玩家抽卡
+            if (own)
+            {
+                // 处理未知卡牌（即从牌库顶抽取的卡牌）
+                if (s == CardDB.cardNameEN.unknown && !nopen)
+                {
+                    // 牌库为空，触发疲劳伤害
+                    if (ownDeckSize == 0)
+                    {
+                        this.ownHeroFatigue++;
+                        this.ownHero.getDamageOrHeal(this.ownHeroFatigue, this, false, true);
+                        return null;
+                    }
+                    else
+                    {
+                        // 从牌库中抽卡
+                        this.ownDeckSize--;
+                        // 手牌已满（10张），无法再抽牌
+                        if (this.owncards.Count >= 10)
+                        {
+                            return null;
+                        }
+                        this.owncarddraw++;
+                        return new Handmanager.Handcard();
+                    }
+                }
+                else
+                {
+                    // 手牌已满（10张），无法再抽牌
+                    if (this.owncards.Count >= 10)
+                    {
+                        return null;
+                    }
+                    this.owncarddraw++;
+                }
+            }
+            else // 处理敌方玩家抽卡
+            {
+                if (s == CardDB.cardNameEN.unknown && !nopen)
+                {
+                    // 牌库为空，触发疲劳伤害
+                    if (enemyDeckSize == 0)
+                    {
+                        this.enemyHeroFatigue++;
+                        this.enemyHero.getDamageOrHeal(this.enemyHeroFatigue, this, false, true);
+                        return null;
+                    }
+                    else
+                    {
+                        // 从牌库中抽卡
+                        this.enemyDeckSize--;
+                        // 手牌已满（10张），无法再抽牌
+                        if (this.enemyAnzCards >= 10)
+                        {
+                            return null;
+                        }
+                        this.enemycarddraw++;
+                        this.enemyAnzCards++;
+                    }
+                }
+                else
+                {
+                    // 手牌已满（10张），无法再抽牌
+                    if (this.enemyAnzCards >= 10)
+                    {
+                        return null;
+                    }
+                    this.enemycarddraw++;
+                    this.enemyAnzCards++;
+                }
+                this.triggerCardsChanged(false);
 
+                return null;
+            }
+            // 处理未知卡牌的抽取和添加到手牌中
+            if (s == CardDB.cardNameEN.unknown)
+            {
+                CardDB.Card c = CardDB.Instance.getCardData(s);
+                Handmanager.Handcard hc = new Handmanager.Handcard
+                {
+                    card = c,
+                    position = this.owncards.Count + 1,
+                    manacost = 1000,
+                    entity = this.getNextEntity()
+                };
+                this.owncards.Add(hc);
+                this.triggerCardsChanged(true);
+            }
+            else // 处理指定卡牌的抽取
+            {
+                CardDB.Card c = CardDB.Instance.getCardData(s);
+                Handmanager.Handcard hc = new Handmanager.Handcard
+                {
+                    card = c,
+                    position = this.owncards.Count + 1,
+                    manacost = c.calculateManaCost(this),
+                    entity = this.getNextEntity()
+                };
+
+                this.owncards.Add(hc);
+                this.triggerCardsChanged(true);
+            }
+           
+            return new Handmanager.Handcard();
+            }
         /// <summary>
         /// 抽取一张卡牌并添加到玩家手牌中。如果手牌已满或牌库为空，会触发相应的惩罚或疲劳伤害。
         /// </summary>
@@ -10078,6 +10171,13 @@ namespace HREngine.Bots
         /// </summary>
         /// <param name="m">目标随从。</param>
         public void minionLosesDivineShield(Minion m)
+        {
+            m.divineshild = false;
+            if (m.own) this.tempTrigger.ownMinionLosesDivineShield++;
+            else this.tempTrigger.enemyMinionLosesDivineShield++;
+        }
+
+        public void minionLosesDivineShield(EntityUnit m)
         {
             m.divineshild = false;
             if (m.own) this.tempTrigger.ownMinionLosesDivineShield++;
