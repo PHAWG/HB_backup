@@ -55,7 +55,7 @@ namespace HREngine.Bots
         /// <summary>
         /// 第二AI步骤模拟的棋盘数量 - 影响AI对未来回合的预测深度
         /// </summary>
-        public int twotsamount = 0; 
+        public int twotsamount = 256; 
         
         /// <summary>
         /// 敌方第一回合第一步AI计算的最大棋盘数量

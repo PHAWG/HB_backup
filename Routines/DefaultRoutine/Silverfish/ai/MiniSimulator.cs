@@ -199,7 +199,7 @@ namespace HREngine.Bots
         /// <param name="amount">模拟数量</param>
         public void setSecondTurnSimu(bool sts, int amount)
         {
-            //this.simulateSecondTurn = sts;
+            this.simulateSecondTurn = sts;
             this.dirtyTwoTurnSim = amount;
         }
 
@@ -210,6 +210,10 @@ namespace HREngine.Bots
         public int getSecondTurnSimu()
         {
             return this.dirtyTwoTurnSim;
+        }
+        public bool getSimulateSecondTurn()
+        {
+            return this.simulateSecondTurn;
         }
 
         /// <summary>

@@ -24,10 +24,10 @@ namespace HREngine.Bots
             public int MODULAR_ENTITY_PART_2 = 0;//自定义模块2
             public int TAG_ONE_TURN_EFFECT = 0;
             public int LUNAHIGHLIGHTHINT = 0;
+            public CardDB.cardIDEnum HAS_DARK_GIFT = CardDB.cardIDEnum.None;
             public int scheme = 1;
             public List<CardDB.cardIDEnum> enchs = new List<CardDB.cardIDEnum>();
             public bool discovered = false;
-
             public bool temporary = false;//临时卡牌
             public bool valeeraShadow = false;//瓦莉拉的阴影，这才是临时牌用的tag
             //条件计数，例如施放过几张法术，英雄技能造成多少伤害等

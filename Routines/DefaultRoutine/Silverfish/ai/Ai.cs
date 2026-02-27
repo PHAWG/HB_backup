@@ -17,15 +17,15 @@ namespace HREngine.Bots
     public class Ai
     {
         /// <summary>
-        /// 最大搜索深度
+        /// 最大计算量
         /// </summary>
         public int maxdeep = 12;
         /// <summary>
-        /// 最大搜索宽度
+        /// 最大考虑步数
         /// </summary>
         public int maxwide = 3000;
         /// <summary>
-        /// 最大计算时间
+        /// 每步最大保留场面数
         /// </summary>
         public int maxCal = 60;
         //public int playaroundprob = 40;
@@ -227,10 +227,11 @@ namespace HREngine.Bots
         /// </summary>
         /// <param name="stts">是否启用</param>
         /// <param name="amount">模拟数量</param>
-        public void setTwoTurnSimulation(bool stts, int amount)
+        public void setTwoTurnSimulation(bool EnableTwoTurnSimulation, int amount)
         {
-            this.mainTurnSimulator.setSecondTurnSimu(stts, amount);
-            this.secondturnsim = stts;
+            this.mainTurnSimulator.setSecondTurnSimu(EnableTwoTurnSimulation, amount);
+            this.secondturnsim = EnableTwoTurnSimulation;
+            settings.simulateEnemysTurn = EnableTwoTurnSimulation;
             settings.secondTurnAmount = amount;
         }
         /// <summary>

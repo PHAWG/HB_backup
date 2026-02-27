@@ -210,55 +210,55 @@ namespace HREngine.Bots
                 if (p.manaTurnEnd + usecoin > 10) retval -= 10 * usecoin;
             }
             // 法力水晶还剩下 2 个并且还能用英雄技能
-            if (p.manaTurnEnd >= p.ownHeroAblility.manacost && !useAbili)
-            {
-                switch (p.ownHeroAblility.card.nameEN)
-                {
-                    case CardDB.cardNameEN.heal: goto case CardDB.cardNameEN.lesserheal;
-                    case CardDB.cardNameEN.lesserheal:
-                        bool wereTarget = false;
-                        if (p.ownHero.Hp < p.ownHero.maxHp) wereTarget = true;
-                        if (!wereTarget)
-                        {
-                            foreach (Minion m in p.ownMinions)
-                            {
-                                if (m.wounded) { wereTarget = true; break; }
-                            }
-                        }
-                        if (wereTarget && !(p.anzOwnAuchenaiSoulpriest > 0 || p.embracetheshadow > 0)) retval -= 10;
-                        break;
-                    case CardDB.cardNameEN.poisoneddaggers: goto case CardDB.cardNameEN.daggermastery;
-                    case CardDB.cardNameEN.daggermastery:
-                        if (!(p.ownWeapon.Durability > 1 || p.ownWeapon.Angr > 1)) retval -= 10;
-                        break;
-                    case CardDB.cardNameEN.totemicslam: goto case CardDB.cardNameEN.totemiccall;
-                    case CardDB.cardNameEN.totemiccall:
-                        if (p.ownMinions.Count < 7) retval -= 10;
-                        else retval -= 3;
-                        break;
-                    case CardDB.cardNameEN.thetidalhand: goto case CardDB.cardNameEN.reinforce;
-                    case CardDB.cardNameEN.thesilverhand: goto case CardDB.cardNameEN.reinforce;
-                    case CardDB.cardNameEN.reinforce:
-                        if (p.ownMinions.Count < 7) retval -= 10;
-                        else retval -= 3;
-                        break;
-                    case CardDB.cardNameEN.soultap:
-                        if (p.owncards.Count < 10 && p.ownDeckSize > 0)
-                        {
-                            retval -= 20;
-                        }
-                        break;
-                    case CardDB.cardNameEN.lifetap:
-                        if (p.owncards.Count < 10 && p.ownDeckSize > 0 && p.ownHero.Hp >= 20 && p.enemyMinions.Count == 0)
-                        {
-                            retval -= 10;
-                        }
-                        break;
-                    default:
-                        retval -= 10;
-                        break;
-                }
-            }
+            // if (p.manaTurnEnd >= p.ownHeroAblility.manacost && !useAbili)
+            // {
+            //     switch (p.ownHeroAblility.card.nameEN)
+            //     {
+            //         case CardDB.cardNameEN.heal: goto case CardDB.cardNameEN.lesserheal;
+            //         case CardDB.cardNameEN.lesserheal:
+            //             bool wereTarget = false;
+            //             if (p.ownHero.Hp < p.ownHero.maxHp) wereTarget = true;
+            //             if (!wereTarget)
+            //             {
+            //                 foreach (Minion m in p.ownMinions)
+            //                 {
+            //                     if (m.wounded) { wereTarget = true; break; }
+            //                 }
+            //             }
+            //             if (wereTarget && !(p.anzOwnAuchenaiSoulpriest > 0 || p.embracetheshadow > 0)) retval -= 10;
+            //             break;
+            //         case CardDB.cardNameEN.poisoneddaggers: goto case CardDB.cardNameEN.daggermastery;
+            //         case CardDB.cardNameEN.daggermastery:
+            //             if (!(p.ownWeapon.Durability > 1 || p.ownWeapon.Angr > 1)) retval -= 10;
+            //             break;
+            //         case CardDB.cardNameEN.totemicslam: goto case CardDB.cardNameEN.totemiccall;
+            //         case CardDB.cardNameEN.totemiccall:
+            //             if (p.ownMinions.Count < 7) retval -= 10;
+            //             else retval -= 3;
+            //             break;
+            //         case CardDB.cardNameEN.thetidalhand: goto case CardDB.cardNameEN.reinforce;
+            //         case CardDB.cardNameEN.thesilverhand: goto case CardDB.cardNameEN.reinforce;
+            //         case CardDB.cardNameEN.reinforce:
+            //             if (p.ownMinions.Count < 7) retval -= 10;
+            //             else retval -= 3;
+            //             break;
+            //         case CardDB.cardNameEN.soultap:
+            //             if (p.owncards.Count < 10 && p.ownDeckSize > 0)
+            //             {
+            //                 retval -= 20;
+            //             }
+            //             break;
+            //         case CardDB.cardNameEN.lifetap:
+            //             if (p.owncards.Count < 10 && p.ownDeckSize > 0 && p.ownHero.Hp >= 20 && p.enemyMinions.Count == 0)
+            //             {
+            //                 retval -= 10;
+            //             }
+            //             break;
+            //         default:
+            //             retval -= 10;
+            //             break;
+            //     }
+            // }
             // if (usecoin && p.mana >= 1) retval -= 20;
             // 手里的随从
             int mobsInHand = 0;
@@ -329,10 +329,10 @@ namespace HREngine.Bots
                 if (retval < 10000) retval = 10000;
             }
             // 感觉要死
-            if (p.enemyHero.Hp >= 1 && p.guessingHeroHP <= 0)
-            {
-                retval -= 1000;
-            }
+            // if (p.enemyHero.Hp >= 1 && p.guessingHeroHP <= 0)
+            // {
+            //     retval -= 1000;
+            // }
             // 确实无法斩杀，并且对面场攻已经斩杀我们了，苟命要紧，但是如果能神抽说不定还有机会
             if (p.calEnemyTotalAngr() >= p.ownHero.Hp + p.ownHero.armor && (p.calDirectDmg(p.mana, false) < p.enemyHero.Hp + p.enemyHero.armor) && (p.anzEnemyTaunt > 0 || p.calTotalAngr() + p.calDirectDmg(p.mana, false) < p.enemyHero.Hp + p.enemyHero.armor))
             {

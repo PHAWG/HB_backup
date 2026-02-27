@@ -289,7 +289,7 @@ namespace HREngine.Bots
 
             Questmanager.Instance.updatePlayedMobs(this.gTurnStep);//任务管理
             Hrtprozis.Instance.updateMinions(this.ownMinions, this.enemyMinions);//更新随从
-            Hrtprozis.Instance.updateLurkersDB(this.LurkersDB);//潜伏者?
+            Hrtprozis.Instance.updateLurkersDB(this.LurkersDB);//沟渠潜伏者消灭随从的实体id
             Handmanager.Instance.setHandcards(this.handCards, this.anzcards, this.enemyAnzCards);//手牌
             Hrtprozis.Instance.updateFatigueStats(this.ownDecksize, this.ownHeroFatigue, this.enemyDecksize, this.enemyHeroFatigue);//疲劳
             Hrtprozis.Instance.updateJadeGolemsInfo(GameState.Get().GetFriendlySidePlayer().GetTag(GAME_TAG.JADE_GOLEM), GameState.Get().GetOpposingSidePlayer().GetTag(GAME_TAG.JADE_GOLEM));//青玉

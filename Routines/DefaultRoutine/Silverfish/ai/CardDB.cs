@@ -446,430 +446,697 @@ namespace HREngine.Bots
             CardRace = 200,
             /// <summary>跟班</summary>
             markOfEvil = 994,
+            /// <summary>军情七处</summary>
+            SI_7 = 1678,
             /// <summary>树人</summary>
             Treant = 2831,
+            /// <summary>古树</summary>
+            Ancient = 2871,
             /// <summary>小鬼</summary>
             IMP = 1965,
             /// <summary>雏龙</summary>
             Whelp = 2355,
+            /// <summary>白银之手新兵</summary>
+            SilverHandRecruit = 3444,
             /// <summary>星舰组件</summary>
             StarshipPiece = 3631,
             /// <summary>星舰</summary>
             Starship = 3555,
             /// <summary>星灵</summary>
             Protoss = 3469,
-
+            /// <summary>小精灵</summary>
+            Wisp = 3881,
+            /// <summary>拉法姆</summary>
+            Rafaam = 3928,
+            /// <summary>伊瑟拉</summary>
+            Ysera = 4392,
         };
 
         /// <summary>
         /// <value> 异常类型 </value>
         /// </summary>
+        /// <summary>
+        /// 定义了一个枚举类型 ErrorType2，用于表示各种错误或条件类型。
+        /// 每个枚举值代表一种特定的错误或条件，并附带简要说明。
+        /// </summary>
         public enum ErrorType2
         {
             /// <summary>
-            /// <value> 无效的 </value>
+            /// 表示无效的状态或操作。
             /// </summary>
             INVALID = -1,
+
             /// <summary>
-            /// <value> 异常类型 </value>
+            /// 表示无异常或默认状态。
             /// </summary>
             NONE = 0,
+
             /// <summary>
-            /// <value> 目标只能是随从 </value>
+            /// 要求目标必须是随从。
             /// </summary>
             REQ_MINION_TARGET = 1,
+
             /// <summary>
-            /// <value> 目标只能是友方 </value>
+            /// 要求目标必须是友方单位。
             /// </summary>
             REQ_FRIENDLY_TARGET = 2,
+
             /// <summary>
-            /// <value> 目标只能是敌方 </value>
+            /// 要求目标必须是敌方单位。
             /// </summary>
             REQ_ENEMY_TARGET = 3,
+
             /// <summary>
-            /// <value> 目标只能是受伤的随从 </value>
+            /// 要求目标必须是受伤的随从。
             /// </summary>
             REQ_DAMAGED_TARGET = 4,
+
             /// <summary>
-            /// <value> 最大奥秘 </value>
+            /// 要求达到最大奥秘数量限制。
             /// </summary>
             REQ_MAX_SECRETS = 5,
+
             /// <summary>
-            /// <value> 目标只能是被冻结的随从 </value>
+            /// 要求目标必须是被冻结的随从。
             /// </summary>
             REQ_FROZEN_TARGET = 6,
+
             /// <summary>
-            /// <value> 冲锋 </value>
+            /// 要求目标具有冲锋能力。
             /// </summary>
             REQ_CHARGE_TARGET = 7,
+
             /// <summary>
-            /// <value> 目标攻击力要求小于等于 参数攻击力</value>
+            /// 要求目标的攻击力小于等于指定值。
             /// </summary>
             REQ_TARGET_MAX_ATTACK = 8,
+
             /// <summary>
-            /// <value> 目标是除了自身英雄以外的目标 </value>
+            /// 要求目标不能是自身英雄。
             /// </summary>
             REQ_NONSELF_TARGET = 9,
+
             /// <summary>
-            /// <value> 目标只能是指定种族的 参数为种族数字</value>
+            /// 要求目标必须是指定种族的单位。
             /// </summary>
             REQ_TARGET_WITH_RACE = 10,
+
             /// <summary>
-            /// <value> 需要有目标 </value>
+            /// 要求必须有目标才能执行操作。
             /// </summary>
             REQ_TARGET_TO_PLAY = 11,
+
             /// <summary>
-            /// <value> 随从数量空位 有参数 </value>
+            /// 要求随从槽位满足一定数量。
             /// </summary>
             REQ_NUM_MINION_SLOTS = 12,
+
             /// <summary>
-            /// <value> 需要武器才能使用 </value>
+            /// 要求必须装备武器才能使用。
             /// </summary>
             REQ_WEAPON_EQUIPPED = 13,
+
             /// <summary>
-            /// <value> 要求足够的法力值 </value>
+            /// 要求拥有足够的法力值。
             /// </summary>
             REQ_ENOUGH_MANA = 14,
+
             /// <summary>
-            /// <value> 要求在你的回合 </value>
+            /// 要求必须在自己的回合。
             /// </summary>
             REQ_YOUR_TURN = 15,
+
             /// <summary>
-            /// <value> 要求非潜行敌方目标</value>
+            /// 要求目标不能处于潜行状态。
             /// </summary>
             REQ_NONSTEALTH_ENEMY_TARGET = 16,
+
             /// <summary>
-            /// <value> 目标只能是英雄 </value>
+            /// 要求目标必须是英雄。
             /// </summary>
             REQ_HERO_TARGET = 17,
+
             /// <summary>
-            /// <value> 要求奥秘区域上限 </value>
+            /// 要求奥秘区域未达到上限。
             /// </summary>
             REQ_SECRET_ZONE_CAP = 18,
+
             /// <summary>
-            /// <value> 要求随从上限（如果有目标） </value>
+            /// 要求随从数量未达到上限（如果有目标）。
             /// </summary>
             REQ_MINION_CAP_IF_TARGET_AVAILABLE = 19,
+
             /// <summary>
-            /// <value> 要求随从数量,param为数量 </value>
+            /// 要求随从数量满足指定条件。
             /// </summary>
             REQ_MINION_CAP = 20,
+
             /// <summary>
-            /// <value> 要求目标本回合攻击 </value>
+            /// 要求目标在本回合内进行过攻击。
             /// </summary>
             REQ_TARGET_ATTACKED_THIS_TURN = 21,
+
             /// <summary>
-            /// <value> 无目标时也可以使用（抉择星辰降落，无面腐蚀者） </value>
+            /// 允许在无目标时使用（如抉择卡牌）。
             /// </summary>
             REQ_TARGET_IF_AVAILABLE = 22,
+
             /// <summary>
-            /// <value> 对面场上的全部随从最少需要X个，有参数 </value>
+            /// 要求敌方场上至少有指定数量的随从。
             /// </summary>
             REQ_MINIMUM_ENEMY_MINIONS = 23,
+
             /// <summary>
-            /// <value> 连击有目标 </value>
+            /// 连击效果需要指定目标。
             /// </summary>
             REQ_TARGET_FOR_COMBO = 24,
+
             /// <summary>
-            /// <value> 要求剩余法力水晶 </value>
+            /// 要求剩余法力水晶满足条件。
             /// </summary>
             REQ_NOT_EXHAUSTED_ACTIVATE = 25,
+
             /// <summary>
-            /// <value> 要求控制一个奥秘或任务 </value>
+            /// 要求控制一个唯一的奥秘或任务。
             /// </summary>
             REQ_UNIQUE_SECRET_OR_QUEST = 26,
+
             /// <summary>
-            /// <value> 要求目标嘲讽 </value>
+            /// 要求目标具有嘲讽能力。
             /// </summary>
             REQ_TARGET_TAUNTER = 27,
+
             /// <summary>
-            /// <value> 要求目标可以被攻击 </value>
+            /// 要求目标可以被攻击。
             /// </summary>
             REQ_CAN_BE_ATTACKED = 28,
+
             /// <summary>
-            /// <value> 要求英雄技能能使用 </value>
+            /// 要求英雄技能可以使用。
             /// </summary>
             REQ_ACTION_PWR_IS_MASTER_PWR = 29,
+
             /// <summary>
-            /// <value> 要求磁力目标 </value>
+            /// 要求目标具有磁力特性。
             /// </summary>
             REQ_TARGET_MAGNET = 30,
+
             /// <summary>
-            /// <value> 要求目标攻击力大于0 </value>
+            /// 要求目标攻击力大于0。
             /// </summary>
             REQ_ATTACK_GREATER_THAN_0 = 31,
+
             /// <summary>
-            /// <value> 要求攻击者未被冻结 </value>
+            /// 要求攻击者未被冻结。
             /// </summary>
             REQ_ATTACKER_NOT_FROZEN = 32,
+
             /// <summary>
-            /// <value> 要求目标为英雄或随从 </value>
+            /// 要求目标是英雄或随从。
             /// </summary>
             REQ_HERO_OR_MINION_TARGET = 33,
+
             /// <summary>
-            /// <value> 要求目标能被法术指定 </value>
+            /// 要求目标可以被法术指定。
             /// </summary>
             REQ_CAN_BE_TARGETED_BY_SPELLS = 34,
+
             /// <summary>
-            /// <value> 暂时不清楚 </value>
+            /// 当前用途暂不明确。
             /// </summary>
             REQ_SUBCARD_IS_PLAYABLE = 35,
+
             /// <summary>
-            /// <value> 连击无目标 </value>
+            /// 连击效果无需指定目标。
             /// </summary>
             REQ_TARGET_FOR_NO_COMBO = 36,
+
             /// <summary>
-            /// <value> 要求没有控制其他随从 </value>
+            /// 要求未控制其他随从。
             /// </summary>
             REQ_NOT_MINION_JUST_PLAYED = 37,
+
             /// <summary>
-            /// <value> 要求未使用英雄技能 </value>
+            /// 要求未使用英雄技能。
             /// </summary>
             REQ_NOT_EXHAUSTED_HERO_POWER = 38,
+
             /// <summary>
-            /// <value> 可由对手指定目标 </value>
+            /// 允许对手指定目标。
             /// </summary>
             REQ_CAN_BE_TARGETED_BY_OPPONENTS = 39,
+
             /// <summary>
-            /// <value> 攻击者可以攻击 </value>
+            /// 要求攻击者可以发起攻击。
             /// </summary>
             REQ_ATTACKER_CAN_ATTACK = 40,
+
             /// <summary>
-            /// <value> 要求目标攻击力大于等于  参数为攻击力</value>
+            /// 要求目标攻击力大于等于指定值。
             /// </summary>
-            REQ_TARGET_MIN_ATTACK = 41, // 有参数
+            REQ_TARGET_MIN_ATTACK = 41,
+
             /// <summary>
-            /// <value> 要求可被英雄技能瞄准 </value>
+            /// 要求目标可以被英雄技能指定。
             /// </summary>
             REQ_CAN_BE_TARGETED_BY_HERO_POWERS = 42,
+
             /// <summary>
-            /// <value> 要求敌方目标不具有免疫 </value>
+            /// 要求敌方目标不具有免疫能力。
             /// </summary>
             REQ_ENEMY_TARGET_NOT_IMMUNE = 43,
+
             /// <summary>
-            /// <value> 要求全场面没有随从 </value>
+            /// 要求全场没有随从存在。
             /// </summary>
             REQ_ENTIRE_ENTOURAGE_NOT_IN_PLAY = 44,
+
             /// <summary>
-            /// <value> 对面场上的全部随从最少需要X个  参数最少随从数量</value>
+            /// 要求总随从数量至少达到指定值。
             /// </summary>
             REQ_MINIMUM_TOTAL_MINIONS = 45,
+
             /// <summary>
-            /// <value> 目标必须是嘲讽随从 </value>
+            /// 要求目标必须是嘲讽随从。
             /// </summary>
             REQ_MUST_TARGET_TAUNTER = 46,
+
             /// <summary>
-            /// <value> 目标只能是未受伤的随从 </value>
+            /// 要求目标未受伤。
             /// </summary>
             REQ_UNDAMAGED_TARGET = 47,
+
             /// <summary>
-            /// <value> 可以被战吼指定目标 </value>
+            /// 要求目标可以被战吼效果指定。
             /// </summary>
             REQ_CAN_BE_TARGETED_BY_BATTLECRIES = 48,
+
             /// <summary>
-            /// <value> 猎人英雄技能稳固射击 </value>
+            /// 猎人英雄技能“稳固射击”的特殊要求。
             /// </summary>
             REQ_STEADY_SHOT = 49,
+
             /// <summary>
-            /// <value> 要求目标是随从或者敌方英雄 </value>
+            /// 要求目标是随从或敌方英雄。
             /// </summary>
             REQ_MINION_OR_ENEMY_HERO = 50,
+
             /// <summary>
-            /// <value> 有龙牌在手才有目标 </value>
+            /// 要求手中有龙牌才可指定目标。
             /// </summary>
             REQ_TARGET_IF_AVAILABLE_AND_DRAGON_IN_HAND = 51,
+
             /// <summary>
-            /// <value> 目标只能是传说随从 </value>
+            /// 要求目标必须是传说随从。
             /// </summary>
             REQ_LEGENDARY_TARGET = 52,
+
             /// <summary>
-            /// <value> 需要一个死亡的友方随从在当前回合死亡 </value>
+            /// 要求本回合有友方随从死亡。
             /// </summary>
             REQ_FRIENDLY_MINION_DIED_THIS_TURN = 53,
+
             /// <summary>
-            /// <value> 需要一个死亡的友方随从 </value>
+            /// 要求本局游戏中有友方随从死亡。
             /// </summary>
             REQ_FRIENDLY_MINION_DIED_THIS_GAME = 54,
+
             /// <summary>
-            /// <value> 敌方英雄已装备武器 </value>
+            /// 要求敌方英雄已装备武器。
             /// </summary>
             REQ_ENEMY_WEAPON_EQUIPPED = 55,
+
             /// <summary>
-            /// <value> 我方随从最少要X个可以使用，有param</value>
+            /// 要求友方随从数量满足最低要求才可使用。
             /// </summary>
             REQ_TARGET_IF_AVAILABLE_AND_MINIMUM_FRIENDLY_MINIONS = 56,
+
             /// <summary>
-            /// <value> 目标只能是战吼随从 </value>
+            /// 要求目标必须是战吼随从。
             /// </summary>
             REQ_TARGET_WITH_BATTLECRY = 57,
+
             /// <summary>
-            /// <value> 目标只能是亡语随从 </value>
+            /// 要求目标必须是亡语随从。
             /// </summary>
             REQ_TARGET_WITH_DEATHRATTLE = 58,
+
             /// <summary>
-            /// <value> 最少需要X个奥秘才有目标 </value>
+            /// 要求奥秘数量满足最低要求才可指定目标。
             /// </summary>
             REQ_TARGET_IF_AVAILABLE_AND_MINIMUM_FRIENDLY_SECRETS = 59,
+
             /// <summary>
-            /// <value> 奥秘数未达到奥秘区域上限 </value>
+            /// 要求奥秘数未达到区域上限。
             /// </summary>
             REQ_SECRET_ZONE_CAP_FOR_NON_SECRET = 60,
+
             /// <summary>
-            /// <value> 只能是费用等于准确费用的目标 </value>
+            /// 要求目标费用等于指定值。
             /// </summary>
             REQ_TARGET_EXACT_COST = 61,
+
             /// <summary>
-            /// <value> 目标只能是潜行随从 </value>
+            /// 要求目标处于潜行状态。
             /// </summary>
             REQ_STEALTHED_TARGET = 62,
+
             /// <summary>
-            /// <value> 场上可以放一个随从且小于10个水晶 </value>
+            /// 要求场上可以放置随从且法力水晶未满。
             /// </summary>
             REQ_MINION_SLOT_OR_MANA_CRYSTAL_SLOT = 63,
+
             /// <summary>
-            /// <value> 最少需要x个任务 </value>
+            /// 要求任务数量满足最低要求。
             /// </summary>
             REQ_MAX_QUESTS = 64,
+
             /// <summary>
-            /// <value> 如果上个回合打过元素牌则有目标 </value>
+            /// 要求上一回合打出过元素牌才可指定目标。
             /// </summary>
             REQ_TARGET_IF_AVAILABE_AND_ELEMENTAL_PLAYED_LAST_TURN = 65,
+
             /// <summary>
-            /// <value> 要求目标不是吸血鬼 冒险boss的技能</value>
+            /// 要求目标不是吸血鬼。
             /// </summary>
             REQ_TARGET_NOT_VAMPIRE = 66,
+
             /// <summary>
-            /// <value> 目标只会受到武器伤害 冒险boss的技能</value>
+            /// 要求目标只能受到武器伤害。
             /// </summary>
             REQ_TARGET_NOT_DAMAGEABLE_ONLY_BY_WEAPONS = 67,
+
             /// <summary>
-            /// <value> 要求英雄技能未禁用 </value>
+            /// 要求英雄技能未被禁用。
             /// </summary>
             REQ_NOT_DISABLED_HERO_POWER = 68,
+
             /// <summary>
-            /// <value> 必须先使用其他卡牌 </value>
-            /// 例如：暗影映像 - 每当你使用一张牌，变形成为该卡牌的复制。
+            /// 要求必须先使用其他卡牌。
             /// </summary>
             REQ_MUST_PLAY_OTHER_CARD_FIRST = 69,
+
             /// <summary>
-            /// <value> 手牌未满 </value>
+            /// 要求手牌未满。
             /// </summary>
             REQ_HAND_NOT_FULL = 70,
 
-            REQ_DRAG_TO_PLAY = 71,
             /// <summary>
-            /// <value> 需要有目标2 </value>
+            /// 要求通过拖拽方式使用卡牌。
+            /// </summary>
+            REQ_DRAG_TO_PLAY = 71,
+
+            /// <summary>
+            /// 要求必须有目标才能使用。
             /// </summary>
             REQ_TARGET_TO_PLAY2 = 75,
+
             /// <summary>
-            /// <value> 目标法术无自然属性 </value>
+            /// 要求目标法术不含自然属性。
             /// </summary>
             REQ_TARGET_NO_NATURE = 77,
-            REQ_LITERALLY_UNPLAYABLE,
+
             /// <summary>
-            /// 如果目标可用且英雄有攻击力，则请求目标
+            /// 要求目标不可播放。
+            /// </summary>
+            REQ_LITERALLY_UNPLAYABLE,
+
+            /// <summary>
+            /// 如果目标可用且英雄有攻击力，则请求目标。
             /// </summary>
             REQ_TARGET_IF_AVAILABLE_AND_HERO_HAS_ATTACK,
+
             /// <summary>
-            /// <value> 需要一个对应种族的死亡友方随从在当前回合死亡 </value>
+            /// 要求本回合有对应种族的友方随从死亡。
             /// </summary>
             REQ_FRIENDLY_MINION_OF_RACE_DIED_THIS_TURN,
-            REQ_TARGET_IF_AVAILABLE_AND_MINIMUM_SPELLS_PLAYED_THIS_TURN,
+
             /// <summary>
-            /// <value> 要求手牌中有同种族友方随从 </value>
+            /// 要求本回合打出过足够数量的法术才可指定目标。
+            /// </summary>
+            REQ_TARGET_IF_AVAILABLE_AND_MINIMUM_SPELLS_PLAYED_THIS_TURN,
+
+            /// <summary>
+            /// 要求手牌中有同种族友方随从。
             /// </summary>
             REQ_FRIENDLY_MINION_OF_RACE_IN_HAND,
+
             /// <summary>
-            /// <value> 要求本局对战有友方死语随从死亡 </value>
+            /// 要求本局游戏有友方亡语随从死亡。
             /// </summary>
             REQ_FRIENDLY_DEATHRATTLE_MINION_DIED_THIS_GAME = 86,
+
             /// <summary>
-            /// <value> 要求本局对战有友方复生随从死亡 </value>
+            /// 要求本局游戏有友方复生随从死亡。
             /// </summary>
             REQ_FRIENDLY_REBORN_MINION_DIED_THIS_GAME = 89,
+
             /// <summary>
-            /// <value> 要求本局对战有随从死亡 </value>
+            /// 要求本局游戏有随从死亡。
             /// </summary>
             REQ_MINION_DIED_THIS_GAME,
-            REQ_BOARD_NOT_COMPLETELY_FULL = 92,
+
             /// <summary>
-            /// <value> 要求有过载的法力水晶才有目标</value>
+            /// 要求战场未完全满员。
+            /// </summary>
+            REQ_BOARD_NOT_COMPLETELY_FULL = 92,
+
+            /// <summary>
+            /// 要求有过载的法力水晶才可指定目标。
             /// </summary>
             REQ_TARGET_IF_AVAILABLE_AND_HAS_OVERLOADED_MANA,
-            REQ_TARGET_IF_AVAILABLE_AND_HERO_ATTACKED_THIS_TURN,
-            REQ_TARGET_IF_AVAILABLE_AND_DRAWN_THIS_TURN,
-            REQ_TARGET_IF_AVAILABLE_AND_NOT_DRAWN_THIS_TURN,
-            REQ_TARGET_NON_TRIPLED_MINION,
-            REQ_BOUGHT_MINION_THIS_TURN,
-            REQ_SOLD_MINION_THIS_TURN,
-            REQ_TARGET_IF_AVAILABLE_AND_PLAYER_HEALTH_CHANGED_THIS_TURN,
-            REQ_TARGET_IF_AVAILABLE_AND_SOUL_FRAGMENT_IN_DECK,
-            REQ_DAMAGED_TARGET_UNLESS_COMBO,
-            REQ_NOT_MINION_DORMANT,
-            REQ_TARGET_NOT_UNTOUCHABLE,
-            REQ_TARGET_IF_AVAILABLE_AND_BOUGHT_RACE_THIS_TURN,
-            REQ_TARGET_IF_AVAILABLE_AND_SOLD_RACE_THIS_TURN,
-            REQ_NOT_IN_COOLDOWN,
-            REQ_TARGET_IS_MERC,
-            REQ_TARGET_IS_NON_MERC,
+
             /// <summary>
-            /// 要求两个不同的种族
+            /// 要求英雄本回合已攻击才可指定目标。
+            /// </summary>
+            REQ_TARGET_IF_AVAILABLE_AND_HERO_ATTACKED_THIS_TURN,
+
+            /// <summary>
+            /// 要求本回合抽过牌才可指定目标。
+            /// </summary>
+            REQ_TARGET_IF_AVAILABLE_AND_DRAWN_THIS_TURN,
+
+            /// <summary>
+            /// 要求本回合未抽过牌才可指定目标。
+            /// </summary>
+            REQ_TARGET_IF_AVAILABLE_AND_NOT_DRAWN_THIS_TURN,
+
+            /// <summary>
+            /// 要求目标不是三倍复制的随从。
+            /// </summary>
+            REQ_TARGET_NON_TRIPLED_MINION,
+
+            /// <summary>
+            /// 要求本回合购买过随从。
+            /// </summary>
+            REQ_BOUGHT_MINION_THIS_TURN,
+
+            /// <summary>
+            /// 要求本回合出售过随从。
+            /// </summary>
+            REQ_SOLD_MINION_THIS_TURN,
+
+            /// <summary>
+            /// 要求玩家生命值本回合发生变化才可指定目标。
+            /// </summary>
+            REQ_TARGET_IF_AVAILABLE_AND_PLAYER_HEALTH_CHANGED_THIS_TURN,
+
+            /// <summary>
+            /// 要求牌库中有灵魂碎片才可指定目标。
+            /// </summary>
+            REQ_TARGET_IF_AVAILABLE_AND_SOUL_FRAGMENT_IN_DECK,
+
+            /// <summary>
+            /// 要求目标未受伤（除非连击）。
+            /// </summary>
+            REQ_DAMAGED_TARGET_UNLESS_COMBO,
+
+            /// <summary>
+            /// 要求目标不处于休眠状态。
+            /// </summary>
+            REQ_NOT_MINION_DORMANT,
+
+            /// <summary>
+            /// 要求目标不可被触碰。
+            /// </summary>
+            REQ_TARGET_NOT_UNTOUCHABLE,
+
+            /// <summary>
+            /// 要求本回合购买过指定种族的随从才可指定目标。
+            /// </summary>
+            REQ_TARGET_IF_AVAILABLE_AND_BOUGHT_RACE_THIS_TURN,
+
+            /// <summary>
+            /// 要求本回合出售过指定种族的随从才可指定目标。
+            /// </summary>
+            REQ_TARGET_IF_AVAILABLE_AND_SOLD_RACE_THIS_TURN,
+
+            /// <summary>
+            /// 要求不在冷却时间内。
+            /// </summary>
+            REQ_NOT_IN_COOLDOWN,
+
+            /// <summary>
+            /// 要求目标是雇佣兵。
+            /// </summary>
+            REQ_TARGET_IS_MERC,
+
+            /// <summary>
+            /// 要求目标不是雇佣兵。
+            /// </summary>
+            REQ_TARGET_IS_NON_MERC,
+
+            /// <summary>
+            /// 要求两个不同种族的目标。
             /// </summary>
             REQ_TWO_OF_A_KIND,
+
             /// <summary>
-            /// <value> 要求法力过载 </value>
+            /// 要求存在法力过载。
             /// </summary>
             REQ_HAS_OVERLOADED_MANA,
-            REQ_LETTUCE_ABILITY_CANNOT_TARGET_OWNER,
-            REQ_TARGET_NOT_HAVE_TAG = 116,
+
             /// <summary>
-            /// 需要目标有对应标签,param为标签tag数
+            /// 要求目标不能是拥有者的莱特切能力。
+            /// </summary>
+            REQ_LETTUCE_ABILITY_CANNOT_TARGET_OWNER,
+
+            /// <summary>
+            /// 要求目标不具有指定标签。
+            /// </summary>
+            REQ_TARGET_NOT_HAVE_TAG = 116,
+
+            /// <summary>
+            /// 要求目标必须具有指定标签。
             /// </summary>
             REQ_TARGET_MUST_HAVE_TAG,
+
             /// <summary>
-            /// <value> 可交易 </value>
+            /// 要求目标可交易。
             /// </summary>
             REQ_TRADEABLE = 119,
-            REQ_NOT_LEGENDARY_TARGET = 123,
-            REQ_MINIMUM_TAVERN_TIER_LEVEL_TO_PLAY = 128,
-            REQ_CARD_TAVERN_TIER_LEVEL_TO_PLAY,
-            REQ_NOT_EXHAUSTED_LOCATION,
+
             /// <summary>
-            /// 要求目标是地标
+            /// 要求目标不是传说随从。
+            /// </summary>
+            REQ_NOT_LEGENDARY_TARGET = 123,
+
+            /// <summary>
+            /// 要求酒馆等级满足最低要求才可使用。
+            /// </summary>
+            REQ_MINIMUM_TAVERN_TIER_LEVEL_TO_PLAY = 128,
+
+            /// <summary>
+            /// 要求卡牌酒馆等级满足条件才可使用。
+            /// </summary>
+            REQ_CARD_TAVERN_TIER_LEVEL_TO_PLAY,
+
+            /// <summary>
+            /// 要求地点未处于疲劳状态。
+            /// </summary>
+            REQ_NOT_EXHAUSTED_LOCATION,
+
+            /// <summary>
+            /// 要求目标是地标。
             /// </summary>
             REQ_LOCATION_TARGET,
+
             /// <summary>
-            /// 要求目标是白银之手新兵
+            /// 要求目标是白银之手新兵。
             /// </summary>
             REQ_TARGET_SILVER_HAND_RECRUIT,
+
             /// <summary>
-            /// 最少需要多少残骸,需要param
+            /// 要求残骸数量满足最低要求。
             /// </summary>
             REQ_MINIMUM_CORPSES,
-            REQ_LOCATION_OR_MINION_TARGET,
-            REQ_CAN_BE_TARGETED_BY_LOCATIONS,
-            REQ_FORGE,
-            REQ_TARGET_MAX_COST,
-            REQ_HAS_PLAYED_SPELL_THIS_GAME,
+
             /// <summary>
-            /// 目标不能是泰坦
+            /// 要求目标是地点或随从。
+            /// </summary>
+            REQ_LOCATION_OR_MINION_TARGET,
+
+            /// <summary>
+            /// 要求目标可以被地点指定。
+            /// </summary>
+            REQ_CAN_BE_TARGETED_BY_LOCATIONS,
+
+            /// <summary>
+            /// 要求锻造条件满足。
+            /// </summary>
+            REQ_FORGE,
+
+            /// <summary>
+            /// 要求目标费用不超过指定值。
+            /// </summary>
+            REQ_TARGET_MAX_COST,
+
+            /// <summary>
+            /// 要求本局游戏打出过法术。
+            /// </summary>
+            REQ_HAS_PLAYED_SPELL_THIS_GAME,
+
+            /// <summary>
+            /// 要求目标不是泰坦。
             /// </summary>
             REQ_TARGET_IS_NON_TITAN = 141,
-            REQ_BACON_DUO_PASSABLE,
+
             /// <summary>
-            /// 只能是准确攻击力的目标,需要param
+            /// 要求双人通行证可用。
+            /// </summary>
+            REQ_BACON_DUO_PASSABLE,
+
+            /// <summary>
+            /// 要求目标攻击力精确匹配指定值。
             /// </summary>
             REQ_TARGET_EXACT_ATTACK,
+
+            /// <summary>
+            /// 要求敌方非金色随从数量满足最低要求。
+            /// </summary>
             REQ_MINIMUM_NON_GOLDEN_ENEMY_MINIONS = 146,
+
+            /// <summary>
+            /// 要求本局游戏有友方嘲讽随从死亡。
+            /// </summary>
             REQ_FRIENDLY_TAUNT_MINION_DIED_THIS_GAME = 148,
+
+            /// <summary>
+            /// 要求目标本回合触发过回合结束效果。
+            /// </summary>
             REQ_TARGET_HAS_END_OF_TURN_POWER_TO_TRIGGER_THIS_TURN = 152,
+
+            /// <summary>
+            /// 要求游戏回合数满足最低要求。
+            /// </summary>
             REQ_MINIMUM_GAME_TURN,
+
+            /// <summary>
+            /// 要求敌方场上有指定种族的随从。
+            /// </summary>
             REQ_ENEMY_MINION_OF_RACE_IN_PLAY,
+
+            /// <summary>
+            /// 要求目标不在战场上。
+            /// </summary>
             REQ_TARGET_NOT_IN_PLAY,
+
+            /// <summary>
+            /// 要求敌方目标不受火焰法术免疫。
+            /// </summary>
             REQ_ENEMY_TARGET_NOT_IMMUNE_TO_FIRE_SPELLS,
+
+            /// <summary>
+            /// 要求来源必须具有指定标签。
+            /// </summary>
             REQ_SOURCE_MUST_HAVE_TAG = 158,
+
+            /// <summary>
+            /// 要求回溯界面未显示时才可使用。
+            /// </summary>
             REQ_CANNOT_USE_WHILE_REWIND_UI_DISPLAYED,
         }
+
         public class Card
         {
             public string dbfId = "";
@@ -936,19 +1203,7 @@ namespace HREngine.Bots
             public SpellSchool SpellSchool = SpellSchool.NONE;//法术派系
             public bool Tradeable = false;//可交易
             public int TradeCost = 0;//交易消耗法力值
-            public int needEmptyPlacesForPlaying = 0;
-            public int needWithMinAttackValueOf = 0;
-            public int needWithMaxAttackValueOf = 0;
-            public int needWithExactAttackValueOf = 0;
-            public int needWithMinimumCorpeses = 0;
-            public int needRaceForPlaying = 0;
-            public CardDB.Specialtags needTagForPlaying = 0;
 
-            public int needMinNumberOfEnemy = 0;
-            public int needMinTotalMinions = 0;
-            public int needMinOwnMinions = 0;
-            public int needMinionsCapIfAvailable = 0;
-            public int needControlaSecret = 0;
             public bool isToken = false;
             public int isCarddraw = 0;
             public bool damagesTarget = false;
@@ -1009,29 +1264,12 @@ namespace HREngine.Bots
             public int ObjectiveAura = 0; // 会影响场面的光环 如征战平原
             public int Sigil = 0; // 咒符
 
-            /// <summary>跟班</summary>
-            public bool markOfEvil = false;
-            /// <summary>树人</summary>
-            public bool Treant = false;
-            /// <summary>小鬼</summary>
-            public bool IMP = false;
-            /// <summary>雏龙</summary>
-            public bool Whelp = false;
-            /// <summary>星舰组件</summary>
-            public bool StarshipPiece = false;
-            /// <summary>星舰</summary>
-            public bool Starship = false;
-            public bool Crewmate = false;  // 乘务员
-            public int MultipleClasses = 0; // 194: 玉莲帮 296: 暗金教 532: 玉莲帮
-            public bool Zerg = false;   // 异虫
-            public bool Terran = false; // 人族
-            public bool Protoss = false;    // 星灵
+
             public int costBlood = 0;   // 鲜血符文
             public int costFrost = 0;    // 冰霜符文
             public int costUnholy = 0; // 邪恶符文
             public int CastsWhenDrawn = 0; // 抽到时触发效果
-            public bool SilverHandRecruit = false; //白银之手新兵
-            public bool SI_7 = false;//军情七处
+
             public bool HideCost = false;//隐藏费用
             public bool ShiftingSpell = false;//
             public int InteractableObjectCost = 0;
@@ -1043,6 +1281,50 @@ namespace HREngine.Bots
             public int MODULAR_ENTITY_PART_2 = 0;//自定义模块2
             /// <summary>磁力允许的其他随从类型</summary>
             public int magneticToRace = 0;
+            #region 卡牌分类 
+            public bool SilverHandRecruit = false; //白银之手新兵
+            public bool SI_7 = false;//军情七处
+            /// <summary>跟班</summary>
+            public bool markOfEvil = false;
+            /// <summary>树人</summary>
+            public bool Treant = false;
+            /// <summary>古树</summary>
+            public bool Ancient = false;
+            /// <summary>小鬼</summary>
+            public bool IMP = false;
+            /// <summary>雏龙</summary>
+            public bool Whelp = false;
+            /// <summary>星舰组件</summary>
+            public bool StarshipPiece = false;
+            /// <summary>星舰</summary>
+            public bool Starship = false;
+            /// <summary>乘务员</summary>
+            public bool Crewmate = false;
+            public int MultipleClasses = 0; // 194: 玉莲帮 296: 暗金教 532: 玉莲帮
+            public bool Zerg = false;   // 异虫
+            public bool Terran = false; // 人族
+            public bool Protoss = false;    // 星灵
+            public bool Wipe = false; //小精灵
+            public bool Rafaam = false; //拉法姆
+            public bool Ysera = false; //伊瑟拉
+
+            #endregion
+            #region 要求目标满足的条件
+            public int needEmptyPlacesForPlaying = 0;
+            public int needWithMinAttackValueOf = 0;
+            public int needWithMaxAttackValueOf = 0;
+            public int needWithExactAttackValueOf = 0;
+            public int needWithMinimumCorpeses = 0;
+            public int needRaceForPlaying = 0;
+            public int needRaceInHand = 0;
+            public CardDB.Specialtags needTagForPlaying = 0;
+
+            public int needMinNumberOfEnemy = 0;
+            public int needMinTotalMinions = 0;
+            public int needMinOwnMinions = 0;
+            public int needMinionsCapIfAvailable = 0;
+            public int needControlaSecret = 0;
+            #endregion
             public void getModularCard(out CardDB.Card part1, out CardDB.Card part2)
             {
 
@@ -1055,38 +1337,28 @@ namespace HREngine.Bots
                 {
                     CardDB.Card part1 = Instance.getCardDataFromDbfID(MODULAR_ENTITY_PART_1.ToString());
                     CardDB.Card part2 = Instance.getCardDataFromDbfID(MODULAR_ENTITY_PART_2.ToString());
+
                     if (part1 != null && part2 != null)
                     {
                         cost = part1.cost + part2.cost;
                         HideCost = false;
-                        Attack = part1.Attack + part2.Attack;
-                        Health = part1.Health + part2.Health;
-                        textCN = part1.textCN + part2.textCN;
-                        tank = (part1.tank || part2.tank);                                    //嘲讽
-                        Shield = (part1.Shield || part2.Shield);                              //圣盾
-                        Charge = (part1.Charge || part2.Charge);                              //冲锋
-                        Rush = (part1.Rush || part2.Rush);                                    //突袭
-                        Stealth = (part1.Stealth || part2.Stealth);                           //潜行
-                        Elusive = (part1.Elusive || part2.Elusive);                           //扰魔
-                        windfury = (part1.windfury || part2.windfury);                        //风怒
-                        poisonous = (part1.poisonous || part2.poisonous);                     //剧毒
-                        lifesteal = (part1.lifesteal || part2.lifesteal);                     //吸血
-                        reborn = (part1.reborn || part2.reborn);                              //复生
+                        if (this.type == CardDB.cardtype.MOB)
+                        {
 
-                        /*               switch (MODULAR_ENTITY_PART_1)
-                                      {
-                                          case 104944: { } break;//递归模块
-                                          case 104945: { } break;//失控模块
-                                          case 104946: { } break;//能量模块
-                                          case 104947: { } break;//输能模块
-                                          case 104948: { } break;//病毒模块
-                                          case 104949: { } break;//复制模块
-                                          case 104950: { } break;//计数模块
-                                          case 104951: { } break;//完美模块
-
-                                      } */
-
-
+                            Attack = part1.Attack + part2.Attack;
+                            Health = part1.Health + part2.Health;
+                            textCN = part1.textCN + part2.textCN;
+                            tank = (part1.tank || part2.tank);                                    //嘲讽
+                            Shield = (part1.Shield || part2.Shield);                              //圣盾
+                            Charge = (part1.Charge || part2.Charge);                              //冲锋
+                            Rush = (part1.Rush || part2.Rush);                                    //突袭
+                            Stealth = (part1.Stealth || part2.Stealth);                           //潜行
+                            Elusive = (part1.Elusive || part2.Elusive);                           //扰魔
+                            windfury = (part1.windfury || part2.windfury);                        //风怒
+                            poisonous = (part1.poisonous || part2.poisonous);                     //剧毒
+                            lifesteal = (part1.lifesteal || part2.lifesteal);                     //吸血
+                            reborn = (part1.reborn || part2.reborn);                              //复生
+                        }
                     }
                 }
             }
@@ -1201,26 +1473,23 @@ namespace HREngine.Bots
                 }
                 return false;
             }
-
             /// <summary>
-            /// 获得卡牌的目标
+            /// 获取目标
             /// </summary>
-            /// <param name="p"></param>
+            /// <param name="p">场面</param>
             /// <param name="isLethalCheck"></param>
             /// <param name="own"></param>
+            /// <param name="result"></param>
+            /// <param name="playReqs"></param>
             /// <returns></returns>
-            public List<Minion> getTargetsForCard(Playfield p, bool isLethalCheck, bool own)
+            public List<Minion> getTargets(Playfield p, bool isLethalCheck, bool own, List<Minion> result, PlayReq[] playReqs)
             {
-                //if wereTargets=true and 0 targets at end -> then can not play this card
-                List<Minion> retval = new List<Minion>();
-                if (this.type == CardDB.cardtype.MOB && ((own && p.ownMinions.Count >= 7) || (!own && p.enemyMinions.Count >= 7))) return retval; // cant play mob, if we have allready 7 mininos
-                if (this.Secret && ((own && (p.ownSecretsIDList.Contains(this.cardIDenum) || p.ownSecretsIDList.Count >= 5)) || (!own && p.enemySecretCount >= 5))) return retval;
-                if (!string.IsNullOrWhiteSpace(this.TreatItAsTheSameCard))
+                if (playReqs.Length == 0)
                 {
-                    Card card = Instance.getCardDataFromDbfID(this.TreatItAsTheSameCard);
-                    this.sim_card = card.sim_card;
+                    result.Add(null);
+                    return result;
+
                 }
-                if (this.sim_card.GetPlayReqs().Length == 0) { retval.Add(null); return retval; }
 
                 List<Minion> targets = new List<Minion>();
                 bool targetAll = false;
@@ -1251,7 +1520,8 @@ namespace HREngine.Bots
                 bool REQ_TARGET_SILVER_HAND_RECRUIT = false;
                 bool REQ_LOCATION_TARGET = false;
                 bool REQ_TARGET_MUST_HAVE_TAG = false;
-                foreach (PlayReq pr in this.sim_card.GetPlayReqs())
+                bool REQ_FRIENDLY_MINION_OF_RACE_IN_HAND = false;
+                foreach (PlayReq pr in playReqs)
                 {
                     switch (pr.errorType)
                     {
@@ -1275,11 +1545,11 @@ namespace HREngine.Bots
                             else targetAllEnemy = true;
                             continue;
                         case ErrorType2.REQ_NUM_MINION_SLOTS:
-                            if ((own ? p.ownMinions.Count : p.enemyMinions.Count) > 7 - this.needEmptyPlacesForPlaying) return retval;
+                            if ((own ? p.ownMinions.Count : p.enemyMinions.Count) > 7 - this.needEmptyPlacesForPlaying) return result;
                             continue;
                         case ErrorType2.REQ_MINION_SLOT_OR_MANA_CRYSTAL_SLOT:
-                            if (own) { if (p.ownMinions.Count > 6 & p.ownMaxMana > 9) return retval; }
-                            else if (p.enemyMinions.Count > 6 & p.enemyMaxMana > 9) return retval;
+                            if (own) { if (p.ownMinions.Count > 6 & p.ownMaxMana > 9) return result; }
+                            else if (p.enemyMinions.Count > 6 & p.enemyMaxMana > 9) return result;
                             continue;
                         case ErrorType2.REQ_ENEMY_TARGET:
                             if (own) targetAllEnemy = true;
@@ -1290,7 +1560,7 @@ namespace HREngine.Bots
                             extraParam = true;
                             continue;
                         case ErrorType2.REQ_MINIMUM_ENEMY_MINIONS:
-                            if ((own ? p.enemyMinions.Count : p.ownMinions.Count) < this.needMinNumberOfEnemy) return retval;
+                            if ((own ? p.enemyMinions.Count : p.ownMinions.Count) < this.needMinNumberOfEnemy) return result;
                             continue;
                         case ErrorType2.REQ_NONSELF_TARGET:
                             targetAll = true;
@@ -1312,7 +1582,7 @@ namespace HREngine.Bots
                             extraParam = true;
                             continue;
                         case ErrorType2.REQ_WEAPON_EQUIPPED:
-                            if ((own ? p.ownWeapon.Durability : p.enemyWeapon.Durability) == 0) return retval;
+                            if ((own ? p.ownWeapon.Durability : p.enemyWeapon.Durability) == 0) return result;
                             continue;
                         case ErrorType2.REQ_TARGET_FOR_COMBO:
                             if (p.cardsPlayedThisTurn >= 1) targetAll = true;
@@ -1322,16 +1592,16 @@ namespace HREngine.Bots
                             extraParam = true;
                             continue;
                         case ErrorType2.REQ_MINIMUM_TOTAL_MINIONS:
-                            if (this.needMinTotalMinions > p.ownMinions.Count + p.enemyMinions.Count) return retval;
+                            if (this.needMinTotalMinions > p.ownMinions.Count + p.enemyMinions.Count) return result;
                             continue;
                         case ErrorType2.REQ_TARGET_IF_AVAILABLE_AND_HERO_HAS_ATTACK:
-                            if (p.ownHero.Angr >= 1) return retval;
+                            if (p.ownHero.Angr >= 1) return result;
                             continue;
                         case ErrorType2.REQ_MINIMUM_CORPSES:
-                            if (p.getCorpseCount() >= this.needWithMinimumCorpeses) return retval;
+                            if (p.getCorpseCount() < this.needWithMinimumCorpeses) return result;
                             continue;
                         case ErrorType2.REQ_MINION_CAP_IF_TARGET_AVAILABLE:
-                            if ((own ? p.ownMinions.Count : p.enemyMinions.Count) > 7 - this.needMinionsCapIfAvailable) return retval;
+                            if ((own ? p.ownMinions.Count : p.enemyMinions.Count) > 7 - this.needMinionsCapIfAvailable) return result;
                             continue;
                         case ErrorType2.REQ_ENTIRE_ENTOURAGE_NOT_IN_PLAY://不能召唤更多图腾
                             bool searingtotem = false;
@@ -1362,7 +1632,7 @@ namespace HREngine.Bots
                                     continue;
                                 }
                             }
-                            if (healingtotem && wrathofairtotem && searingtotem && stoneclawtotem) return retval;
+                            if (healingtotem && wrathofairtotem && searingtotem && stoneclawtotem) return result;
                             continue;
                         case ErrorType2.REQ_MUST_TARGET_TAUNTER:
                             REQ_MUST_TARGET_TAUNTER = true;
@@ -1379,6 +1649,12 @@ namespace HREngine.Bots
                             }
                             else targetAll = true; // apriori the enemy have a dragon
                             continue;
+                        case ErrorType2.REQ_FRIENDLY_MINION_OF_RACE_IN_HAND:
+                            {
+                                REQ_FRIENDLY_MINION_OF_RACE_IN_HAND = true;
+                                extraParam = true;
+                                continue;
+                            }
                         case ErrorType2.REQ_LEGENDARY_TARGET:
                             REQ_LEGENDARY_TARGET = true;
                             extraParam = true;
@@ -1420,12 +1696,12 @@ namespace HREngine.Bots
                             if (own)
                             {
                                 if (p.enemyWeapon.Durability > 0) targetEnemyHero = true;
-                                else return retval;
+                                else return result;
                             }
                             else
                             {
                                 if (p.ownWeapon.Durability > 0) targetOwnHero = true;
-                                else return retval;
+                                else return result;
                             }
                             continue;
                         case ErrorType2.REQ_TARGET_IF_AVAILABLE_AND_MINIMUM_FRIENDLY_MINIONS:
@@ -1436,10 +1712,10 @@ namespace HREngine.Bots
                             if (p.ownSecretsIDList.Count >= needControlaSecret) targetAll = true;
                             continue;
                         case ErrorType2.REQ_MUST_PLAY_OTHER_CARD_FIRST:
-                            if (p.cardsPlayedThisTurn == 0) return retval;
+                            if (p.cardsPlayedThisTurn == 0) return result;
                             continue;
                         case ErrorType2.REQ_HAND_NOT_FULL:
-                            if (p.owncards.Count == 10) return retval;
+                            if (p.owncards.Count == 10) return result;
                             continue;
                         case ErrorType2.REQ_TARGET_IS_NON_TITAN:
                             REQ_TARGET_IS_NON_TITAN = true;
@@ -1544,6 +1820,8 @@ namespace HREngine.Bots
                         {
                             m.extraParam = !m.handcard.card.SilverHandRecruit;
                         }
+                        targetOwnHero = false;
+                        targetEnemyHero = false;
                     }
 
                     if (REQ_TARGET_WITH_RACE)
@@ -1559,6 +1837,18 @@ namespace HREngine.Bots
                         // targetEnemyHero = (p.enemyHeroName == HeroEnum.lordjaraxxus && (TAG_RACE)this.needRaceForPlaying == TAG_RACE.DEMON);
                         targetOwnHero = false;
                         targetEnemyHero = false;
+                    }
+
+                    if (REQ_FRIENDLY_MINION_OF_RACE_IN_HAND)
+                    {
+                        if (own)
+                        {
+                            foreach (Handmanager.Handcard hc in p.owncards)
+                            {
+                                if (RaceUtils.MinionBelongsToRace(hc.card.GetRaces(), (CardDB.Race)this.needRaceInHand)) { targetAll = true; break; }
+                            }
+                        }
+                        else targetAll = true; // apriori the enemy have a dragon
                     }
                     if (REQ_HERO_TARGET)
                     {
@@ -1724,7 +2014,7 @@ namespace HREngine.Bots
                         foreach (Minion m in targets)
                         {
                             if (m.handcard.card.type != cardtype.LOCATION) m.extraParam = true;
-                            else retval.Add(m);
+                            else result.Add(m);
                         }
                         targetEnemyHero = false;
                         targetOwnHero = false;
@@ -1737,24 +2027,24 @@ namespace HREngine.Bots
                 //斩杀
                 if (isLethalCheck)
                 {
-                    if (targetEnemyHero && own) retval.Add(p.enemyHero);
-                    else if (targetOwnHero && !own) retval.Add(p.ownHero);
+                    if (targetEnemyHero && own) result.Add(p.enemyHero);
+                    else if (targetOwnHero && !own) result.Add(p.ownHero);
 
                     switch (this.type)
                     {
                         case cardtype.SPELL:
                             if (p.prozis.penman.attackBuffDatabase.ContainsKey(this.nameEN))
                             {
-                                if (targetOwnHero && own) retval.Add(p.ownHero);
+                                if (targetOwnHero && own) result.Add(p.ownHero);
                                 foreach (Minion m in targets)
                                 {
                                     if (m.extraParam != true && !m.Elusive)
                                     {
                                         if (m.own)
                                         {
-                                            if (m.Ready) retval.Add(m);
+                                            if (m.Ready) result.Add(m);
                                         }
-                                        else if (m.taunt) retval.Add(m);
+                                        else if (m.taunt) result.Add(m);
                                     }
                                     m.extraParam = false;
                                 }
@@ -1768,8 +2058,8 @@ namespace HREngine.Bots
                                         {
                                             m.extraParam = false;
                                             if (m.Elusive) continue;
-                                            if (m.own) retval.Add(m);
-                                            else if (m.taunt) retval.Add(m);
+                                            if (m.own) result.Add(m);
+                                            else if (m.taunt) result.Add(m);
                                         }
                                         break;
                                     // case cardNameEN.hex: goto case cardNameEN.polymorph;//妖术
@@ -1778,7 +2068,7 @@ namespace HREngine.Bots
                                         foreach (Minion m in targets)
                                         {
                                             m.extraParam = false;
-                                            if (!m.own && m.taunt && !m.cantBeTargetedBySpellsOrHeroPowers) retval.Add(m);
+                                            if (!m.own && m.taunt && !m.cantBeTargetedBySpellsOrHeroPowers) result.Add(m);
                                         }
                                         break;
                                 }
@@ -1790,7 +2080,7 @@ namespace HREngine.Bots
                                 if (!m.extraParam)
                                 {
                                     if (m.stealth && !m.own) continue;
-                                    retval.Add(m);
+                                    result.Add(m);
                                 }
                                 m.extraParam = false;
                             }
@@ -1804,9 +2094,9 @@ namespace HREngine.Bots
                                     {
                                         if (m.own)
                                         {
-                                            if (m.Ready) retval.Add(m);
+                                            if (m.Ready) result.Add(m);
                                         }
-                                        else if (m.taunt) retval.Add(m);
+                                        else if (m.taunt) result.Add(m);
                                     }
                                     m.extraParam = false;
                                 }
@@ -1816,8 +2106,8 @@ namespace HREngine.Bots
                 }
                 else
                 {
-                    if (targetEnemyHero) retval.Add(p.enemyHero);
-                    if (targetOwnHero) retval.Add(p.ownHero);
+                    if (targetEnemyHero) result.Add(p.enemyHero);
+                    if (targetOwnHero) result.Add(p.ownHero);
 
                     foreach (Minion m in targets)
                     {
@@ -1825,7 +2115,7 @@ namespace HREngine.Bots
                         {
                             if (m.stealth && !m.own) continue;
                             if (m.Elusive && (this.type == cardtype.SPELL || this.type == cardtype.HEROPWR)) continue;
-                            retval.Add(m);
+                            result.Add(m);
                         }
                         m.extraParam = false;
                     }
@@ -1834,39 +2124,56 @@ namespace HREngine.Bots
                 //非地标目标指向，移除地标
                 if (!REQ_LOCATION_TARGET)
                 {
-                    retval.RemoveAll(minion => minion != null &&
-                          minion.handcard != null &&
-                          minion.handcard.card != null &&
-                          minion.handcard.card.type == CardDB.cardtype.LOCATION);
+
+
+                    result.RemoveAll(minion =>
+                          minion?.handcard?.card.type == CardDB.cardtype.LOCATION);
                 }
                 else
                 {
-                    retval.RemoveAll(minion => minion != null &&
-                             minion.handcard != null &&
-                             minion.handcard.card != null &&
-                             (minion.handcard.card.type == CardDB.cardtype.MOB || minion.handcard.card.type == CardDB.cardtype.HERO));
+
+                    result.RemoveAll(minion =>
+                             (minion?.handcard?.card.type == CardDB.cardtype.MOB || minion?.handcard?.card.type == CardDB.cardtype.HERO));
                 }
 
                 //移除不可接触的随从
-                retval.RemoveAll(minion => minion != null &&
-                                                        minion.handcard != null &&
-                                                        minion.handcard.card != null &&
-                                                        minion.handcard.card.untouchable);
+                result.RemoveAll(minion => minion?.handcard?.card.untouchable == true);
 
-                //如果是法术，移除扰魔、地标
-                if (this.type == CardDB.cardtype.SPELL)
+                if (result.Count == 0 && (!wereTargets || REQ_TARGET_IF_AVAILABLE)) result.Add(null);
+
+                return result;
+
+            }
+            /// <summary>
+            /// 获得卡牌的目标
+            /// </summary>
+            /// <param name="p"></param>
+            /// <param name="isLethalCheck"></param>
+            /// <param name="own"></param>
+            /// <returns></returns>
+            public List<Minion> getTargetsForCard(Playfield p, bool isLethalCheck, bool own)
+            {
+                //if wereTargets=true and 0 targets at end -> then can not play this card
+                PlayReq[] playReqs = this.sim_card.GetPlayReqs();
+                List<Minion> result = new List<Minion>();
+                if ((this.type == CardDB.cardtype.MOB || this.type == CardDB.cardtype.LOCATION) && ((own && p.ownMinions.Count >= 7) || (!own && p.enemyMinions.Count >= 7))) return result; // cant play mob, if we have allready 7 mininos
+                if (this.Secret && ((own && (p.ownSecretsIDList.Contains(this.cardIDenum) || p.ownSecretsIDList.Count >= 5)) || (!own && p.enemySecretCount >= 5))) return result;
+                if (!string.IsNullOrWhiteSpace(this.TreatItAsTheSameCard))
                 {
-                    retval.RemoveAll(minion => minion != null &&
-                          minion.handcard != null &&
-                          minion.handcard.card != null &&
-                          minion.handcard.card.Elusive);
+                    Card card = Instance.getCardDataFromDbfID(this.TreatItAsTheSameCard);
+                    this.sim_card = card.sim_card;
+                    playReqs = this.sim_card.GetPlayReqs();
                 }
+                if (playReqs.Length == 0) { result.Add(null); return result; }
 
-
-
-                if (retval.Count == 0 && (!wereTargets || REQ_TARGET_IF_AVAILABLE)) retval.Add(null);
-
-                return retval;
+                result = this.getTargets(p, p.isLethalCheck, own, result, playReqs);
+                //如果是法术或英雄技能，移除扰魔目标
+                if (this.type == CardDB.cardtype.SPELL || this.type == CardDB.cardtype.HEROPWR)
+                {
+                    result.RemoveAll(minion =>
+                          minion?.handcard?.card.Elusive == true);
+                }
+                return result;
             }
 
             /// <summary>
@@ -1945,21 +2252,6 @@ namespace HREngine.Bots
                         }
                         break;
                 }
-                targetsForHeroPower.RemoveAll(minion => minion != null &&
-                                                        minion.handcard != null &&
-                                                        minion.handcard.card != null &&
-                                                        minion.handcard.card.untouchable);
-
-                //移除扰魔的随从
-                targetsForHeroPower.RemoveAll(minion => minion != null &&
-                                                        minion.handcard != null &&
-                                                        minion.handcard.card != null &&
-                                                        minion.handcard.card.Elusive);
-                //移除地标
-                // targetsForHeroPower.RemoveAll(minion => minion != null &&
-                //                                         minion.handcard != null &&
-                //                                         minion.handcard.card != null &&
-                //                                         minion.handcard.card.type == CardDB.cardtype.LOCATION);
 
                 return targetsForHeroPower;
             }
@@ -1973,183 +2265,33 @@ namespace HREngine.Bots
             /// <returns>返回可以选择的随从目标列表</returns>
             public List<Minion> getTargetsForLocation(Playfield p, bool isLethalCheck, bool own)
             {
-                List<Minion> retval = new List<Minion>();
-                if (this.sim_card.GetUseAbilityReqs().Length == 0) { retval.Add(null); return retval; }
+                List<Minion> result = new List<Minion>();
+                PlayReq[] playReq = this.sim_card.GetUseAbilityReqs();
 
-                List<Minion> targets = new List<Minion>();
-                bool targetAll = false;
-                bool targetAllEnemy = false;
-                bool targetAllFriendly = false;
-                bool targetEnemyHero = false;
-                bool targetOwnHero = false;
-                bool targetOnlyMinion = false;
-                bool extraParam = false;
-                bool wereTargets = false;
-                bool REQ_DAMAGED_TARGET = false;
-                bool REQ_TARGET_WITH_DEATHRATTLE = false;
-                bool REQ_TARGET_WITH_RACE = false;
-
-                foreach (PlayReq pr in this.sim_card.GetUseAbilityReqs())
+                if (this.MODULAR_ENTITY_PART_1 != 0 & this.MODULAR_ENTITY_PART_2 != 0)
                 {
-                    switch (pr.errorType)
-                    {
-                        case ErrorType2.REQ_TARGET_TO_PLAY:
-                            targetAll = true;
-                            continue;
-                        case ErrorType2.REQ_MINION_TARGET:
-                            targetOnlyMinion = true;
-                            continue;
-                        case ErrorType2.REQ_FRIENDLY_TARGET:
-                            if (own) targetAllFriendly = true;
-                            else targetAllEnemy = true;
-                            continue;
-                        case ErrorType2.REQ_ENEMY_TARGET:
-                            if (own) targetAllEnemy = true;
-                            else targetAllFriendly = true;
-                            continue;
-                        case ErrorType2.REQ_DAMAGED_TARGET:
-                            REQ_DAMAGED_TARGET = true;
-                            extraParam = true;
-                            continue;
-                        case ErrorType2.REQ_TARGET_WITH_DEATHRATTLE:
-                            REQ_TARGET_WITH_DEATHRATTLE = true;
-                            targetOnlyMinion = true;
-                            extraParam = true;
-                            continue;
-                        case ErrorType2.REQ_TARGET_WITH_RACE:
-                            REQ_TARGET_WITH_RACE = true;
-                            targetOnlyMinion = true;
-                            extraParam = true;
-                            continue;
-                    }
+                    CardDB.Card modular1 = CardDB.Instance.getCardDataFromDbfID(this.MODULAR_ENTITY_PART_1.ToString());
+                    CardDB.Card modular2 = CardDB.Instance.getCardDataFromDbfID(this.MODULAR_ENTITY_PART_2.ToString());
+                    PlayReq[] modular1PlayReq = modular1.sim_card.GetPlayReqs();
+                    PlayReq[] modular2PlayReq = modular2.sim_card.GetPlayReqs();
+                    PlayReq[] tempPlayReq = new PlayReq[playReq.Length + modular1PlayReq.Length + modular2PlayReq.Length];
+                    Array.Copy(modular1PlayReq, 0, tempPlayReq, 0, modular1PlayReq.Length);
+                    Array.Copy(modular2PlayReq, 0, tempPlayReq, modular1PlayReq.Length, modular2PlayReq.Length);
+                    playReq = tempPlayReq;
                 }
-
-                foreach (var pr in this.sim_card.GetUseAbilityReqs()) pr.UpdateCardAttr(this);
-
-                if (targetAll)
+                if (playReq.Length == 0)
                 {
-                    wereTargets = true;
-                    if (targetAllFriendly != targetAllEnemy)
-                    {
-                        if (targetAllFriendly)
-                        {
-                            foreach (Minion m in p.ownMinions) if (!m.untouchable) targets.Add(m);
-                        }
-                        else
-                        {
-                            foreach (Minion m in p.enemyMinions) if (!m.untouchable) targets.Add(m);
-                        }
-                    }
-                    else
-                    {
-                        foreach (Minion m in p.ownMinions) if (!m.untouchable) targets.Add(m);
-                        foreach (Minion m in p.enemyMinions) if (!m.untouchable) targets.Add(m);
-                    }
-                    if (targetOnlyMinion)
-                    {
-                        targetEnemyHero = false;
-                        targetOwnHero = false;
-                    }
-                    else
-                    {
-                        if (!p.enemyHero.immune) targetEnemyHero = true;
-                        if (!p.ownHero.immune) targetOwnHero = true;
-                        if (targetAllEnemy) targetOwnHero = false;
-                        if (targetAllFriendly) targetEnemyHero = false;
-                    }
+                    result.Add(null);
+                    return result;
                 }
+                result = this.getTargets(p, isLethalCheck, own, result, playReq);
 
-                if (extraParam)
+                if (playReq.Length == 0)
                 {
-                    wereTargets = true;
-                    if (REQ_DAMAGED_TARGET)
-                    {
-                        foreach (Minion m in targets)
-                        {
-                            m.extraParam = !m.wounded;
-                        }
-                        targetOwnHero = false;
-                        targetEnemyHero = false;
-                    }
-                    if (REQ_TARGET_WITH_DEATHRATTLE)
-                    {
-                        foreach (Minion m in targets)
-                        {
-                            if (!m.silenced && (m.handcard.card.deathrattle || m.deathrattle2 != null)) continue;
-                            else m.extraParam = true;
-                        }
-                        targetOwnHero = false;
-                        targetEnemyHero = false;
-                    }
-                    if (REQ_TARGET_WITH_RACE)
-                    {
-                        foreach (Minion m in targets)
-                        {
-                            // 不满足使用条件（或者是融合怪）
-                            // if (m.handcard.card.race != (Race)this.needRaceForPlaying && m.handcard.card.race != Race.ALL) m.extraParam = true;
-                            m.extraParam = !RaceUtils.MinionBelongsToRace(m.handcard.card.GetRaces(), (CardDB.Race)this.needRaceForPlaying);
-
-                        }
-                        targetOwnHero = false;
-                        targetEnemyHero = false;
-
-                    }
+                    result.Add(null);
+                    return result;
                 }
-
-                if (targetEnemyHero && own && p.enemyHero.stealth) targetEnemyHero = false;
-                if (targetOwnHero && !own && p.ownHero.stealth) targetOwnHero = false;
-
-                // 斩杀检测
-                if (isLethalCheck)
-                {
-                    if (targetEnemyHero && own) retval.Add(p.enemyHero);
-                    else if (targetOwnHero && !own) retval.Add(p.ownHero);
-
-                    foreach (Minion m in targets)
-                    {
-                        if (m.extraParam != true)
-                        {
-                            if (m.stealth && !m.own) continue;
-                            retval.Add(m);
-                        }
-                        m.extraParam = false;
-                    }
-                }
-                else
-                {
-                    if (targetEnemyHero) retval.Add(p.enemyHero);
-                    if (targetOwnHero) retval.Add(p.ownHero);
-
-                    foreach (Minion m in targets)
-                    {
-                        if (m.extraParam != true)
-                        {
-                            if (m.stealth && !m.own) continue;
-                            if (m.cantBeTargetedBySpellsOrHeroPowers && (this.type == cardtype.SPELL || this.type == cardtype.HEROPWR)) continue;
-                            retval.Add(m);
-                        }
-                        m.extraParam = false;
-                    }
-                }
-                //移除不可接触的随从
-                retval.RemoveAll(minion => minion != null &&
-                                                        minion.handcard != null &&
-                                                        minion.handcard.card != null &&
-                                                        minion.handcard.card.untouchable);
-                //移除地标
-                retval.RemoveAll(minion => minion != null &&
-                                                        minion.handcard != null &&
-                                                        minion.handcard.card != null &&
-                                                        minion.handcard.card.type == CardDB.cardtype.LOCATION);
-
-
-                // 如果没有找到合适的目标且没有特定目标要求，则返回null
-                if (retval.Count == 0 && !wereTargets)
-                {
-                    retval.Add(null);
-                }
-
-                return retval;
+                return result;
             }
 
             /// <summary>
@@ -2840,6 +2982,7 @@ namespace HREngine.Bots
                     //instance.enumCreator();// only call this to get latest cardids
                     // have to do it 2 times (or the kids inside the simcards will not have a simcard :D
                     Helpfunctions.Instance.ErrorLog("开始加载Sim");
+                    //加载卡牌的REQ
                     foreach (Card c in instance.cardlist)
                     {
                         if (c.cardIDenum != cardIDEnum.None)  // 增加非None判断
@@ -2847,7 +2990,20 @@ namespace HREngine.Bots
                         if (c.sim_card == null) continue;
                         foreach (var pr in c.sim_card.GetPlayReqs()) pr.UpdateCardAttr(c);
                     }
+
+                    // foreach (Card c in instance.cardlist)
+                    // {
+                    //         if (!string.IsNullOrWhiteSpace(c.TreatItAsTheSameCard))
+                    //         {
+                    //             Card OriginCard = instance.getCardDataFromDbfID(c.TreatItAsTheSameCard);
+                    //             if (OriginCard != instance.unknownCard && OriginCard.sim_card != null)
+                    //                 c.sim_card = OriginCard.sim_card;
+                    //         }
+                    // }
+
+
                     Helpfunctions.Instance.ErrorLog("加载完毕,总计用时: " + (DateTime.Now - dt).TotalSeconds + " s");
+                    Log.Debug($"加载完毕,总计用时: {(DateTime.Now - dt).TotalSeconds} s");
                     instance.setAdditionalData();
                 }
                 return instance;
@@ -3499,6 +3655,11 @@ namespace HREngine.Bots
 
                             }
                             break;
+                        case "2871":
+                            {
+                                card.Ancient = true; // 古树
+                            }
+                            break;
                         case "1965":
                             {
                                 card.IMP = true; // 小鬼
@@ -3534,6 +3695,18 @@ namespace HREngine.Bots
                                 card.SilverHandRecruit = true; // 白银之手新兵
                             }
                             break;
+                        case "3928":
+                            {
+                                card.Rafaam = true; // 拉法姆
+
+                            }
+                            break;
+                        case "4392":
+                            {
+                                card.Ysera = true; // 伊瑟拉
+
+                            }
+                            break;
                         case "476":
                             {
                                 card.MultipleClasses = int.Parse(tag.GetAttribute("value")); // 194: 玉莲帮  296: 暗金教 532: 玉莲帮
@@ -3552,6 +3725,12 @@ namespace HREngine.Bots
                         case "3469":
                             {
                                 card.Protoss = true; // 星灵
+                            }
+                            break;
+                        case "3881":
+                            {
+                                card.Wipe = true; // 小精灵
+
                             }
                             break;
                         //TODO:双种族代码
@@ -3681,6 +3860,7 @@ namespace HREngine.Bots
                     if (OriginCard != this.unknownCard)
                         item.sim_card = OriginCard.sim_card;
                 }
+
             }
         }
 
@@ -3838,6 +4018,9 @@ namespace HREngine.Bots
                     break;
                 case CardDB.ErrorType2.REQ_TARGET_WITH_RACE:
                     card.needRaceForPlaying = param;
+                    break;
+                case CardDB.ErrorType2.REQ_FRIENDLY_MINION_OF_RACE_IN_HAND:
+                    card.needRaceInHand = param;
                     break;
                 case CardDB.ErrorType2.REQ_NUM_MINION_SLOTS:
                     card.needEmptyPlacesForPlaying = param;

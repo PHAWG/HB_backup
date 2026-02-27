@@ -975,9 +975,7 @@ namespace HREngine.Bots
                     break;
                 case CardDB.cardtype.HERO:
                     {
-                        if (cantAttack) return;
-
-                        if (frozen || Angr == 0)
+                        if (frozen || cantAttack || Angr == 0)
                         {
                             Ready = false;
                             return;
