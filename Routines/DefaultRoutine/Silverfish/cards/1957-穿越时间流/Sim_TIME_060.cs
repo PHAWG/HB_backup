@@ -11,7 +11,10 @@ namespace HREngine.Bots
 	//本随从受到的所有伤害翻倍。
 	class Sim_TIME_060 : SimTemplate
 	{
-		
+        public override int ReturnMinionReceiveDamage(Playfield p, Minion m, int damage)
+        {
+			return damage * 2;
+        }
 		
 	}
 }

@@ -11,7 +11,13 @@ namespace HREngine.Bots
 	//抽三张法力值消耗不同的牌。
 	class Sim_TIME_031 : SimTemplate
 	{
-		
-		
-	}
+        public override void onCardPlay(Playfield p, bool ownplay, Minion target, int choice, Handmanager.Handcard hc)
+        {
+            p.drawACard(CardDB.cardIDEnum.None, ownplay);
+            p.drawACard(CardDB.cardIDEnum.None, ownplay);
+            p.drawACard(CardDB.cardIDEnum.None, ownplay);
+
+        }
+
+    }
 }

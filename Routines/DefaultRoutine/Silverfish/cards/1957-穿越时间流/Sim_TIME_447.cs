@@ -4,14 +4,36 @@ using System.Text;
 
 namespace HREngine.Bots
 {
-	//法术 潜行者 费用：1
-	//Power Word: Barrier
-	//真言术：障
-	//Give a character <b>Divine Shield</b>. Give minions in your hand +2 Health.
-	//使一个角色获得<b>圣盾</b>。使你手牌中的随从牌获得+2生命值。
-	class Sim_TIME_447 : SimTemplate
-	{
-		
-		
-	}
+    //法术 潜行者 费用：1
+    //Power Word: Barrier
+    //真言术：障
+    //Give a character <b>Divine Shield</b>. Give minions in your hand +2 Health.
+    //使一个角色获得<b>圣盾</b>。使你手牌中的随从牌获得+2生命值。
+    class Sim_TIME_447 : SimTemplate
+    {
+        public override void onCardPlay(Playfield p, bool ownplay, Minion target, int choice, Handmanager.Handcard hc)
+        {
+            if (target != null)
+            {
+                p.minionGetDivineShild(target);
+                if (ownplay)
+                {
+                    foreach (var item in p.owncards)
+                    {
+                        if (item.card.type == CardDB.cardtype.MOB)
+                            item.addHp += 2;
+                    }
+                }
+            }
+        }
+
+        public override PlayReq[] GetPlayReqs()
+        {
+            return new PlayReq[]
+            {
+                new PlayReq(CardDB.ErrorType2.REQ_TARGET_TO_PLAY),
+            };
+        }
+
+    }
 }

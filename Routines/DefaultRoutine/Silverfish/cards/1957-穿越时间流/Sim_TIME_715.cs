@@ -11,7 +11,12 @@ namespace HREngine.Bots
 	//抽两张牌。你的对手每控制一个随从，本牌的法力值消耗便减少（1）点。
 	class Sim_TIME_715 : SimTemplate
 	{
-		
-		
-	}
+        public override void onCardPlay(Playfield p, bool ownplay, Minion target, int choice, Handmanager.Handcard hc)
+        {
+            p.drawACard(CardDB.cardIDEnum.None, ownplay);
+            p.drawACard(CardDB.cardIDEnum.None, ownplay);
+
+        }
+
+    }
 }

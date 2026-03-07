@@ -11,7 +11,11 @@ namespace HREngine.Bots
 	//<b>突袭</b>。<b>战吼：</b>本随从的攻击力翻倍。
 	class Sim_TIME_051 : SimTemplate
 	{
-		
-		
-	}
+        public override void getBattlecryEffect(Playfield p, Minion own, Minion target, int choice)
+        {
+            p.minionGetBuffed(own, own.Angr,0);
+
+        }
+
+    }
 }

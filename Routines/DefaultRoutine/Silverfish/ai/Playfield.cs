@@ -9945,6 +9945,19 @@ namespace HREngine.Bots
                 }
             }
         }
+        /// <summary>
+        /// 给随从赋予圣盾效果
+        /// </summary>
+        /// <param name="m"></param>
+        public void minionGetDivineShild(Minion m)
+        {
+            if (m.divineshild) return;
+            m.divineshild = true;
+        }
+        /// <summary>
+        /// 给随从赋予嘲讽效果
+        /// </summary>
+        /// <param name="m"></param>
         public void minionGetTaunt(Minion m)
         {
             if (m.taunt) return;

@@ -11,7 +11,13 @@ namespace HREngine.Bots
 	//<b>扰魔</b>。<b>战吼：</b>召唤两个2/1并具有<b>扰魔</b>的悖论活体。
 	class Sim_TIME_059 : SimTemplate
 	{
-		
-		
-	}
+        CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.TIME_059);
+        public override void getBattlecryEffect(Playfield p, Minion own, Minion target, int choice)
+        {
+			p.callKid(kid, own.zonepos - 1, own.own);
+			p.callKid(kid, own.zonepos, own.own);
+
+        }
+
+    }
 }

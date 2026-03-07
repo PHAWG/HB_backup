@@ -11,7 +11,10 @@ namespace HREngine.Bots
 	//<b>突袭</b>。<b>战吼：</b>从你的牌库中施放一张时空撕裂以召唤一个本随从的复制。
 	class Sim_TIME_029 : SimTemplate
 	{
-		
-		
-	}
+        public override void getBattlecryEffect(Playfield p, Minion own, Minion target, int choice)
+        {
+            p.CallMinionCopy(own, own.own);
+        }
+
+    }
 }
