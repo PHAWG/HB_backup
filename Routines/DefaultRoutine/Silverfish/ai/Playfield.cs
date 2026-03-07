@@ -9945,6 +9945,12 @@ namespace HREngine.Bots
                 }
             }
         }
+
+        public void minionGetLifesteal(Minion m)
+        {
+            if (m.lifesteal) return;
+            m.lifesteal = true;
+        }
         /// <summary>
         /// 给随从赋予圣盾效果
         /// </summary>
@@ -10190,12 +10196,6 @@ namespace HREngine.Bots
             else this.tempTrigger.enemyMinionLosesDivineShield++;
         }
 
-        public void minionLosesDivineShield(EntityUnit m)
-        {
-            m.divineshild = false;
-            if (m.own) this.tempTrigger.ownMinionLosesDivineShield++;
-            else this.tempTrigger.enemyMinionLosesDivineShield++;
-        }
 
         /// <summary>
         /// 处理弃牌逻辑，支持己方和敌方的弃牌行为。
