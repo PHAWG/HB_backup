@@ -6,10 +6,16 @@ namespace HREngine.Bots
 {
 	class Sim_BT_196 : SimTemplate //* 击碎者克里丹 Keli'dan the Breaker
 	{
-		//[x]<b>Battlecry:</b> Destroy a minion.If drawn this turn, insteaddestroy all minionsexcept this one.
-		//<b>战吼：</b>消灭一个随从。如果该牌在本回合被抽到，则改为消灭除此随从外的所有随从。
-		
-		
+        //[x]<b>Battlecry:</b> Destroy a minion.If drawn this turn, insteaddestroy all minionsexcept this one.
+        //<b>战吼：</b>消灭一个随从。如果该牌在本回合被抽到，则改为消灭除此随从外的所有随从。
+        public override void getBattlecryEffect(Playfield p, Minion own, Minion target, int choice)
+        {
+            if (target != null)
+            {
+                p.minionGetDestroyed(target);
+            }
+        }
+
 
         public override PlayReq[] GetPlayReqs()
         {

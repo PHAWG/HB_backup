@@ -11,7 +11,7 @@ namespace HREngine.Bots
 	//<b>战吼：</b>对所有非拉法姆随从造成6点伤害。
 	class Sim_TIME_005t6 : SimTemplate
 	{
-		
+		override get
 		
 	}
 }

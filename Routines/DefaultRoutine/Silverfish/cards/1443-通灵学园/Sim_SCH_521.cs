@@ -10,15 +10,11 @@ namespace HREngine.Bots
 		//消灭一个受伤的随从。<b>连击：</b>消灭任意随从。
 		public override void onCardPlay(Playfield p, bool ownplay, Minion target, int choice, Handmanager.Handcard hc)
         {
-			foreach (var m in p.enemyMinions)
-			{
-				if (m.wounded) p.minionGetDestroyed(m);
-
-				if (p.cardsPlayedThisTurn >= 1 && target != null && ownplay)
+				if (target != null)
 				{
 					p.minionGetDestroyed(target);
 				}
-			}
+			
 		}
 
         public override PlayReq[] GetPlayReqs()
@@ -26,8 +22,8 @@ namespace HREngine.Bots
             return new PlayReq[] {
                 new PlayReq(CardDB.ErrorType2.REQ_TARGET_TO_PLAY),
                 new PlayReq(CardDB.ErrorType2.REQ_MINION_TARGET),
-                new PlayReq(CardDB.ErrorType2.REQ_ENEMY_TARGET),
                 new PlayReq(CardDB.ErrorType2.REQ_DAMAGED_TARGET),
+                new PlayReq(CardDB.ErrorType2.REQ_DAMAGED_TARGET_UNLESS_COMBO),
             };
         }
 	}

@@ -13,16 +13,7 @@ namespace HREngine.Bots
 	{
 		public override void getBattlecryEffect(Playfield p, Minion own, Minion target, int choice)
 		{
-			bool dragonInHand = false;
-			foreach (Handmanager.Handcard hc in p.owncards)
-			{
-				if ((TAG_RACE)hc.card.race == TAG_RACE.DRAGON)
-				{
-					dragonInHand = true;
-					break;
-				}
-			}
-			if (dragonInHand && target != null)
+			if (target != null)
 			{
 				p.minionGetDamageOrHeal(target, 5);
 			}
@@ -34,7 +25,6 @@ namespace HREngine.Bots
 				new PlayReq(CardDB.ErrorType2.REQ_TARGET_IF_AVAILABLE_AND_DRAGON_IN_HAND), //手牌里有龙才有目标
 				new PlayReq(CardDB.ErrorType2.REQ_MINION_TARGET), // 目标只能是随从
 				new PlayReq(CardDB.ErrorType2.REQ_ENEMY_TARGET), // 目标只能是敌方
-				new PlayReq(CardDB.ErrorType2.REQ_TARGET_IF_AVAILABLE), //无目标时也可以用
 			};
 		}
 

@@ -119,6 +119,9 @@ namespace HREngine.Bots
         // public string enchs = "";// 附魔效果
         public List<CardDB.cardIDEnum> enchs = new List<CardDB.cardIDEnum>();
         public bool silenced = false;//沉默
+        /// <summary>
+        /// 为false表示可以为目标，为true表示不可以为目标
+        /// </summary>
         public bool extraParam = false;//扩展参数1
         public int extraParam2 = 0;//扩展参数2
 

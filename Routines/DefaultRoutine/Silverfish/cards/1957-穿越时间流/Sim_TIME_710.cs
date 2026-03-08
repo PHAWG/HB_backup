@@ -11,7 +11,13 @@ namespace HREngine.Bots
 	//<b>潜行</b>。<b>连击：</b>召唤一个本随从的复制。
 	class Sim_TIME_710 : SimTemplate
 	{
-		
-		
+		public override void onCardPlay(Playfield p, Minion own, Minion target, int choice, Handmanager.Handcard hc)
+		{
+			if (p.cardsPlayedThisTurn > 0)
+			{
+				p.CallMinionCopy(own, own.own);
+			}
+		}
+
 	}
 }

@@ -11,7 +11,20 @@ namespace HREngine.Bots
 	//消灭一个随从。你的牌库中每有一张套牌之外的牌，本牌的法力值消耗便减少（1）点。
 	class Sim_DMF_518 : SimTemplate
 	{
-		
-		
-	}
+        public override void onCardPlay(Playfield p, bool ownplay, Minion target, int choice, Handmanager.Handcard hc)
+        {
+            if (target != null)
+            {
+                p.minionGetDestroyed(target);
+            }
+        }
+        public override PlayReq[] GetPlayReqs()
+        {
+            return new PlayReq[] {
+                new PlayReq(CardDB.ErrorType2.REQ_TARGET_TO_PLAY),
+                new PlayReq(CardDB.ErrorType2.REQ_MINION_TARGET),
+            };
+        }
+
+    }
 }

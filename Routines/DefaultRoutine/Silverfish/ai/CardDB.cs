@@ -1490,7 +1490,8 @@ namespace HREngine.Bots
                     return result;
 
                 }
-
+                Minion ownHero = p.ownHero;
+                Minion enemyHero = p.enemyHero;
                 List<Minion> targets = new List<Minion>();
                 bool targetAll = false;
                 bool targetAllEnemy = false;
@@ -1521,6 +1522,8 @@ namespace HREngine.Bots
                 bool REQ_LOCATION_TARGET = false;
                 bool REQ_TARGET_MUST_HAVE_TAG = false;
                 bool REQ_FRIENDLY_MINION_OF_RACE_IN_HAND = false;
+                bool REQ_DAMAGED_TARGET_UNLESS_COMBO = false;
+                bool REQ_TARGET_IF_AVAILABLE_AND_PLAYER_HEALTH_CHANGED_THIS_TURN = false;
                 foreach (PlayReq pr in playReqs)
                 {
                     switch (pr.errorType)
@@ -1595,7 +1598,7 @@ namespace HREngine.Bots
                             if (this.needMinTotalMinions > p.ownMinions.Count + p.enemyMinions.Count) return result;
                             continue;
                         case ErrorType2.REQ_TARGET_IF_AVAILABLE_AND_HERO_HAS_ATTACK:
-                            if (p.ownHero.Angr >= 1) return result;
+                            if (ownHero.Angr >= 1) return result;
                             continue;
                         case ErrorType2.REQ_MINIMUM_CORPSES:
                             if (p.getCorpseCount() < this.needWithMinimumCorpeses) return result;
@@ -1729,6 +1732,14 @@ namespace HREngine.Bots
                             REQ_TARGET_MUST_HAVE_TAG = true;
                             extraParam = true;
                             continue;
+                        case ErrorType2.REQ_DAMAGED_TARGET_UNLESS_COMBO:
+                            REQ_DAMAGED_TARGET_UNLESS_COMBO = true;
+                            extraParam = true;
+                            continue;
+                        case ErrorType2.REQ_TARGET_IF_AVAILABLE_AND_PLAYER_HEALTH_CHANGED_THIS_TURN:
+                            REQ_TARGET_IF_AVAILABLE_AND_PLAYER_HEALTH_CHANGED_THIS_TURN = true;
+                            extraParam = true;
+                            continue;
                     }
                 }
 
@@ -1761,8 +1772,8 @@ namespace HREngine.Bots
                     }
                     else
                     {
-                        if (!p.enemyHero.immune) targetEnemyHero = true;
-                        if (!p.ownHero.immune) targetOwnHero = true;
+                        if (!enemyHero.immune) targetEnemyHero = true;
+                        if (!ownHero.immune) targetOwnHero = true;
                         if (targetAllEnemy) targetOwnHero = false;
                         if (targetAllFriendly) targetEnemyHero = false;
                     }
@@ -1868,9 +1879,36 @@ namespace HREngine.Bots
                         {
                             m.extraParam = !m.wounded;
                         }
-                        targetOwnHero = false;
-                        targetEnemyHero = false;
+                        targetOwnHero = ownHero.wounded;
+                        targetEnemyHero = enemyHero.wounded;
                     }
+                    if (REQ_DAMAGED_TARGET_UNLESS_COMBO)
+                    {
+                        if (p.cardsPlayedThisTurn >= 1){
+                            foreach (Minion m in targets)
+                            {
+                                m.extraParam = false;
+                            }
+                            targetOwnHero = ownHero.wounded;
+                            targetEnemyHero = enemyHero.wounded;
+                        }
+                        else
+                        {
+
+                        foreach (Minion m in targets)
+                        {
+                            m.extraParam = !m.wounded;
+                        }
+                        targetOwnHero = ownHero.wounded;
+                        targetEnemyHero = enemyHero.wounded;
+                        }
+                    }
+                    //本回合英雄血量变化
+                    if (REQ_TARGET_IF_AVAILABLE_AND_PLAYER_HEALTH_CHANGED_THIS_TURN)
+                    {
+                        
+                    }
+                        
                     if (REQ_TARGET_MAX_ATTACK)
                     {
                         foreach (Minion m in targets)
@@ -2021,21 +2059,21 @@ namespace HREngine.Bots
                     }
                 }
 
-                if (targetEnemyHero && own && p.enemyHero.stealth) targetEnemyHero = false;
-                if (targetOwnHero && !own && p.ownHero.stealth) targetOwnHero = false;
+                if (targetEnemyHero && own && enemyHero.stealth) targetEnemyHero = false;
+                if (targetOwnHero && !own && ownHero.stealth) targetOwnHero = false;
 
                 //斩杀
                 if (isLethalCheck)
                 {
-                    if (targetEnemyHero && own) result.Add(p.enemyHero);
-                    else if (targetOwnHero && !own) result.Add(p.ownHero);
+                    if (targetEnemyHero && own) result.Add(enemyHero);
+                    else if (targetOwnHero && !own) result.Add(ownHero);
 
                     switch (this.type)
                     {
                         case cardtype.SPELL:
                             if (p.prozis.penman.attackBuffDatabase.ContainsKey(this.nameEN))
                             {
-                                if (targetOwnHero && own) result.Add(p.ownHero);
+                                if (targetOwnHero && own) result.Add(ownHero);
                                 foreach (Minion m in targets)
                                 {
                                     if (m.extraParam != true && !m.Elusive)
@@ -2106,8 +2144,8 @@ namespace HREngine.Bots
                 }
                 else
                 {
-                    if (targetEnemyHero) result.Add(p.enemyHero);
-                    if (targetOwnHero) result.Add(p.ownHero);
+                    if (targetEnemyHero) result.Add(enemyHero);
+                    if (targetOwnHero) result.Add(ownHero);
 
                     foreach (Minion m in targets)
                     {

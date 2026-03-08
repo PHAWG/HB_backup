@@ -11,7 +11,10 @@ namespace HREngine.Bots
 	//在你使用你的英雄技能后，复原2个法力水晶。
 	class Sim_END_008 : SimTemplate
 	{
-		
+        public override void onInspire(Playfield p, Minion m, bool ownerOfInspire)
+        {
+				p.mana = Math.Max(p.ownMaxMana, p.mana + 2);
+        }
 		
 	}
 }

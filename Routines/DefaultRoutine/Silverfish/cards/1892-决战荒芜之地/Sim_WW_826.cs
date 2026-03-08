@@ -19,12 +19,6 @@ namespace HREngine.Bots
 			}
 		}
 
-		public override PlayReq[] GetPlayReqs()
-		{
-			return new PlayReq[]{
-				new PlayReq(CardDB.ErrorType2.REQ_FRIENDLY_MINION_OF_RACE_IN_HAND,24), //手牌里有龙
-			};
-		}
 
 	}
 }

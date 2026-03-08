@@ -4,14 +4,30 @@ using System.Text;
 
 namespace HREngine.Bots
 {
-	//随从 中立 费用：3 攻击力：3 生命值：3
-	//Crusty the Crustacean
-	//硬壳横行蟹
-	//[x]<b>Battlecry:</b> Destroy a minion.Gain its Attack and Health.
-	//<b>战吼：</b>消灭一个随从。获得其攻击力和生命值。
-	class Sim_ONY_005ta7 : SimTemplate
-	{
-		
-		
-	}
+    //随从 中立 费用：3 攻击力：3 生命值：3
+    //Crusty the Crustacean
+    //硬壳横行蟹
+    //[x]<b>Battlecry:</b> Destroy a minion.Gain its Attack and Health.
+    //<b>战吼：</b>消灭一个随从。获得其攻击力和生命值。
+    class Sim_ONY_005ta7 : SimTemplate
+    {
+        public override void getBattlecryEffect(Playfield p, Minion m, Minion target, int choice)
+        {
+            if (target != null)
+            {
+                p.minionGetDestroyed(target);
+                p.minionGetBuffed(m, target.Angr, target.Hp);
+            }
+        }
+
+        public override PlayReq[] GetPlayReqs()
+        {
+            return new PlayReq[] {
+				new PlayReq(CardDB.ErrorType2.REQ_TARGET_IF_AVAILABLE),
+				new PlayReq(CardDB.ErrorType2.REQ_MINION_TARGET),
+            };
+
+        }
+
+    }
 }
