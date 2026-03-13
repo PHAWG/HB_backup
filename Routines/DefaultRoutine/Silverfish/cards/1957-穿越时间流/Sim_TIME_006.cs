@@ -14,10 +14,11 @@ namespace HREngine.Bots
 		CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.TIME_006t1);
 		public override void onCardPlay(Playfield p, bool ownplay, Minion target, int choice, Handmanager.Handcard hc)
         {
-			p.callKid(kid, p.getPosition(ownplay), ownplay);
+			int pos = ownplay ? p.ownMinions.Count : p.enemyMinions.Count;
+			p.callKid(kid, pos, ownplay);
 			if (p.anyRaceCardInHand(CardDB.Race.DRAGON))
 			{
-				p.callKid(kid, p.getPosition(ownplay), ownplay);
+				p.callKid(kid, pos, ownplay);
 
 			}
 		}

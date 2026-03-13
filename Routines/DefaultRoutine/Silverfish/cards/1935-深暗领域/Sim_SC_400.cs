@@ -4,7 +4,7 @@ using System.Text;
 
 namespace HREngine.Bots
 {
-	//英雄 无效的 费用：8
+	//英雄 无效的 费用：7
 	//Jim Raynor
 	//吉姆·雷诺
 	//[x]<b>Battlecry:</b> Relaunchevery <b>Starship</b> that youlaunched this game.

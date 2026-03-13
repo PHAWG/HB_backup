@@ -11,7 +11,9 @@ namespace HREngine.Bots
 	//受伤时拥有<b>法术伤害+2</b>。
 	class Sim_END_022 : SimTemplate
 	{
-		
+        public override void onEnrageStart(Playfield p, Minion m)
+        {
+        }
 		
 	}
 }

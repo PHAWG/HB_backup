@@ -7,8 +7,8 @@ namespace HREngine.Bots
 	//附魔 中立 费用：0
 	//Bouncy Bouncy
 	//保护酒馆
-	//+{0}/+{1} and <b>Taunt</b>.
-	//+{0}/+{1}和<b>嘲讽</b>。
+	//<b>Taunt</b> and Health set to +{1}.
+	//<b>嘲讽</b>。生命值变为+{1}。
 	class Sim_BGS_Treasures_026e : SimTemplate
 	{
 		

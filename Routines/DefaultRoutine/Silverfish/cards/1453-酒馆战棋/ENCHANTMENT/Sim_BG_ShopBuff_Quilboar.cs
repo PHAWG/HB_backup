@@ -5,7 +5,7 @@ using System.Text;
 namespace HREngine.Bots
 {
 	//附魔 中立 费用：0
-	//Quilboar Tavern Buff
+	//Quilboar Shop Buff Player Enchantment (DNT)
 	//野猪人酒馆增益
 	//Quilboar in the Tavern have increased stats. (DNT)
 	//酒馆中的元素拥有的属性值提高。
