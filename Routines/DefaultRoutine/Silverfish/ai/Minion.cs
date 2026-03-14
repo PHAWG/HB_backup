@@ -20,6 +20,7 @@ namespace HREngine.Bots
         public int pID = 0; //PID
         public CardDB.cardNameEN name = CardDB.cardNameEN.unknown;//随从名称
         public CardDB.cardNameCN nameCN = CardDB.cardNameCN.未知;//随从中文名称
+        public CardDB.cardIDEnum cardId = CardDB.cardIDEnum.None;//随从CardId名称
         public TAG_CLASS cardClass = TAG_CLASS.INVALID;//随从类别
         public int synergy = 0;//职业契合度，即各种族（机械鱼人恶魔野兽）与职业相关性
         public Handmanager.Handcard handcard;
@@ -85,7 +86,6 @@ namespace HREngine.Bots
         /// <summary>冲锋</summary>
         public int charge = 0;
         /// <summary>非关键词冲锋</summary>
-        public int nonKeywordCharge { get; set; }
         public int rush = 0;//突袭
         /// <summary>扰魔</summary>
         public bool Elusive { get; set; }
@@ -245,6 +245,7 @@ namespace HREngine.Bots
 
             this.name = m.name;
             this.nameCN = m.nameCN;
+            this.cardId = m.cardId;
             this.cardClass = m.cardClass;
             this.synergy = m.synergy;
             this.handcard = m.handcard;
@@ -358,6 +359,7 @@ namespace HREngine.Bots
 
             this.name = m.name;
             this.nameCN = m.nameCN;
+            this.cardId = m.cardId;
             this.cardClass = m.cardClass;
             this.synergy = m.synergy;
             this.handcard = m.handcard;
@@ -1383,230 +1385,9 @@ namespace HREngine.Bots
             }
         }
 
-        public override bool Equals(object obj)
-        {
-            Minion minion = obj as Minion;
-            return anzGotDmg == minion.anzGotDmg &&
-                   GotDmgValue == minion.GotDmgValue &&
-                   anzGotHealed == minion.anzGotHealed &&
-                   GotHealedValue == minion.GotHealedValue &&
-                   gotInspire == minion.gotInspire &&
-                   isHero == minion.isHero &&
-                   own == minion.own &&
-                   pID == minion.pID &&
-                   name == minion.name &&
-                   nameCN == minion.nameCN &&
-                   cardClass == minion.cardClass &&
-                   synergy == minion.synergy &&
-                   EqualityComparer<Handmanager.Handcard>.Default.Equals(handcard, minion.handcard) &&
-                   entitiyID == minion.entitiyID &&
-                   zonepos == minion.zonepos &&
-                   playedFromHand == minion.playedFromHand &&
-                   playedThisTurn == minion.playedThisTurn &&
-                   playedPrevTurn == minion.playedPrevTurn &&
-                   ShowSleepZZZOverride == minion.ShowSleepZZZOverride &&
-                   numAttacksThisTurn == minion.numAttacksThisTurn &&
-                   extraAttacksThisTurn == minion.extraAttacksThisTurn &&
-                   allreadyAttacked == minion.allreadyAttacked &&
-                   cantAttackHeroes == minion.cantAttackHeroes &&
-                   cantAttack == minion.cantAttack &&
-                   immuneWhileAttacking == minion.immuneWhileAttacking &&
-                   nonKeyWordCharge == minion.nonKeyWordCharge &&
-                   TAG_SCRIPT_DATA_NUM_1 == minion.TAG_SCRIPT_DATA_NUM_1 &&
-                   TAG_SCRIPT_DATA_NUM_2 == minion.TAG_SCRIPT_DATA_NUM_2 &&
-                   MODULAR_ENTITY_PART_1 == minion.MODULAR_ENTITY_PART_1 &&
-                   MODULAR_ENTITY_PART_2 == minion.MODULAR_ENTITY_PART_2 &&
-                   EqualityComparer<CardDB.Card>.Default.Equals(deathrattle2, minion.deathrattle2) &&
-                   spellpower == minion.spellpower &&
-                   cantBeTargetedBySpellsOrHeroPowers == minion.cantBeTargetedBySpellsOrHeroPowers &&
-                   cost == minion.cost &&
-                   Hp == minion.Hp &&
-                   maxHp == minion.maxHp &&
-                   armor == minion.armor &&
-                   Angr == minion.Angr &&
-                   AdjacentAngr == minion.AdjacentAngr &&
-                   tempAttack == minion.tempAttack &&
-                   justBuffed == minion.justBuffed &&
-                   Ready == minion.Ready &&
-                   taunt == minion.taunt &&
-                   wounded == minion.wounded &&
-                   divineshild == minion.divineshild &&
-                   windfury == minion.windfury &&
-                   megaWindfury == minion.megaWindfury &&
-                   frozen == minion.frozen &&
-                   stealth == minion.stealth &&
-                   immune == minion.immune &&
-                   untouchable == minion.untouchable &&
-                   exhausted == minion.exhausted &&
-                   lifesteal == minion.lifesteal &&
-                   dormant == minion.dormant &&
-                   outcast == minion.outcast &&
-                   reborn == minion.reborn &&
-                   poisonous == minion.poisonous &&
-                   modular == minion.modular &&
-                   charge == minion.charge &&
-                   nonKeywordCharge == minion.nonKeywordCharge &&
-                   rush == minion.rush &&
-                   Elusive == minion.Elusive &&
-                   Enraged == minion.Enraged &&
-                   Spellburst == minion.Spellburst &&
-                   Frenzy == minion.Frenzy &&
-                   Overkill == minion.Overkill &&
-                   HonorableKill == minion.HonorableKill &&
-                   Aura == minion.Aura &&
-                   TriggerVisual == minion.TriggerVisual &&
-                   hChoice == minion.hChoice &&
-                   CooldownTurn == minion.CooldownTurn &&
-                   EqualityComparer<List<CardDB.cardIDEnum>>.Default.Equals(enchs, minion.enchs) &&
-                   silenced == minion.silenced &&
-                   extraParam == minion.extraParam &&
-                   extraParam2 == minion.extraParam2 &&
-                   Status == minion.Status &&
-                   shadowmadnessed == minion.shadowmadnessed &&
-                   destroyOnOwnTurnStart == minion.destroyOnOwnTurnStart &&
-                   destroyOnEnemyTurnStart == minion.destroyOnEnemyTurnStart &&
-                   destroyOnOwnTurnEnd == minion.destroyOnOwnTurnEnd &&
-                   destroyOnEnemyTurnEnd == minion.destroyOnEnemyTurnEnd &&
-                   changeOwnerOnTurnStart == minion.changeOwnerOnTurnStart &&
-                   conceal == minion.conceal &&
-                   cantLowerHPbelowONE == minion.cantLowerHPbelowONE &&
-                   ownBlessingOfWisdom == minion.ownBlessingOfWisdom &&
-                   enemyBlessingOfWisdom == minion.enemyBlessingOfWisdom &&
-                   ownPowerWordGlory == minion.ownPowerWordGlory &&
-                   enemyPowerWordGlory == minion.enemyPowerWordGlory &&
-                   ancestralspirit == minion.ancestralspirit &&
-                   desperatestand == minion.desperatestand &&
-                   souloftheforest == minion.souloftheforest &&
-                   stegodon == minion.stegodon &&
-                   onanelekk == minion.onanelekk &&
-                   onahorse == minion.onahorse &&
-                   onaram == minion.onaram &&
-                   onakodo == minion.onakodo &&
-                   itsnecrolit == minion.itsnecrolit &&
-                   plagued == minion.plagued &&
-                   greybud == minion.greybud &&
-                   infected == minion.infected &&
-                   finalsession == minion.finalsession &&
-                   sheepmask == minion.sheepmask &&
-                   livingspores == minion.livingspores &&
-                   explorershat == minion.explorershat &&
-                   libramofwisdom == minion.libramofwisdom &&
-                   returnToHand == minion.returnToHand &&
-                   infest == minion.infest;
-        }
+        
 
-        public override int GetHashCode()
-        {
-            int hashCode = 1195226830;
-            hashCode = hashCode * -1521134295 + anzGotDmg.GetHashCode();
-            hashCode = hashCode * -1521134295 + GotDmgValue.GetHashCode();
-            hashCode = hashCode * -1521134295 + anzGotHealed.GetHashCode();
-            hashCode = hashCode * -1521134295 + GotHealedValue.GetHashCode();
-            hashCode = hashCode * -1521134295 + gotInspire.GetHashCode();
-            hashCode = hashCode * -1521134295 + isHero.GetHashCode();
-            hashCode = hashCode * -1521134295 + own.GetHashCode();
-            hashCode = hashCode * -1521134295 + pID.GetHashCode();
-            hashCode = hashCode * -1521134295 + name.GetHashCode();
-            hashCode = hashCode * -1521134295 + nameCN.GetHashCode();
-            hashCode = hashCode * -1521134295 + cardClass.GetHashCode();
-            hashCode = hashCode * -1521134295 + synergy.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<Handmanager.Handcard>.Default.GetHashCode(handcard);
-            hashCode = hashCode * -1521134295 + entitiyID.GetHashCode();
-            hashCode = hashCode * -1521134295 + zonepos.GetHashCode();
-            hashCode = hashCode * -1521134295 + playedFromHand.GetHashCode();
-            hashCode = hashCode * -1521134295 + playedThisTurn.GetHashCode();
-            hashCode = hashCode * -1521134295 + playedPrevTurn.GetHashCode();
-            hashCode = hashCode * -1521134295 + ShowSleepZZZOverride.GetHashCode();
-            hashCode = hashCode * -1521134295 + numAttacksThisTurn.GetHashCode();
-            hashCode = hashCode * -1521134295 + extraAttacksThisTurn.GetHashCode();
-            hashCode = hashCode * -1521134295 + allreadyAttacked.GetHashCode();
-            hashCode = hashCode * -1521134295 + cantAttackHeroes.GetHashCode();
-            hashCode = hashCode * -1521134295 + cantAttack.GetHashCode();
-            hashCode = hashCode * -1521134295 + immuneWhileAttacking.GetHashCode();
-            hashCode = hashCode * -1521134295 + nonKeyWordCharge.GetHashCode();
-            hashCode = hashCode * -1521134295 + TAG_SCRIPT_DATA_NUM_1.GetHashCode();
-            hashCode = hashCode * -1521134295 + TAG_SCRIPT_DATA_NUM_2.GetHashCode();
-            hashCode = hashCode * -1521134295 + MODULAR_ENTITY_PART_1.GetHashCode();
-            hashCode = hashCode * -1521134295 + MODULAR_ENTITY_PART_2.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<CardDB.Card>.Default.GetHashCode(deathrattle2);
-            hashCode = hashCode * -1521134295 + spellpower.GetHashCode();
-            hashCode = hashCode * -1521134295 + cantBeTargetedBySpellsOrHeroPowers.GetHashCode();
-            hashCode = hashCode * -1521134295 + cost.GetHashCode();
-            hashCode = hashCode * -1521134295 + Hp.GetHashCode();
-            hashCode = hashCode * -1521134295 + maxHp.GetHashCode();
-            hashCode = hashCode * -1521134295 + armor.GetHashCode();
-            hashCode = hashCode * -1521134295 + Angr.GetHashCode();
-            hashCode = hashCode * -1521134295 + AdjacentAngr.GetHashCode();
-            hashCode = hashCode * -1521134295 + tempAttack.GetHashCode();
-            hashCode = hashCode * -1521134295 + justBuffed.GetHashCode();
-            hashCode = hashCode * -1521134295 + Ready.GetHashCode();
-            hashCode = hashCode * -1521134295 + taunt.GetHashCode();
-            hashCode = hashCode * -1521134295 + wounded.GetHashCode();
-            hashCode = hashCode * -1521134295 + divineshild.GetHashCode();
-            hashCode = hashCode * -1521134295 + windfury.GetHashCode();
-            hashCode = hashCode * -1521134295 + megaWindfury.GetHashCode();
-            hashCode = hashCode * -1521134295 + frozen.GetHashCode();
-            hashCode = hashCode * -1521134295 + stealth.GetHashCode();
-            hashCode = hashCode * -1521134295 + immune.GetHashCode();
-            hashCode = hashCode * -1521134295 + untouchable.GetHashCode();
-            hashCode = hashCode * -1521134295 + exhausted.GetHashCode();
-            hashCode = hashCode * -1521134295 + lifesteal.GetHashCode();
-            hashCode = hashCode * -1521134295 + dormant.GetHashCode();
-            hashCode = hashCode * -1521134295 + outcast.GetHashCode();
-            hashCode = hashCode * -1521134295 + reborn.GetHashCode();
-            hashCode = hashCode * -1521134295 + poisonous.GetHashCode();
-            hashCode = hashCode * -1521134295 + modular.GetHashCode();
-            hashCode = hashCode * -1521134295 + charge.GetHashCode();
-            hashCode = hashCode * -1521134295 + nonKeywordCharge.GetHashCode();
-            hashCode = hashCode * -1521134295 + rush.GetHashCode();
-            hashCode = hashCode * -1521134295 + Elusive.GetHashCode();
-            hashCode = hashCode * -1521134295 + Enraged.GetHashCode();
-            hashCode = hashCode * -1521134295 + Spellburst.GetHashCode();
-            hashCode = hashCode * -1521134295 + Frenzy.GetHashCode();
-            hashCode = hashCode * -1521134295 + Overkill.GetHashCode();
-            hashCode = hashCode * -1521134295 + HonorableKill.GetHashCode();
-            hashCode = hashCode * -1521134295 + Aura.GetHashCode();
-            hashCode = hashCode * -1521134295 + TriggerVisual.GetHashCode();
-            hashCode = hashCode * -1521134295 + hChoice.GetHashCode();
-            hashCode = hashCode * -1521134295 + CooldownTurn.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<List<CardDB.cardIDEnum>>.Default.GetHashCode(enchs);
-            hashCode = hashCode * -1521134295 + silenced.GetHashCode();
-            hashCode = hashCode * -1521134295 + extraParam.GetHashCode();
-            hashCode = hashCode * -1521134295 + extraParam2.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Status);
-            hashCode = hashCode * -1521134295 + shadowmadnessed.GetHashCode();
-            hashCode = hashCode * -1521134295 + destroyOnOwnTurnStart.GetHashCode();
-            hashCode = hashCode * -1521134295 + destroyOnEnemyTurnStart.GetHashCode();
-            hashCode = hashCode * -1521134295 + destroyOnOwnTurnEnd.GetHashCode();
-            hashCode = hashCode * -1521134295 + destroyOnEnemyTurnEnd.GetHashCode();
-            hashCode = hashCode * -1521134295 + changeOwnerOnTurnStart.GetHashCode();
-            hashCode = hashCode * -1521134295 + conceal.GetHashCode();
-            hashCode = hashCode * -1521134295 + cantLowerHPbelowONE.GetHashCode();
-            hashCode = hashCode * -1521134295 + ownBlessingOfWisdom.GetHashCode();
-            hashCode = hashCode * -1521134295 + enemyBlessingOfWisdom.GetHashCode();
-            hashCode = hashCode * -1521134295 + ownPowerWordGlory.GetHashCode();
-            hashCode = hashCode * -1521134295 + enemyPowerWordGlory.GetHashCode();
-            hashCode = hashCode * -1521134295 + ancestralspirit.GetHashCode();
-            hashCode = hashCode * -1521134295 + desperatestand.GetHashCode();
-            hashCode = hashCode * -1521134295 + souloftheforest.GetHashCode();
-            hashCode = hashCode * -1521134295 + stegodon.GetHashCode();
-            hashCode = hashCode * -1521134295 + onanelekk.GetHashCode();
-            hashCode = hashCode * -1521134295 + onahorse.GetHashCode();
-            hashCode = hashCode * -1521134295 + onaram.GetHashCode();
-            hashCode = hashCode * -1521134295 + onakodo.GetHashCode();
-            hashCode = hashCode * -1521134295 + itsnecrolit.GetHashCode();
-            hashCode = hashCode * -1521134295 + plagued.GetHashCode();
-            hashCode = hashCode * -1521134295 + greybud.GetHashCode();
-            hashCode = hashCode * -1521134295 + infected.GetHashCode();
-            hashCode = hashCode * -1521134295 + finalsession.GetHashCode();
-            hashCode = hashCode * -1521134295 + sheepmask.GetHashCode();
-            hashCode = hashCode * -1521134295 + livingspores.GetHashCode();
-            hashCode = hashCode * -1521134295 + explorershat.GetHashCode();
-            hashCode = hashCode * -1521134295 + libramofwisdom.GetHashCode();
-            hashCode = hashCode * -1521134295 + returnToHand.GetHashCode();
-            hashCode = hashCode * -1521134295 + infest.GetHashCode();
-            return hashCode;
-        }
+        
 
         public static bool operator ==(Minion left, Minion right)
         {
