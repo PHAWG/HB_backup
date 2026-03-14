@@ -831,6 +831,7 @@ namespace HREngine.Bots
                 this.ownHero.extraAttacksThisTurn = hero.GetExtraAttacksThisTurn();
                 this.ownHero.immuneWhileAttacking = hero.HasTag(GAME_TAG.IMMUNE_WHILE_ATTACKING);
                 this.ownHero.nameCN = CardDB.Instance.cardNameCNstringToEnum(hero.GetName());
+                this.ownHero.cardId = CardDB.Instance.cardIdstringToEnum(hero.GetCardId());
             }
             else
             {
@@ -854,6 +855,8 @@ namespace HREngine.Bots
                 this.enemyHero.extraAttacksThisTurn = hero.GetExtraAttacksThisTurn();
                 this.enemyHero.immuneWhileAttacking = hero.HasTag(GAME_TAG.IMMUNE_WHILE_ATTACKING);
                 this.enemyHero.nameCN = CardDB.Instance.cardNameCNstringToEnum(hero.GetName());
+                this.enemyHero.cardId = CardDB.Instance.cardIdstringToEnum(hero.GetCardId());
+
             }
             if (hero.IsEnchanted())
             {
@@ -994,6 +997,7 @@ namespace HREngine.Bots
                     Minion m = new Minion();
                     m.name = c.nameEN;
                     m.nameCN = c.nameCN;
+                    m.cardId = c.cardIDenum;
                     m.handcard.card = c;
 
                     m.zonepos = zp;//棋盘上的位置
@@ -1032,7 +1036,7 @@ namespace HREngine.Bots
                     m.reborn = entity.HasReborn();//复生
                     m.Elusive = entity.HasTag(GAME_TAG.ELUSIVE);//扰魔
                     m.charge = entity.HasCharge() ? 1 : 0;//冲锋
-                    m.nonKeywordCharge = entity.GetTag(GAME_TAG.NON_KEYWORD_CHARGE);//非关键词冲锋
+                    m.nonKeyWordCharge = entity.HasTag(GAME_TAG.NON_KEYWORD_CHARGE);//非关键词冲锋
                     m.immune = entity.HasTag(GAME_TAG.IMMUNE);//免疫
                     m.immuneWhileAttacking = entity.HasTag(GAME_TAG.IMMUNE_WHILE_ATTACKING);//攻击时免疫
                     m.untouchable = entity.HasTag(GAME_TAG.UNTOUCHABLE);//无法选择

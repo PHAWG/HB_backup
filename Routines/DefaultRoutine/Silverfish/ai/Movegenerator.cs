@@ -63,11 +63,13 @@ namespace HREngine.Bots
             // 获取英雄武器和随从的攻击目标
             targets = p.GetAttackTargets(own, p.isLethalCheck);
             if (!p.isLethalCheck) targets = this.cutAttackList(targets);
+
             //获取随从攻击动作
             resultAction.AddRange(this.getMinionAttackActions(p, targets, usePenalityManager));
 
             //获取英雄攻击动作
             resultAction.AddRange(this.getHeroAttackActions(p, targets, usePenalityManager, own));
+
 
             // 使用己方英雄技能
             resultAction.AddRange(this.getHeroPowerActions(p, targets, usePenalityManager, own));
@@ -105,6 +107,9 @@ namespace HREngine.Bots
                 //如果隐藏费用跳过此次循环
                 if (hc.card.nameEN == CardDB.cardNameEN.unknown || hc.card.HideCost) continue;
 
+                if (hc.card.type == CardDB.cardtype.MOB || hc.card.type == CardDB.cardtype.LOCATION)
+                    if (p.ownMinions.Count >= 7)
+                        continue;
                 int cardCost = hc.card.getManaCost(p, hc.manacost);
 
                 // 检查卡牌的打出条件
@@ -126,6 +131,7 @@ namespace HREngine.Bots
 
                 for (int choice = isChoice ? 1 : 0; choice <= (isChoice ? 2 : 1); choice++)
                 {
+
                     if (isChoice)
                     {
                         c = pen.getChooseCard(hc.card, choice);
@@ -145,9 +151,7 @@ namespace HREngine.Bots
                             }
                         }
                     }
-                    if (p.ownMinions.Count >= 7)
-                        if (hc.card.type == CardDB.cardtype.MOB || hc.card.type == CardDB.cardtype.LOCATION)
-                            continue;
+
                     targets = c.getTargetsForCard(p, p.isLethalCheck, true);
                     if (targets.Count == 0) continue;
 
@@ -197,7 +201,7 @@ namespace HREngine.Bots
             {
                 foreach (Minion target in targets)
                 {
-                    if (target == null || target.own) continue;
+                    if (target == null) continue;
                     if (target.untouchable || (m.cantAttackHeroes && target.isHero)) continue;
 
                     int attackPenality = usePenalityManager ? pen.getAttackWithMininonPenality(m, p, target) : 0;
@@ -215,7 +219,7 @@ namespace HREngine.Bots
         /// <param name="p"></param>
         /// <param name="targets"></param>
         /// <param name="usePenalityManager"></param>
-        /// <param name="own"></param>
+        /// <param name="own"></param>p.GetAttackTargets(own, p.isLethalCheck);
         /// <returns></returns>
         public List<Action> getHeroAttackActions(Playfield p, List<Minion> targets, bool usePenalityManager, bool own)
         {
@@ -224,7 +228,8 @@ namespace HREngine.Bots
             hero.updateReadyness();
 
             // 处理英雄攻击（武器）
-            if (hero.Ready)
+            // if (hero.Ready)
+            if ((own && p.ownHero.Ready && p.ownHero.Angr >= 1) || (!own && p.enemyHero.Ready && p.enemyHero.Angr >= 1))
             {
                 foreach (Minion target in targets)
                 {
@@ -233,7 +238,7 @@ namespace HREngine.Bots
                     int heroAttackPen = usePenalityManager ? pen.getAttackWithHeroPenality(target, p) : 0;
                     if (heroAttackPen <= 499)
                     {
-                        resultAction.Add(new Action(actionEnum.attackWithHero, null, hero, 0, target, heroAttackPen, 0));
+                        resultAction.Add(new Action(actionEnum.attackWithHero, null, own ? p.ownHero : p.enemyHero, 0, target, heroAttackPen, 0));
                     }
                 }
             }
@@ -435,45 +440,24 @@ namespace HREngine.Bots
         /// <returns></returns>
         public List<Minion> cutAttackList(List<Minion> oldlist)
         {
-            List<Minion> retvalues = new List<Minion>(oldlist.Count);
-            List<Minion> addedmins = new List<Minion>(oldlist.Count);
+            List<Minion> result = new List<Minion>(oldlist.Count);
+            HashSet<Minion> seen = new HashSet<Minion>(); // 利用 Minion 的 Equals 和 GetHashCode
 
             foreach (Minion m in oldlist)
             {
                 if (m.isHero)
                 {
-                    retvalues.Add(m);
+                    result.Add(m);
                     continue;
                 }
-
-                bool goingtoadd = true;
-                bool isSpecial = m.handcard.card.isSpecialMinion;
-                foreach (Minion mnn in addedmins)
+                // 如果已存在相同的随从（按 Equals 定义），则跳过
+                if (!seen.Contains(m))
                 {
-                    bool otherisSpecial = mnn.handcard.card.isSpecialMinion;
-                    bool onlySpecial = isSpecial && otherisSpecial && !m.silenced && !mnn.silenced;
-                    bool onlyNotSpecial = (!isSpecial || (isSpecial && m.silenced)) && (!otherisSpecial || (otherisSpecial && mnn.silenced));
-
-                    if (onlySpecial && (m.name != mnn.name)) continue; // different name -> take it
-                    // if ((onlySpecial || onlyNotSpecial) && (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.divineshild == m.divineshild && mnn.taunt == m.taunt && mnn.poisonous == m.poisonous && mnn.lifesteal == m.lifesteal && m.handcard.card.isToken == mnn.handcard.card.isToken && mnn.handcard.card.race == m.handcard.card.race && mnn.Spellburst == m.Spellburst && mnn.cantAttackHeroes == m.cantAttackHeroes))
-                    if ((onlySpecial || onlyNotSpecial) && (mnn == m))
-                    {
-                        goingtoadd = false;
-                        break;
-                    }
-                }
-
-                if (goingtoadd)
-                {
-                    addedmins.Add(m);
-                    retvalues.Add(m);
-                }
-                else
-                {
-                    continue;
+                    seen.Add(m);
+                    result.Add(m);
                 }
             }
-            return retvalues;
+            return result;
         }
 
 

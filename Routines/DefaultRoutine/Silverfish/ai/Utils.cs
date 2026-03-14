@@ -36,6 +36,7 @@ namespace HREngine.Bots
                 m.taunt = c.tank;
                 m.name = c.nameEN;
                 m.nameCN = c.nameCN;
+                m.cardId = c.cardIDenum;
                 if (getValueOfMinion(m) < val) ret = false;
             }
             return ret;
