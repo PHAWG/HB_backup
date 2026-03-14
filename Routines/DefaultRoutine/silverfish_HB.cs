@@ -813,6 +813,7 @@ namespace HREngine.Bots
                 this.ownHero.entitiyID = hero.GetEntityId();
                 this.ownHero.own = true;
                 this.ownHero.isHero = true;
+                this.ownHero.handcard.card.type = CardDB.cardtype.HERO;
                 this.ownHero.Ready = !hero.IsExhausted();
                 this.ownHero.cardClass = (TAG_CLASS)hero.GetClass();
                 this.ownHeroFatigue = player.GetFatigue();
@@ -824,7 +825,7 @@ namespace HREngine.Bots
                 this.ownHero.frozen = hero.IsFrozen();
                 this.ownHero.stealth = hero.IsStealthed();
                 this.ownHero.windfury = hero.HasWindfury();
-                this.ownHero.megaWindfury = hero.GetTag(GAME_TAG.WINDFURY) == 3;//超级风怒
+                this.ownHero.megaWindfury = hero.GetTag(GAME_TAG.WINDFURY) == 3;
                 this.ownHero.immune = hero.HasTag(GAME_TAG.IMMUNE);
                 this.ownHero.Elusive = hero.HasTag(GAME_TAG.ELUSIVE);
                 this.ownHero.numAttacksThisTurn = hero.GetNumAttacksThisTurn();
@@ -838,6 +839,7 @@ namespace HREngine.Bots
                 this.enemyHero.entitiyID = hero.GetEntityId();
                 this.enemyHero.own = false;
                 this.enemyHero.isHero = true;
+                this.enemyHero.handcard.card.type = CardDB.cardtype.HERO;
                 this.enemyHero.Ready = !hero.IsExhausted();
                 this.enemyHero.cardClass = (TAG_CLASS)hero.GetClass();
                 this.enemyHeroFatigue = player.GetFatigue();
