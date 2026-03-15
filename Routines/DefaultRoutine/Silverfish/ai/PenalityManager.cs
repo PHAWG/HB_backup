@@ -246,7 +246,6 @@ namespace HREngine.Bots
             if (target == null || target.untouchable || target.Hp <= 0) return 1000;
             if (m != null && !m.silenced && (m.untouchable || m.handcard.card.CantAttack)) return 1000;
             if (m.cantAttackHeroes && target.isHero) return 1000;
-            if (target.own) return 1000;
             int enfaceReward = 0;
             if (printUtils.enfaceReward != 0 && target != null && target.isHero)
             {
@@ -257,7 +256,6 @@ namespace HREngine.Bots
         public int getAttackWithHeroPenality(Minion target, Playfield p)
         {
             if (target == null || target.untouchable || target.Hp <= 0) return 1000;
-            if (target.own) return 1000;
             int enfaceReward = 0;
             if (printUtils.enfaceReward != 0 && target != null && target.isHero)
             {
@@ -2459,6 +2457,7 @@ namespace HREngine.Bots
             this.choose1database.Add(CardDB.cardNameEN.malfurionthepestilent, CardDB.cardIDEnum.ICC_832b);
             this.choose1database.Add(CardDB.cardNameEN.plaguelord, CardDB.cardIDEnum.ICC_832pb);
             this.choose1database.Add(CardDB.cardNameEN.druidoftheswarm, CardDB.cardIDEnum.ICC_051t);
+            this.choose1database.Add(CardDB.cardNameEN.nurture, CardDB.cardIDEnum.AV_205pb);
 
             this.choose2database.Add(CardDB.cardNameEN.ancientoflore, CardDB.cardIDEnum.NEW1_008b);
             this.choose2database.Add(CardDB.cardNameEN.ancientofwar, CardDB.cardIDEnum.EX1_178a);
@@ -2486,6 +2485,7 @@ namespace HREngine.Bots
             this.choose2database.Add(CardDB.cardNameEN.malfurionthepestilent, CardDB.cardIDEnum.ICC_832a);
             this.choose2database.Add(CardDB.cardNameEN.plaguelord, CardDB.cardIDEnum.ICC_832pa);
             this.choose2database.Add(CardDB.cardNameEN.druidoftheswarm, CardDB.cardIDEnum.ICC_051t2);
+            this.choose2database.Add(CardDB.cardNameEN.nurture, CardDB.cardIDEnum.AV_205a);
         }
 
 

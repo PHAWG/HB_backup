@@ -395,12 +395,7 @@ namespace HREngine.Bots
 
                 case actionEnum.attackWithMinion:
                     // 检查随从是否可以攻击
-                    // 不能攻击己方目标
-                    if (a.target.own)
-                    {
-                        actionFound = false;
-                        return actionFound;
-                    }
+
                     // 查找要攻击的随从
                     foreach (Minion m in p.ownMinions)
                     {

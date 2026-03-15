@@ -534,6 +534,8 @@ public class BoardTester
             this.enemyHero = new Minion();
             this.ownHero.isHero = true;
             this.enemyHero.isHero = true;
+            this.ownHero.handcard.card.type = CardDB.cardtype.HERO;
+            this.enemyHero.handcard.card.type = CardDB.cardtype.HERO;
             this.ownHero.own = true;
             this.enemyHero.own = false;
             this.ownHero.maxHp = this.ownheromaxhp;
