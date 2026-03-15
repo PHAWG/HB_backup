@@ -14,7 +14,7 @@ namespace HREngine.Bots
     /// todo save "started" variables outside (they doesnt change)
     /// 记录战场数据 标记
     /// </summary>
-    public class Playfield
+    public partial class Playfield
     {
         private static readonly ILog ilog_0 = Logger.GetLoggerInstanceForType();
 
@@ -239,14 +239,13 @@ namespace HREngine.Bots
         public int startedWithbeschwoerungsportal = 0;
         public int myCardsCostLess = 0;
         public int startedWithmyCardsCostLess = 0;
-        public int anzOwnAviana = 0; //艾维娜
-        public int anzOwnScargil = 0; //斯卡基尔
+        public int anzOwnAviana = 0;
+        public int anzOwnScargil = 0; //
         public int anzOwnCloakedHuntress = 0;//神秘女猎手
         public int anzOwnRazorfenRockstar = 0; // 剃刀沼泽摇滚明星
         public int anzOwnXB931Housekeeper = 0; // XB-931型家政机
         public int anzOwnPopGarThePutrid = 0;//我方腐臭淤泥波普加
         public int anzEnemyPopGarThePutrid = 0;//敌方腐臭淤泥波普加
-
         public int nerubarweblord = 0;
         public int startedWithnerubarweblord = 0;
         public bool startedWithDamagedMinions = false; //重碾
@@ -263,6 +262,7 @@ namespace HREngine.Bots
         public int secretsplayedSinceRecalc = 0;
         public int optionsPlayedThisTurn = 0;
         public int cardsPlayedThisTurn = 0;
+
         public int ueberladung = 0;
         public int lockedMana = 0;
         public int enemyOptionsDoneThisTurn = 0;
@@ -545,17 +545,17 @@ namespace HREngine.Bots
         public Playfield()
         {
             this.value = int.MinValue;
-            this.deckAngrBuff = 0;
-            this.deckHpBuff = 0;
+            // this.deckAngrBuff = 0;
+            // this.deckHpBuff = 0;
             this.patchesInDeck = true;
-            this.healOrDamageTimes = 0;
-            this.healTimes = 0;
+            // this.healOrDamageTimes = 0;
+            // this.healTimes = 0;
             this.totalAngr = -1;
             this.enemyTotalAngr = -1;
-            this.ownMinionsDied = 0;
+            // this.ownMinionsDied = 0;
             this.setMankrik = false;
             this.anzSolor = false;
-            this.enemyMinionStartCount = 0;
+            // this.enemyMinionStartCount = 0;
             this.pID = prozis.getPid();
             if (this.print)
             {
@@ -564,15 +564,15 @@ namespace HREngine.Bots
             this.nextEntity = 1000;
             this.isLethalCheck = false;
             this.ownController = prozis.getOwnController();
-            this.libram = 0;
+            // this.libram = 0;
             this.gTurn = (prozis.gTurn + 1) / 2;
             this.gTurnStep = prozis.gTurnStep;
             this.mana = prozis.currentMana;
             this.manaTurnEnd = this.mana;
             this.ownMaxMana = prozis.ownMaxMana;
             this.enemyMaxMana = prozis.enemyMaxMana;
-            this.evaluatePenality = 0;
-            this.ruleWeight = 0;
+            // this.evaluatePenality = 0;
+            // this.ruleWeight = 0;
             this.rulesUsed = "";
             this.ownSecretsIDList.AddRange(prozis.ownSecretList);
             this.enemySecretCount = prozis.enemySecretCount;
@@ -620,83 +620,83 @@ namespace HREngine.Bots
             this.enemyHeroStartClass = prozis.enemyHeroStartClass;
             //####buffs#############################
 
-            this.anzOwnRaidleader = 0;
-            this.anzEnemyRaidleader = 0;
-            this.anzOwnVessina = 0;
-            this.anzEnemyVessina = 0;
-            this.anzOwnStormwindChamps = 0;
-            this.anzEnemyStormwindChamps = 0;
-            this.anzOwnAnimatedArmor = 0;
-            this.anzEnemyAnimatedArmor = 0;
-            this.anzMoorabi = 0;
-            this.anzDark = 0;
-            this.anzTamsinroame = 0;
-            this.anzOldWoman = 0;
-            this.usedUndeadAllies = 0;
-            this.anzOwnExtraAngrHp = 0;
-            this.anzEnemyExtraAngrHp = 0;
-            this.anzOwnWarhorseTrainer = 0;
-            this.anzEnemyWarhorseTrainer = 0;
-            this.anzOwnTundrarhino = 0;
-            this.anzEnemyTundrarhino = 0;
-            this.anzOwnMrSmite = 0;//重拳先生
-            this.anzEnemyMrSmite = 0;
-            this.anzOwnTimberWolfs = 0;//森林狼
-            this.anzEnemyTimberWolfs = 0;
-            this.anzOwnMurlocWarleader = 0;
-            this.anzEnemyMurlocWarleader = 0;
-            this.anzAcidmaw = 0;
-            this.anzOwnGrimscaleOracle = 0;
-            this.anzEnemyGrimscaleOracle = 0;
-            this.anzOwnShadowfiend = 0;
-            this.anzOwnAuchenaiSoulpriest = 0;
-            this.anzEnemyAuchenaiSoulpriest = 0;
-            this.anzOwnSouthseacaptain = 0;
-            this.anzEnemySouthseacaptain = 0;
-            this.anzOwnDragonConsortStarted = 0;
-            this.ownElementCostStarted = 0;//火光元素
-            this.ownBeastCostLessOnceStarted = 0;//雷矛军用山羊
-            this.anzOwnPiratesStarted = 0;//回合开始海盗数
-            this.anzOwnMurlocStarted = 0;//回合开始鱼人数
-            this.anzOwnElementStarted = 0;//回合开始元素数
-            this.anzOwnDraeneiStarted = 0;//回合开始德莱尼数
-            this.anzOwnTreantStarted = 0;//回合开始树人数
-            this.ownAbilityFreezesTarget = 0;
-            this.enemyAbilityFreezesTarget = 0;
-            this.ownDemonCostLessOnce = 0;
-            this.ownHeroPowerCostLessOnce = 0;
-            this.ownHeroPowerCostLessTwice = 0;
-            this.enemyHeroPowerCostLessOnce = 0;
-            this.ownHeroPowerExtraDamage = 0;
-            this.enemyHeroPowerExtraDamage = 0;
+            // this.anzOwnRaidleader = 0;
+            // this.anzEnemyRaidleader = 0;
+            // this.anzOwnVessina = 0;
+            // this.anzEnemyVessina = 0;
+            // this.anzOwnStormwindChamps = 0;
+            // this.anzEnemyStormwindChamps = 0;
+            // this.anzOwnAnimatedArmor = 0;
+            // this.anzEnemyAnimatedArmor = 0;
+            // this.anzMoorabi = 0;
+            // this.anzDark = 0;
+            // this.anzTamsinroame = 0;
+            // this.anzOldWoman = 0;
+            // this.usedUndeadAllies = 0;
+            // this.anzOwnExtraAngrHp = 0;
+            // this.anzEnemyExtraAngrHp = 0;
+            // this.anzOwnWarhorseTrainer = 0;
+            // this.anzEnemyWarhorseTrainer = 0;
+            // this.anzOwnTundrarhino = 0;
+            // this.anzEnemyTundrarhino = 0;
+            // this.anzOwnMrSmite = 0;//重拳先生
+            // this.anzEnemyMrSmite = 0;
+            // this.anzOwnTimberWolfs = 0;//森林狼
+            // this.anzEnemyTimberWolfs = 0;
+            // this.anzOwnMurlocWarleader = 0;
+            // this.anzEnemyMurlocWarleader = 0;
+            // this.anzAcidmaw = 0;
+            // this.anzOwnGrimscaleOracle = 0;
+            // this.anzEnemyGrimscaleOracle = 0;
+            // this.anzOwnShadowfiend = 0;
+            // this.anzOwnAuchenaiSoulpriest = 0;
+            // this.anzEnemyAuchenaiSoulpriest = 0;
+            // this.anzOwnSouthseacaptain = 0;
+            // this.anzEnemySouthseacaptain = 0;
+            // this.anzOwnDragonConsortStarted = 0;
+            // this.ownElementCostStarted = 0;//火光元素
+            // this.ownBeastCostLessOnceStarted = 0;//雷矛军用山羊
+            // this.anzOwnPiratesStarted = 0;//回合开始海盗数
+            // this.anzOwnMurlocStarted = 0;//回合开始鱼人数
+            // this.anzOwnElementStarted = 0;//回合开始元素数
+            // this.anzOwnDraeneiStarted = 0;//回合开始德莱尼数
+            // this.anzOwnTreantStarted = 0;//回合开始树人数
+            // this.ownAbilityFreezesTarget = 0;
+            // this.enemyAbilityFreezesTarget = 0;
+            // this.ownDemonCostLessOnce = 0;
+            // this.ownHeroPowerCostLessOnce = 0;
+            // this.ownHeroPowerCostLessTwice = 0;
+            // this.enemyHeroPowerCostLessOnce = 0;
+            // this.ownHeroPowerExtraDamage = 0;
+            // this.enemyHeroPowerExtraDamage = 0;
             this.ownHeroPowerAllowedQuantity = 1;
             this.enemyHeroPowerAllowedQuantity = 1;
-            this.anzUsedOwnHeroPower = 0;
-            this.anzUsedEnemyHeroPower = 0;
-            this.anzEnemyTaunt = 0;
-            this.anzOwnTaunt = 0;
-            this.ownMinionsDiedTurn = 0;
-            this.enemyMinionsDiedTurn = 0;
+            // this.anzUsedOwnHeroPower = 0;
+            // this.anzUsedEnemyHeroPower = 0;
+            // this.anzEnemyTaunt = 0;
+            // this.anzOwnTaunt = 0;
+            // this.ownMinionsDiedTurn = 0;
+            // this.enemyMinionsDiedTurn = 0;
             this.feugenDead = Probabilitymaker.Instance.feugenDead;
             this.stalaggDead = Probabilitymaker.Instance.stalaggDead;
             this.weHavePlayedMillhouseManastorm = false;
-            this.doublepriest = 0;
-            this.enemydoublepriest = 0;
-            this.ownMistcaller = 0;
-            this.lockandload = 0;//子弹上膛标记
-            this.stampede = 0;
-            this.ownBaronRivendare = 0;
-            this.enemyBaronRivendare = 0;
-            this.ownBrannBronzebeard = 0;//友方战吼额外触发次数
-            this.enemyBrannBronzebeard = 0;//敌方战吼额外触发次数
-            this.ownTurnEndEffectsTriggerTwice = 0;
-            this.enemyTurnEndEffectsTriggerTwice = 0;
-            this.ownFandralStaghelm = 0;//范达尔·鹿盔
-            this.anzOwnRazorfenRockstar = 0; // 剃刀沼泽摇滚明星
-            this.anzOwnXB931Housekeeper = 0; // XB-931型家政机
+            // this.doublepriest = 0;
+            // this.enemydoublepriest = 0;
+            // this.ownMistcaller = 0;
+            // this.lockandload = 0;//子弹上膛标记
+            // this.stampede = 0;
+            // this.ownBaronRivendare = 0;
+            // this.enemyBaronRivendare = 0;
+            // this.ownBrannBronzebeard = 0;//友方战吼额外触发次数
+            // this.enemyBrannBronzebeard = 0;//敌方战吼额外触发次数
+            // this.ownTurnEndEffectsTriggerTwice = 0;
+            // this.enemyTurnEndEffectsTriggerTwice = 0;
+            // this.ownFandralStaghelm = 0;//范达尔·鹿盔
+            // this.anzOwnRazorfenRockstar = 0; // 剃刀沼泽摇滚明星
+            // this.anzOwnXB931Housekeeper = 0; // XB-931型家政机
             //#########################################
-            this.enemycarddraw = 0;
-            this.owncarddraw = 0;
+            // this.enemycarddraw = 0;
+            // this.owncarddraw = 0;
             this.enemyAnzCards = Handmanager.Instance.enemyAnzCards;
             this.ownAbilityReady = prozis.ownAbilityisReady;
             this.ownHeroAblility = new Handmanager.Handcard { card = prozis.heroAbility, manacost = prozis.ownHeroPowerCost };
@@ -709,8 +709,8 @@ namespace HREngine.Bots
             this.mobsplayedThisTurn = prozis.numMinionsPlayedThisTurn;
             this.startedWithMobsPlayedThisTurn = prozis.numMinionsPlayedThisTurn;// only change mobsplayedthisturm
             this.cardsPlayedThisTurn = prozis.cardsPlayedThisTurn;
-            this.spellsplayedSinceRecalc = 0;
-            this.secretsplayedSinceRecalc = 0;
+            // this.spellsplayedSinceRecalc = 0;
+            // this.secretsplayedSinceRecalc = 0;
             this.optionsPlayedThisTurn = prozis.numOptionsPlayedThisTurn;
             this.ueberladung = prozis.ueberladung;
             this.lockedMana = prozis.lockedMana;
@@ -732,35 +732,35 @@ namespace HREngine.Bots
             this.nextMurlocThisTurnCostHealth = false;
             this.nextSpellThisTurnCostHealth = false;
             this.nextAnyCardThisTurnCostEnemyHealth = false;
-            this.winzigebeschwoererin = 0;
-            this.winRazormaneBattleguard = 0;
-            this.managespenst = 0;
-            this.beschwoerungsportal = 0;
-            this.anzOwnAviana = 0; //艾维娜
-            this.anzOwnScargil = 0; //斯卡基尔
-            this.anzOwnCloakedHuntress = 0; //神秘女猎手
-            this.anzOwnPopGarThePutrid = 0;//我方腐臭淤泥波普加
+            // this.winzigebeschwoererin = 0;
+            // this.winRazormaneBattleguard = 0;
+            // this.managespenst = 0;
+            // this.beschwoerungsportal = 0;
+            // this.anzOwnAviana = 0; //艾维娜
+            // this.anzOwnScargil = 0; //斯卡基尔
+            // this.anzOwnCloakedHuntress = 0; //神秘女猎手
+            // this.anzOwnPopGarThePutrid = 0;//我方腐臭淤泥波普加
 
-            this.nerubarweblord = 0;
-            this.myCardsCostLess = 0;
-            this.startedWithmyCardsCostLess = 0;
-            this.startedWithnerubarweblord = 0;
-            this.startedWithbeschwoerungsportal = 0;
-            this.startedWithManagespenst = 0;
-            this.startedWithWinzigebeschwoererin = 0;
-            this.startedRazormaneBattleguard = 0;
-            this.blackwaterpirate = 0;
-            this.blackwaterpirateStarted = 0;
-            this.embracetheshadow = 0;
+            // this.nerubarweblord = 0;
+            // this.myCardsCostLess = 0;
+            // this.startedWithmyCardsCostLess = 0;
+            // this.startedWithnerubarweblord = 0;
+            // this.startedWithbeschwoerungsportal = 0;
+            // this.startedWithManagespenst = 0;
+            // this.startedWithWinzigebeschwoererin = 0;
+            // this.startedRazormaneBattleguard = 0;
+            // this.blackwaterpirate = 0;
+            // this.blackwaterpirateStarted = 0;
+            // this.embracetheshadow = 0;
             this.ownCrystalCore = prozis.ownCrystalCore;
             this.ownMinionsInDeckCost0 = prozis.ownMinionsInDeckCost0;
             this.LothraxionsPower = prozis.LothraxionsPower;
             this.needGraveyard = true;
             this.loatheb = false;
-            this.spellpower = 0;
-            this.spellpowerStarted = 0;
-            this.enemyspellpower = 0;
-            this.enemyspellpowerStarted = 0;
+            // this.spellpower = 0;
+            // this.spellpowerStarted = 0;
+            // this.enemyspellpower = 0;
+            // this.enemyspellpowerStarted = 0;
             this.startedWithDamagedMinions = false;
             this.enemyHeroTurnStartedHp = this.enemyHero.Hp;
             this.ownHeroTurnStartedHp = this.ownHero.Hp;
@@ -771,18 +771,18 @@ namespace HREngine.Bots
             //法术派系
             this.ownSpellSchoolCounts = new Dictionary<TAG_SPELL_SCHOOL, int>();
             //伊丽扎·刺刃光环
-            this.ownElizagoreblade = 0;
+            // this.ownElizagoreblade = 0;
             //回合结束存放的标志
             this.cardsToReturnAtEndOfTurn = new List<CardDB.cardIDEnum>();
             //救生光环
-            this.ownSunscreenTurns = 0;
-            this.enemySunscreenTurns = 0;
+            // this.ownSunscreenTurns = 0;
+            // this.enemySunscreenTurns = 0;
             //重封者拉兹
             this.ownHeroPowerCanBeUsedMultipleTimes = false;
             //当前发掘次数
-            this.excavationCount = 0;
+            // this.excavationCount = 0;
             //总发掘次数
-            this.allExcavationCount = 0;
+            // this.allExcavationCount = 0;
             //下个战吼触发次数
             this.nextBattlecryTriggers = 1;
             //军团进攻
@@ -792,11 +792,11 @@ namespace HREngine.Bots
             this.ownAmitusThePeacekeeper = false;
             this.enemyAmitusThePeacekeeper = false;
             //下一张元素随从牌的法力值消耗减少量
-            this.nextElementalReduction = 0;
+            // this.nextElementalReduction = 0;
             //本回合下一张元素随从牌的法力值消耗减少量
-            this.thisTurnNextElementalReduction = 0;
+            // this.thisTurnNextElementalReduction = 0;
             //上次打出的卡牌的费用
-            this.lastPlayedCardCost = 0;
+            // this.lastPlayedCardCost = 0;
             //在本回合是否打出了元素牌
             this.playedElementalThisTurn = false;
             foreach (TAG_SPELL_SCHOOL school in Enum.GetValues(typeof(TAG_SPELL_SCHOOL)))
@@ -807,6 +807,7 @@ namespace HREngine.Bots
             //我方特殊随从的效果标志位 站场效果
             foreach (Minion m in this.ownMinions)
             {
+                List<CardDB.Race> races = m.handcard.card.GetRaces();
                 // 计算鱼人恩典
                 if (!m.untouchable && (m.handcard.card.race == CardDB.Race.MURLOC || m.handcard.card.race == CardDB.Race.ALL)) this.anzOwnMurlocStarted++; //鱼人
                 if (!m.untouchable && (m.handcard.card.race == CardDB.Race.PIRATE || m.handcard.card.race == CardDB.Race.ALL)) this.anzOwnPiratesStarted++;//Pirates海盗
@@ -2614,25 +2615,68 @@ namespace HREngine.Bots
         }
 
         /// <summary>
-        /// 获取最好的位置
+        /// 获取最好的放置位置（随从站位）
         /// </summary>
-        /// <param name="card"></param>
-        /// <param name="lethal"></param>
-        /// <returns></returns>
+        /// <param name="card">要放置的卡牌</param>
+        /// <param name="lethal">是否处于斩杀检查模式</param>
+        /// <returns>位置（1 到 ownMinions.Count + 1）</returns>
         public int getBestPlace(CardDB.Card card, bool lethal)
         {
-            //we return the zonepos!
-            if (card.type != CardDB.cardtype.MOB) return 1;
-            if (this.ownMinions.Count == 0) return 1;
-            if (this.ownMinions.Count == 1)
+            // 非随从卡牌或没有随从时返回默认位置 1
+            if (card.type != CardDB.cardtype.MOB || this.ownMinions.Count == 0)
+                return 1;
+
+            int ownMinionsCount = this.ownMinions.Count;
+
+            // 只有一个随从时的情况
+            if (ownMinionsCount == 1)
             {
-                if (this.ownMinions[0].Angr < card.Attack) return 1;
-                else if (this.ownMinions[0].handcard.card.nameEN == CardDB.cardNameEN.flametonguetotem || this.ownMinions[0].handcard.card.nameEN == CardDB.cardNameEN.direwolfalpha) return 1;
-                else if (card.nameEN == CardDB.cardNameEN.tuskarrtotemic) return 1;
-                else if (this.ownMinions[0].handcard.card.nameCN == CardDB.cardNameCN.战场军官
-                    || this.ownMinions[0].handcard.card.nameCN == CardDB.cardNameCN.恐狼前锋
-                    || this.ownMinions[0].handcard.card.nameCN == CardDB.cardNameCN.火舌图腾) return 1;
-                else return 2;
+                // 原逻辑：如果当前随从攻击力小于新随从，或当前随从是火舌/恐狼，或新随从是图腾召唤等，可能返回不同位置
+                // 此处简化处理，可根据实际需要扩展
+                Minion existing = this.ownMinions[0];
+                if (existing.Angr < card.Attack)
+                    return 1;
+
+
+                bool getPlace(CardDB.cardIDEnum cardIDEnum)
+                {
+                    switch (cardIDEnum)
+                    {
+                        //恐狼先锋
+                        case CardDB.cardIDEnum.EX1_162:
+                        case CardDB.cardIDEnum.CORE_EX1_162:
+                        case CardDB.cardIDEnum.VAN_EX1_162:
+                        case CardDB.cardIDEnum.Story_09_DireWolfAlphaPuzzle:
+                        //火舌图腾
+                        case CardDB.cardIDEnum.EX1_565:
+                        case CardDB.cardIDEnum.CORE_EX1_565:
+                        case CardDB.cardIDEnum.VAN_EX1_565:
+                        case CardDB.cardIDEnum.FB_Champs_EX1_565:
+                        //海象人图腾师
+                        case CardDB.cardIDEnum.WON_081:
+                        case CardDB.cardIDEnum.AT_046:
+                        //小个子扰咒师
+                        case CardDB.cardIDEnum.GVG_122:
+                        //钳嘴龟盾卫
+                        case CardDB.cardIDEnum.TRL_535:
+                        //奥拉基尔的士兵
+                        case CardDB.cardIDEnum.CATA_565t:
+                        //奥拉基尔的灌能之手
+                        case CardDB.cardIDEnum.CATA_153t:
+                        case CardDB.cardIDEnum.CATA_153t1:
+                        //人类步兵
+                        case CardDB.cardIDEnum.TOY_102:
+                        case CardDB.cardIDEnum.CORE_TOY_102:
+                            return true;
+                    }
+                    return false;
+                }
+                if (getPlace(existing.cardId))
+                    return 1;
+                if (getPlace(card.cardIDenum))
+                    return 1;
+
+                return 2;
             }
 
             // 战场军官特别判定,随从至少两只
@@ -2670,47 +2714,40 @@ namespace HREngine.Bots
                 }
             }
 
+
+
             // buff 怪
-            if (card.nameCN == CardDB.cardNameCN.暴风城卫兵 || card.nameCN == CardDB.cardNameCN.阿古斯防御者 || card.nameCN == CardDB.cardNameCN.年迈的法师
-                || card.nameCN == CardDB.cardNameCN.阳焰瓦格里 || card.nameCN == CardDB.cardNameCN.菌菇术士 || card.nameCN == CardDB.cardNameCN.蠕动的恐魔 || card.nameCN == CardDB.cardNameCN.污手街守护者)
+
+            switch (card.nameCN)
             {
-                int place = 1;
-                int maxVal = 0;
-                for (int ii = 1; ii < this.ownMinions.Count; ii++)
-                {
-                    int val = 0;
-                    if (this.ownMinions[ii - 1].Ready)
+                case CardDB.cardNameCN.暴风城卫兵:
+                case CardDB.cardNameCN.年迈的法师:
+                case CardDB.cardNameCN.阳焰瓦格里:
+                case CardDB.cardNameCN.菌菇术士:
+                case CardDB.cardNameCN.蠕动的恐魔:
+                case CardDB.cardNameCN.污手街守护者:
+                case CardDB.cardNameCN.阿古斯防御者:
                     {
-                        val++;
-                        if (this.ownMinions[ii - 1].windfury) val++;
+                        int bestPlace = 1;
+                        int maxValue = 0;
+                        for (int j = 1; j < ownMinionsCount; j++)
+                        {
+                            Minion left = this.ownMinions[j - 1];
+                            Minion right = this.ownMinions[j];
+                            int leftVal = left.Ready ? (left.windfury ? 2 : 1) : 0;
+                            int rightVal = right.Ready ? (right.windfury ? 2 : 1) : 0;
+                            int total = leftVal + rightVal;
+                            if (total > maxValue)
+                            {
+                                bestPlace = j + 1;
+                                maxValue = total;
+                            }
+                        }
+                        return bestPlace;
                     }
-                    if (this.ownMinions[ii].Ready)
-                    {
-                        val++;
-                        if (this.ownMinions[ii].windfury) val++;
-                    }
-                    if (val > maxVal)
-                    {
-                        place = ii + 1;
-                        maxVal = val;
-                    }
-                }
-                return place;
+
             }
 
-            // 为军官准备
-            /* if (Ai.Instance.botBase.BehaviorName() == "骑士" || Ai.Instance.botBase.BehaviorName() == "黑眼任务术")
-            {
-                int nowAngr = card.Attack;
-                for (int ii = 0; ii < this.ownMinions.Count; ii++)
-                {
-                    if (this.ownMinions[ii].Angr < nowAngr)
-                    {
-                        return ii + 1;
-                    }
-                }
-                return this.ownMinions.Count + 1;
-            } */
 
 
             int omCount = this.ownMinions.Count;
@@ -2718,19 +2755,50 @@ namespace HREngine.Bots
             int[] buffplaces = new int[omCount];
             int i = 0;
             int tempval = 0;
+            //算斩杀？
             if (lethal)
             {
                 bool givesBuff = false;
-                switch (card.nameEN)
+                switch (card.cardIDenum)
                 {
-                    case CardDB.cardNameEN.grimestreetprotector: givesBuff = true; break;
-                    case CardDB.cardNameEN.defenderofargus: givesBuff = true; break;
-                    case CardDB.cardNameEN.flametonguetotem: givesBuff = true; break;
-                    case CardDB.cardNameEN.direwolfalpha: givesBuff = true; break;
-                    case CardDB.cardNameEN.ancientmage: givesBuff = true; break;
-                    case CardDB.cardNameEN.tuskarrtotemic: givesBuff = true; break;
-                    case CardDB.cardNameEN.battlegroundbattlemaster: givesBuff = true; break;
+                    //污手街守护者
+                    case CardDB.cardIDEnum.CFM_062: givesBuff = true; break;
+                    //阿古斯防御者
+                    case CardDB.cardIDEnum.EX1_093:
+                    case CardDB.cardIDEnum.VAN_EX1_093:
+                    case CardDB.cardIDEnum.CORE_EX1_093: givesBuff = true; break;
+                    //火舌图腾
+                    case CardDB.cardIDEnum.EX1_565:
+                    case CardDB.cardIDEnum.CORE_EX1_565:
+                    case CardDB.cardIDEnum.VAN_EX1_565:
+                    case CardDB.cardIDEnum.FB_Champs_EX1_565: givesBuff = true; break;
+                    //恐狼前锋
+                    case CardDB.cardIDEnum.EX1_162:
+                    case CardDB.cardIDEnum.CORE_EX1_162:
+                    case CardDB.cardIDEnum.VAN_EX1_162:
+                    case CardDB.cardIDEnum.Story_09_DireWolfAlphaPuzzle: givesBuff = true; break;
+                    //年迈的法师
+                    case CardDB.cardIDEnum.VAN_EX1_584:
+                    case CardDB.cardIDEnum.EX1_584: givesBuff = true; break;
+                    //海象人图腾师
+                    case CardDB.cardIDEnum.WON_081:
+                    case CardDB.cardIDEnum.AT_046: givesBuff = true; break;
+                    //菌菇术士
+                    case CardDB.cardIDEnum.LOOT_167: givesBuff = true; break;
+                    //阳焰瓦格里
+                    case CardDB.cardIDEnum.ICC_028:
+                    case CardDB.cardIDEnum.CORE_ICC_028: givesBuff = true; break;
+                    //蠕动的恐魔
+                    case CardDB.cardIDEnum.DMF_091: givesBuff = true; break;
+                    //暴风城卫兵
+                    case CardDB.cardIDEnum.SW_054: givesBuff = true; break;
+                    //战场军官
+                    case CardDB.cardIDEnum.SW_063: givesBuff = true; break;
+                    //饮水图腾
+                    case CardDB.cardIDEnum.WORK_011: givesBuff = true; break;
+
                 }
+
                 if (givesBuff)
                 {
                     if (this.ownMinions.Count == 2) return 2;
@@ -2831,11 +2899,11 @@ namespace HREngine.Bots
 
             int cardIsBuffer = 0;
             bool placebuff = false;
-            if (card.nameEN == CardDB.cardNameEN.flametonguetotem || card.nameEN == CardDB.cardNameEN.direwolfalpha || card.nameEN == CardDB.cardNameEN.tuskarrtotemic || card.nameEN == CardDB.cardNameEN.battlegroundbattlemaster)
+            if (card.cardIDenum == CardDB.cardIDEnum.EX1_565 || card.cardIDenum == CardDB.cardIDEnum.EX1_162 || card.cardIDenum == CardDB.cardIDEnum.WON_081 || card.cardIDenum == CardDB.cardIDEnum.SW_063)
             {
                 placebuff = true;
-                if (card.nameEN == CardDB.cardNameEN.flametonguetotem || card.nameEN == CardDB.cardNameEN.tuskarrtotemic) cardIsBuffer = 2;
-                if (card.nameEN == CardDB.cardNameEN.direwolfalpha) cardIsBuffer = 1;
+                if (card.cardIDenum == CardDB.cardIDEnum.EX1_565 || card.cardIDenum == CardDB.cardIDEnum.WON_081) cardIsBuffer = 2;
+                if (card.cardIDenum == CardDB.cardIDEnum.EX1_162) cardIsBuffer = 1;
             }
             bool tundrarhino = false;
             foreach (Minion m in this.ownMinions)
@@ -2847,7 +2915,7 @@ namespace HREngine.Bots
             if (placebuff)
             {
 
-
+                
                 int cval = 0;
                 if (card.Charge || (card.race == CardDB.Race.PET && tundrarhino))
                 {
@@ -4811,11 +4879,11 @@ namespace HREngine.Bots
         public void AttackAdjacentMinions(Minion attacker, Minion defender)
         {
             List<Minion> temp = (attacker.own) ? this.enemyMinions : this.ownMinions;
-            foreach (Minion mnn in temp)
+            foreach (Minion mnn in temp.ToArray())
             {
                 if (mnn.zonepos + 1 == defender.zonepos || mnn.zonepos - 1 == defender.zonepos)
                 {
-                    this.minionAttacksMinion(attacker, mnn, true);
+                    mnn.getDamageOrHeal(attacker.Angr, this, true, false);
                 }
             }
         }
@@ -9058,7 +9126,7 @@ namespace HREngine.Bots
         }
         public Handmanager.Handcard drawACardAndReturn(CardDB.cardNameEN cardNameEn, bool own, bool nopen = false)
         {
-            
+
             CardDB.cardNameEN s = cardNameEn;
             // 检查是否为己方玩家抽卡
             if (own)
@@ -9162,9 +9230,9 @@ namespace HREngine.Bots
                 this.owncards.Add(hc);
                 this.triggerCardsChanged(true);
             }
-           
+
             return new Handmanager.Handcard();
-            }
+        }
         /// <summary>
         /// 抽取一张卡牌并添加到玩家手牌中。如果手牌已满或牌库为空，会触发相应的惩罚或疲劳伤害。
         /// </summary>
@@ -12044,7 +12112,7 @@ namespace HREngine.Bots
             foreach (Minion m in this.ownMinions)
             {
                 // 打印随从的中文名称、攻击力、当前生命值和最大生命值
-                Helpfunctions.Instance.logg(m.handcard.card.nameCN + " (" + m.Angr + "," + m.Hp + "/" + m.maxHp + ")");
+                Helpfunctions.Instance.logg($"{m.handcard.card.nameCN} ({m.Angr},{m.Hp}/{m.maxHp})");
             }
 
             // 输出敌方随从信息
@@ -12052,7 +12120,7 @@ namespace HREngine.Bots
             foreach (Minion m in this.enemyMinions)
             {
                 // 打印随从的中文名称、攻击力、当前生命值和最大生命值
-                Helpfunctions.Instance.logg(m.handcard.card.nameCN + " (" + m.Angr + "," + m.Hp + "/" + m.maxHp + ")");
+                Helpfunctions.Instance.logg($"{m.handcard.card.nameCN} ({m.Angr},{m.Hp}/{m.maxHp})");
             }
         }
 
@@ -13020,10 +13088,7 @@ namespace HREngine.Bots
             }
         }
 
-        public int getPosition(bool ownplay)
-        {
-            return ownplay ? this.ownMinions.Count : this.enemyMinions.Count;
-        }
+
         /// <summary>
         /// 任意种族的卡牌在手牌
         /// </summary>
@@ -13096,125 +13161,9 @@ namespace HREngine.Bots
 
         }
 
-
     }
 
-    /// <summary>
-    /// 扳机触发计数器
-    /// </summary>
-    public struct triggerCounter
-    {
-        /// <summary>
-        /// 随从受到治疗扳机
-        /// </summary>
-        public int minionsGotHealed;
-        /// <summary>
-        /// 角色受到治疗扳机
-        /// </summary>
-        public int charsGotHealed;
-        /// <summary>
-        /// 随从受到伤害扳机
-        /// </summary>
-        public int ownMinionsGotDmg;
-        /// <summary>
-        /// 敌方随从受到伤害扳机
-        /// </summary>
-        public int enemyMinionsGotDmg;
-        /// <summary>
-        /// 我方英雄受到伤害扳机
-        /// </summary>
-        public int ownHeroGotDmg;
-        /// <summary>
-        /// 敌方英雄受到伤害扳机
-        /// </summary>
-        public int enemyHeroGotDmg;
-        /// <summary>
-        /// 我方随从死亡扳机
-        /// </summary>
-        public int ownMinionsDied;
-        /// <summary>
-        /// 敌方随从死亡扳机
-        /// </summary>
-        public int enemyMinionsDied;
-        /// <summary>
-        /// 我方野兽随从召唤扳机
-        /// </summary>
-        public int ownBeastSummoned;
-        /// <summary>
-        /// 我方龙随从召唤扳机
-        /// </summary>
-        public int ownDragonSummoned;
-        /// <summary>
-        /// 我方野兽随从死亡扳机
-        /// </summary>
-        public int ownBeastDied;
-        /// <summary>
-        /// 敌方野兽随从死亡扳机
-        /// </summary>
-        public int enemyBeastDied;
-        /// <summary>
-        /// 我方机械随从死亡扳机
-        /// </summary>
-        public int ownMechanicDied;
-        /// <summary>
-        /// 敌方机械随从死亡扳机
-        /// </summary>
-        public int enemyMechanicDied;
-        /// <summary>
-        /// 我方鱼人随从死亡扳机
-        /// </summary>
-        public int ownMurlocDied;
-        /// <summary>
-        /// 敌方鱼人随从死亡扳机
-        /// </summary>
-        public int enemyMurlocDied;
-        /// <summary>
-        /// 我方随从失去圣盾扳机
-        /// </summary>
-        public int ownMinionLosesDivineShield;
-        /// <summary>
-        /// 敌方随从失去圣盾扳机
-        /// </summary>
-        public int enemyMinionLosesDivineShield;
-        /// <summary>
-        /// 我方随从变化扳机
-        /// </summary>
-        public bool ownMinionsChanged;
-        /// <summary>
-        /// 敌方随从变化扳机
-        /// </summary>
-        public bool enemyMininsChanged;
-        /// <summary>
-        /// 德莱尼扳机提示
-        /// </summary>
-        public bool draeneiTriggerHint;
-        /// <summary>
-        /// 星舰发射时扳机
-        /// </summary>
-        public bool starshipLaunchTrigger;
-        /// <summary>
-        /// 我方亡灵随从死亡扳机
-        /// </summary>
-        public int ownUndeadDied;
-        /// <summary>
-        /// 敌方亡灵随从死亡扳机
-        /// </summary>
-        public int enemyUndeadDied;
-        /// <summary>
-        /// 我方树人随从召唤扳机
-        /// </summary>
-        public int ownTreantSummoned;
-        /// <summary>
-        /// 我方树人随从死亡扳机
-        /// </summary>
-        public int ownTreantDied;
-    }
 
-    public struct IDEnumOwner
-    {
-        public CardDB.cardIDEnum IDEnum;
-        public bool own;
-    }
 
     public static class RaceUtils
     {
