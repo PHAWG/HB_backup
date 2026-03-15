@@ -19,9 +19,19 @@ namespace HREngine.Bots
         /// <param name="card"></param>
         /// <param name="timeout"></param>
         /// <returns></returns>
-        internal static async Task UnderfelRift(this HSCard card, int timeout = 500)
+        internal static async Task UnderfelRift(this HSCard card,HSCard underfelRift, int timeout = 500)
         {
             await card.Pickup(timeout);
+        
+            Vector3 center = Client.CardInteractPoint(underfelRift.Card);
+
+            // 模拟人类操作，将光标移动到卡组操作区域的中心点
+            await Client.MoveCursorHumanLike(center);
+
+            // 稍作延迟，模拟真实用户的点击行为
+            await Coroutine.Sleep(110);
+
+            Client.LeftClickAt(center);
         }
         /// <summary>
         /// 扩展方法，用于异步执行卡片的卡组操作。
@@ -62,7 +72,7 @@ namespace HREngine.Bots
 
             // 获取卡组操作区域的中心点
             var center = collider.Bounds.m_Center;
-			var screenPoint = Camera.Main.WorldToScreenPoint(center);
+            var screenPoint = Camera.Main.WorldToScreenPoint(center);
             if (screenPoint.X > Screen.Width)
             {
                 // 超出屏幕空间，从边界减随机10个像素点作为真实point
@@ -92,6 +102,18 @@ namespace HREngine.Bots
             Vector3 center = Client.CardInteractPoint(card.Card);
             await Client.MoveCursorHumanLike(center);
             Client.LeftClickAt(center);
+        }
+        // internal static async Task MoveAfteroperation(this HSCard card, int timeout = 500){}
+        internal static async Task ClientUiBButton(UIBButton uIBButton, int timeout = 500)
+        {
+         
+            if (uIBButton != null)
+            {
+                Vector3 center = uIBButton.m_RootObject.Transform.Position;
+                await Client.MoveCursorHumanLike(center);
+                Client.LeftClickAt(center);
+            }
+            
         }
 
         internal static ConstructorInfo hsCardCtor = typeof(HSCard).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance,
