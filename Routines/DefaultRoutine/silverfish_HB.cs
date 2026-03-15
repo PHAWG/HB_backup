@@ -24,6 +24,9 @@ namespace HREngine.Bots
 
         public Playfield lastpf;
         private Settings sttngs = Settings.Instance;
+        
+        private bool useCachedData = false;
+        private int cachedTurn = -1;
 
         private List<Minion> ownMinions = new List<Minion>();
         private List<Minion> enemyMinions = new List<Minion>();
@@ -264,6 +267,26 @@ namespace HREngine.Bots
             this.needSleep = false;
             this.updateBehaveString(botbase);
 
+            // 检查是否有预计算的行动且是同一回合
+            bool hasCachedActions = Ai.Instance.bestActions.Count > 0;
+            int currentTurn = TritonHs.GameState.GetTurn();
+            bool sameTurn = (cachedTurn == currentTurn);
+            
+            // 如果有缓存的行动且是同一回合，尝试使用预测状态
+            if (hasCachedActions && sameTurn && Ai.Instance.nextMoveGuess.mana != -100)
+            {
+                sleepRetry = false;
+                Log.Info("[AI] 使用缓存行动，跳过数据读取");
+                
+                // 直接使用预测状态，不重新读取数据
+                Ai.Instance.doNextCalcedMove();
+                return true;
+            }
+            
+            // 标记当前回合
+            cachedTurn = currentTurn;
+            useCachedData = false;
+
             Hrtprozis.Instance.clearAllRecalc();
             Handmanager.Instance.clearAllRecalc();
             updateRealTimeInfo();//获取实时场面信息 
@@ -348,22 +371,22 @@ namespace HREngine.Bots
                 {
                     if (p.gTurnStep > 0 && Ai.Instance.nextMoveGuess.ownMinions.Count == p.ownMinions.Count)
                     {
-                        if (Ai.Instance.nextMoveGuess.ownHero.Ready != p.ownHero.Ready && !p.ownHero.Ready)
-                        {
-                            sleepRetry = true;
-                            Helpfunctions.Instance.ErrorLog("[AI] 英雄的准备状态 = " + p.ownHero.Ready + ". 再次尝试....");
-                            Ai.Instance.nextMoveGuess = new Playfield { mana = -100 };
-                            return false;
-                        }
+                        // if (Ai.Instance.nextMoveGuess.ownHero.Ready != p.ownHero.Ready && !p.ownHero.Ready)
+                        // {
+                        //     sleepRetry = true;
+                        //     Helpfunctions.Instance.ErrorLog("[AI] 英雄的准备状态 = " + p.ownHero.Ready + ". 再次尝试....");
+                        //     Ai.Instance.nextMoveGuess = new Playfield { mana = -100 };
+                        //     return false;
+                        // }
                         for (int i = 0; i < p.ownMinions.Count; i++)
                         {
-                            if (Ai.Instance.nextMoveGuess.ownMinions[i].Ready != p.ownMinions[i].Ready && !p.ownMinions[i].Ready)
-                            {
-                                sleepRetry = true;
-                                Helpfunctions.Instance.ErrorLog("[AI] 随从的准备状态 = " + p.ownMinions[i].Ready + " (" + p.ownMinions[i].entitiyID + " " + p.ownMinions[i].handcard.card.cardIDenum + " " + p.ownMinions[i].name + "). 再次尝试....");
-                                Ai.Instance.nextMoveGuess = new Playfield { mana = -100 };
-                                return false;
-                            }
+                            // if (Ai.Instance.nextMoveGuess.ownMinions[i].Ready != p.ownMinions[i].Ready && !p.ownMinions[i].Ready)
+                            // {
+                            //     sleepRetry = true;
+                            //     Helpfunctions.Instance.ErrorLog("[AI] 随从的准备状态 = " + p.ownMinions[i].Ready + " (" + p.ownMinions[i].entitiyID + " " + p.ownMinions[i].handcard.card.cardIDenum + " " + p.ownMinions[i].name + "). 再次尝试....");
+                            //     Ai.Instance.nextMoveGuess = new Playfield { mana = -100 };
+                            //     return false;
+                            // }
                         }
                     }
                 }
