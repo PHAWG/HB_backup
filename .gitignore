@@ -40,7 +40,7 @@ Blizzard.T5.Core.dll
 
 # 忽略炉石兄弟运行后的其他文件
 # 炉石兄弟.exe
-# Hearthbuddy.exe
+Hearthbuddy.exe
 yqdiqeuhya.exe
 opcpitmhbx.exe
 
@@ -49,3 +49,4 @@ Routines/DefaultRoutine/Silverfish/Test/AiTest.cs
 Routines/DefaultRoutine/Silverfish/Test/AutoJudge.cs
 fatal-removal.txt
 fatal-rename.txt
+新建文件夹/
