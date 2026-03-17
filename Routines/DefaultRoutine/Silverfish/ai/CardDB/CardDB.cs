@@ -7,14 +7,33 @@ using System.Threading.Tasks;
 using System.Xml;
 using Logger = Triton.Common.LogUtilities.Logger;
 using log4net;
+using System.Reflection;
 
 namespace HREngine.Bots
 {
     public partial class CardDB
     {
         private static readonly ILog Log = Logger.GetLoggerInstanceForType();
-       
+        // 存储 Sim_* 类的类型字典
+        private static readonly Dictionary<string, Type> SimTypesDict;
 
+        // 静态构造函数：反射填充字典
+        static CardDB()
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            Type baseType = typeof(SimTemplate);
+            // 使用显式委托 + 传统循环代替 LINQ 并行查询（避免隐式类型 lambda 争议）
+            Dictionary<string, Type> dict = new Dictionary<string, Type>();
+            Type[] allTypes = assembly.GetTypes();
+            foreach (Type t in allTypes)
+            {
+                if (t.Namespace == "HREngine.Bots" && t.BaseType == baseType)
+                {
+                    dict[t.Name] = t;
+                }
+            }
+            SimTypesDict = dict;
+        }
         public class Card
         {
             public cardIDEnum cardIDenum = cardIDEnum.None;//cardId
@@ -756,7 +775,8 @@ namespace HREngine.Bots
                     }
                     if (REQ_DAMAGED_TARGET_UNLESS_COMBO)
                     {
-                        if (p.cardsPlayedThisTurn >= 1){
+                        if (p.cardsPlayedThisTurn >= 1)
+                        {
                             foreach (Minion m in targets)
                             {
                                 m.extraParam = false;
@@ -1861,74 +1881,220 @@ namespace HREngine.Bots
                 }
 
                 return titanSkills;
-                }
             }
+        }
 
-            List<Card> cardlist = new List<Card>();
-            Dictionary<cardIDEnum, Card> cardidToCardList = new Dictionary<cardIDEnum, Card>();
-            Dictionary<string, Card> carddbfidToCardList = new Dictionary<string, Card>();
-            Dictionary<cardNameCN, Card> cardNameCNToCardList = new Dictionary<cardNameCN, Card>();
-            Dictionary<cardNameEN, Card> cardNameENToCardList = new Dictionary<cardNameEN, Card>();
+        List<Card> cardlist = new List<Card>();
+        Dictionary<cardIDEnum, Card> cardidToCardList = new Dictionary<cardIDEnum, Card>();
+        Dictionary<string, Card> carddbfidToCardList = new Dictionary<string, Card>();
+        Dictionary<cardNameCN, Card> cardNameCNToCardList = new Dictionary<cardNameCN, Card>();
+        Dictionary<cardNameEN, Card> cardNameENToCardList = new Dictionary<cardNameEN, Card>();
 
 
-            public Card unknownCard;
-            public bool installedWrong = false;
+        public Card unknownCard;
+        public bool installedWrong = false;
 
-            public Card burlyrockjaw;
-            private static CardDB instance;
+        public Card burlyrockjaw;
+        private static CardDB instance;
 
-            //定义三个稀有度的宝藏卡牌池
-            public Dictionary<string, List<cardIDEnum>> treasurePools;
+        //定义三个稀有度的宝藏卡牌池
+        public Dictionary<string, List<cardIDEnum>> treasurePools;
 
-            public static CardDB Instance
+        public static CardDB Instance
+        {
+            get
             {
-                get
+                if (instance == null)
                 {
-                    if (instance == null)
+                    Helpfunctions.Instance.ErrorLog("开始加载CardDB");
+                    var dt = DateTime.Now;
+                    instance = new CardDB();
+                    //instance.enumCreator();// only call this to get latest cardids
+                    // have to do it 2 times (or the kids inside the simcards will not have a simcard :D
+                    Helpfunctions.Instance.ErrorLog("开始加载Sim");
+                    //加载卡牌的REQ
+                    foreach (Card c in instance.cardlist)
                     {
-                        Helpfunctions.Instance.ErrorLog("开始加载CardDB");
-                        var dt = DateTime.Now;
-                        instance = new CardDB();
-                        //instance.enumCreator();// only call this to get latest cardids
-                        // have to do it 2 times (or the kids inside the simcards will not have a simcard :D
-                        Helpfunctions.Instance.ErrorLog("开始加载Sim");
-                        //加载卡牌的REQ
-                        foreach (Card c in instance.cardlist)
-                        {
-                            if (c.cardIDenum != cardIDEnum.None)  // 增加非None判断
-                                c.sim_card = CardHelper.GetCardSimulation(c.cardIDenum);
-                            if (c.sim_card == null) continue;
-                            foreach (var pr in c.sim_card.GetPlayReqs()) pr.UpdateCardAttr(c);
-                        }
-
-                        // foreach (Card c in instance.cardlist)
-                        // {
-                        //         if (!string.IsNullOrWhiteSpace(c.TreatItAsTheSameCard))
-                        //         {
-                        //             Card OriginCard = instance.getCardDataFromDbfID(c.TreatItAsTheSameCard);
-                        //             if (OriginCard != instance.unknownCard && OriginCard.sim_card != null)
-                        //                 c.sim_card = OriginCard.sim_card;
-                        //         }
-                        // }
-
-
-                        Helpfunctions.Instance.ErrorLog("加载完毕,总计用时: " + (DateTime.Now - dt).TotalSeconds + " s");
-                        Log.Debug($"加载完毕,总计用时: {(DateTime.Now - dt).TotalSeconds} s");
-                        instance.setAdditionalData();
+                        if (c.cardIDenum != cardIDEnum.None)  // 增加非None判断
+                            c.sim_card = CardHelper.GetCardSimulation(c.cardIDenum);
+                        if (c.sim_card == null) continue;
+                        foreach (var pr in c.sim_card.GetPlayReqs()) pr.UpdateCardAttr(c);
                     }
-                    return instance;
-                }
-            }
-            //解析 carddefs.xml的函数
-            CardDB()
-            {
-                this.cardlist.Clear();
-                this.cardidToCardList.Clear();
-                this.carddbfidToCardList.Clear();
-                this.cardNameCNToCardList.Clear();
-                this.cardNameENToCardList.Clear();
 
-                treasurePools = new Dictionary<string, List<cardIDEnum>>
+                    // 处理「套牌规则视为同一卡牌」的替换逻辑
+                    foreach (Card c in instance.cardlist)
+                    {
+                        if (!string.IsNullOrWhiteSpace(c.TreatItAsTheSameCard))
+                        {
+                            Card targetCard = instance.getCardDataFromDbfID(c.TreatItAsTheSameCard);
+                            if (targetCard != instance.unknownCard)
+                                c.sim_card = targetCard.sim_card;   // 替换为关联卡牌的模拟逻辑
+                        }
+                    }  
+
+                    // 统一所有幸运币和技能卡牌的模拟模板
+                    var coinSim = GetCardSimulation(CardDB.cardIDEnum.GAME_005);    // 幸运币
+                    var HERO_01bp = GetCardSimulation(CardDB.cardIDEnum.HERO_01bp); // 战士
+                    var HERO_02bp = GetCardSimulation(CardDB.cardIDEnum.HERO_02bp); // 萨满
+                    var HERO_03bp = GetCardSimulation(CardDB.cardIDEnum.HERO_03bp); // 潜行者
+                    var HERO_04bp = GetCardSimulation(CardDB.cardIDEnum.HERO_04bp); // 圣骑士
+                    var HERO_05bp = GetCardSimulation(CardDB.cardIDEnum.HERO_05bp); // 猎人
+                    var HERO_06bp = GetCardSimulation(CardDB.cardIDEnum.HERO_06bp); // 德鲁伊
+                    var HERO_07bp = GetCardSimulation(CardDB.cardIDEnum.HERO_07bp); // 术士
+                    var HERO_08bp = GetCardSimulation(CardDB.cardIDEnum.HERO_08bp); // 法师
+                    var HERO_09bp = GetCardSimulation(CardDB.cardIDEnum.HERO_09bp); // 牧师
+                    var HERO_10bp = GetCardSimulation(CardDB.cardIDEnum.HERO_10bp); // 恶魔猎手
+                    var HERO_11bp = GetCardSimulation(CardDB.cardIDEnum.HERO_11bp); // 死亡骑士
+                    // 升级后的技能
+                    var HERO_01bp2 = GetCardSimulation(CardDB.cardIDEnum.HERO_01bp2); // 战士
+                    var HERO_02bp2 = GetCardSimulation(CardDB.cardIDEnum.HERO_02bp2); // 萨满
+                    var HERO_03bp2 = GetCardSimulation(CardDB.cardIDEnum.HERO_03bp2); // 潜行者
+                    var HERO_04bp2 = GetCardSimulation(CardDB.cardIDEnum.HERO_04bp2); // 圣骑士
+                    var HERO_05bp2 = GetCardSimulation(CardDB.cardIDEnum.HERO_05bp2); // 猎人
+                    var HERO_06bp2 = GetCardSimulation(CardDB.cardIDEnum.HERO_06bp2); // 德鲁伊
+                    var HERO_07bp2 = GetCardSimulation(CardDB.cardIDEnum.HERO_07bp2); // 术士
+                    var HERO_08bp2 = GetCardSimulation(CardDB.cardIDEnum.HERO_08bp2); // 法师
+                    var HERO_09bp2 = GetCardSimulation(CardDB.cardIDEnum.HERO_09bp2); // 牧师
+                    var HERO_10bp2 = GetCardSimulation(CardDB.cardIDEnum.HERO_10bp2); // 恶魔猎手
+                    var HERO_11bp2 = GetCardSimulation(CardDB.cardIDEnum.HERO_11bp2); // 死亡骑士
+                    //foreach (Card c in instance.cardlist)
+                    //{
+                    //    // 幸运币
+                    //    if (c.coincard && c.cardIDenum != CardDB.cardIDEnum.GAME_005)
+                    //    {
+                    //        c.sim_card = coinSim;
+                    //    }
+                    //    // 战士技能 - 全副武装
+                    //    if (c.nameCN == CardDB.cardNameCN.全副武装 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_01bp)
+                    //    {
+                    //        c.sim_card = HERO_01bp;
+                    //    }
+                    //    // 萨满技能 - 图腾召唤
+                    //    if (c.nameCN == CardDB.cardNameCN.图腾召唤 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_02bp)
+                    //    {
+                    //        c.sim_card = HERO_02bp;
+                    //    }
+                    //    // 潜行者技能 - 匕首精通
+                    //    if (c.nameCN == CardDB.cardNameCN.匕首精通 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_03bp)
+                    //    {
+                    //        c.sim_card = HERO_03bp;
+                    //    }
+                    //    // 圣骑士技能 - 援军
+                    //    if (c.nameCN == CardDB.cardNameCN.援军 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_04bp)
+                    //    {
+                    //        c.sim_card = HERO_04bp;
+                    //    }
+                    //    // 猎人技能 - 稳固射击
+                    //    if (c.nameCN == CardDB.cardNameCN.稳固射击 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_05bp)
+                    //    {
+                    //        c.sim_card = HERO_05bp;
+                    //    }
+                    //    // 德鲁伊技能 - 变形
+                    //    if (c.nameCN == CardDB.cardNameCN.变形 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_06bp)
+                    //    {
+                    //        c.sim_card = HERO_06bp;
+                    //    }
+                    //    // 术士技能 - 生命分流
+                    //    if (c.nameCN == CardDB.cardNameCN.生命分流 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_07bp)
+                    //    {
+                    //        c.sim_card = HERO_07bp;
+                    //    }
+                    //    // 法师技能 - 火焰冲击
+                    //    if (c.nameCN == CardDB.cardNameCN.火焰冲击 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_08bp)
+                    //    {
+                    //        c.sim_card = HERO_08bp;
+                    //    }
+                    //    // 牧师技能 - 次级治疗术
+                    //    if (c.nameCN == CardDB.cardNameCN.次级治疗术 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_09bp)
+                    //    {
+                    //        c.sim_card = HERO_09bp;
+                    //    }
+                    //    // 恶魔猎手技能 - 恶魔之爪
+                    //    if (c.nameCN == CardDB.cardNameCN.恶魔之爪 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_10bp)
+                    //    {
+                    //        c.sim_card = HERO_10bp;
+                    //    }
+                    //    // 死亡骑士技能 - 食尸鬼冲锋
+                    //    if (c.nameCN == CardDB.cardNameCN.食尸鬼冲锋 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_11bp)
+                    //    {
+                    //        c.sim_card = HERO_11bp;
+                    //    }
+
+                    //    // 战士技能 - 坚壁
+                    //    if (c.nameCN == CardDB.cardNameCN.坚壁 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_01bp2)
+                    //    {
+                    //        c.sim_card = HERO_01bp2;
+                    //    }
+                    //    // 萨满技能 - 图腾崇拜
+                    //    if (c.nameCN == CardDB.cardNameCN.图腾崇拜 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_02bp2)
+                    //    {
+                    //        c.sim_card = HERO_02bp2;
+                    //    }
+                    //    // 潜行者技能 - 浸毒匕首
+                    //    if (c.nameCN == CardDB.cardNameCN.浸毒匕首 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_03bp2)
+                    //    {
+                    //        c.sim_card = HERO_03bp2;
+                    //    }
+                    //    // 圣骑士技能 - 白银之手
+                    //    if (c.nameCN == CardDB.cardNameCN.白银之手 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_04bp2)
+                    //    {
+                    //        c.sim_card = HERO_04bp2;
+                    //    }
+                    //    // 猎人技能 - 弩炮射击
+                    //    if (c.nameCN == CardDB.cardNameCN.弩炮射击 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_05bp2)
+                    //    {
+                    //        c.sim_card = HERO_05bp2;
+                    //    }
+                    //    // 德鲁伊技能 - 恐怖变形
+                    //    if (c.nameCN == CardDB.cardNameCN.恐怖变形 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_06bp2)
+                    //    {
+                    //        c.sim_card = HERO_06bp2;
+                    //    }
+                    //    // 术士技能 - 灵魂分流
+                    //    if (c.nameCN == CardDB.cardNameCN.灵魂分流 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_07bp2)
+                    //    {
+                    //        c.sim_card = HERO_07bp2;
+                    //    }
+                    //    // 法师技能 - 二级火焰冲击
+                    //    if (c.nameCN == CardDB.cardNameCN.二级火焰冲击 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_08bp2)
+                    //    {
+                    //        c.sim_card = HERO_08bp2;
+                    //    }
+                    //    // 牧师技能 - 治疗术
+                    //    if (c.nameCN == CardDB.cardNameCN.治疗术 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_09bp2)
+                    //    {
+                    //        c.sim_card = HERO_09bp2;
+                    //    }
+                    //    // 恶魔猎手技能 - 恶魔之咬
+                    //    if (c.nameCN == CardDB.cardNameCN.恶魔之咬 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_10bp2)
+                    //    {
+                    //        c.sim_card = HERO_10bp2;
+                    //    }
+                    //    // 死亡骑士技能 - 食尸鬼狂暴
+                    //    if (c.nameCN == CardDB.cardNameCN.食尸鬼狂暴 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_11bp2)
+                    //    {
+                    //        c.sim_card = HERO_11bp2;
+                    //    }
+                    //}
+
+
+                    Helpfunctions.Instance.ErrorLog("加载完毕,总计用时: " + (DateTime.Now - dt).TotalSeconds + " s");
+                    Log.Debug($"加载完毕,总计用时: {(DateTime.Now - dt).TotalSeconds} s");
+                    instance.setAdditionalData();
+                }
+                return instance;
+            }
+        }
+        //解析 carddefs.xml的函数
+        CardDB()
+        {
+            this.cardlist.Clear();
+            this.cardidToCardList.Clear();
+            this.carddbfidToCardList.Clear();
+            this.cardNameCNToCardList.Clear();
+            this.cardNameENToCardList.Clear();
+
+            treasurePools = new Dictionary<string, List<cardIDEnum>>
             {
                 { "common", new List<cardIDEnum> {
                     cardIDEnum.WW_001t4,
@@ -1956,823 +2122,823 @@ namespace HREngine.Bots
                 }},
             };
 
-                //placeholdercard
-                this.cardlist.Add(new Card { nameEN = cardNameEN.unknown, cost = 10 });
-                this.unknownCard = cardlist[0];
+            //placeholdercard
+            this.cardlist.Add(new Card { nameEN = cardNameEN.unknown, cost = 10 });
+            this.unknownCard = cardlist[0];
 
-                var filePath = Path.Combine(Settings.Instance.path, "CardDefs.xml");
-                if (!File.Exists(filePath))
+            var filePath = Path.Combine(Settings.Instance.path, "CardDefs.xml");
+            if (!File.Exists(filePath))
+            {
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("在" + Settings.Instance.path + "下找不到 CardDefs.xml!");
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                return;
+            }
+            var reNameEN = new Regex("[a-zA-Z0-9]");
+            var reNameCN = new Regex("[a-zA-Z0-9]|[\\u4e00-\\u9fa5]");
+
+            XmlDocument doc = new XmlDocument();
+            doc.Load(filePath);
+            var entities = doc.SelectNodes("CardDefs/Entity");
+            foreach (XmlElement entity in entities)
+            {
+                var cardId = entity.GetAttribute("CardID");
+                var card = new Card();
+                card.dbfId = entity.GetAttribute("ID");
+                card.cardIDenum = this.cardIdstringToEnum(cardId);
+                if (cardId.EndsWith("t") ||
+                    cardId.Equals("ds1_whelptoken") ||
+                    cardId.Equals("CS2_mirror") ||
+                    cardId.Equals("CS2_050") ||
+                    cardId.Equals("CS2_052") ||
+                    cardId.Equals("CS2_051") ||
+                    cardId.Equals("NEW1_009") ||
+                    cardId.Equals("CS2_152") ||
+                    cardId.Equals("CS2_boar") ||
+                    cardId.Equals("EX1_tk11") ||
+                    cardId.Equals("EX1_506a") ||
+                    cardId.Equals("skele21") ||
+                    cardId.Equals("EX1_tk9") ||
+                    cardId.Equals("EX1_finkle") ||
+                    cardId.Equals("EX1_598") ||
+                    cardId.Equals("EX1_tk34"))
                 {
-                    Helpfunctions.Instance.ErrorLog("ERROR#################################################");
-                    Helpfunctions.Instance.ErrorLog("ERROR#################################################");
-                    Helpfunctions.Instance.ErrorLog("ERROR#################################################");
-                    Helpfunctions.Instance.ErrorLog("ERROR#################################################");
-                    Helpfunctions.Instance.ErrorLog("在" + Settings.Instance.path + "下找不到 CardDefs.xml!");
-                    Helpfunctions.Instance.ErrorLog("ERROR#################################################");
-                    Helpfunctions.Instance.ErrorLog("ERROR#################################################");
-                    Helpfunctions.Instance.ErrorLog("ERROR#################################################");
-                    Helpfunctions.Instance.ErrorLog("ERROR#################################################");
-                    return;
-                }
-                var reNameEN = new Regex("[a-zA-Z0-9]");
-                var reNameCN = new Regex("[a-zA-Z0-9]|[\\u4e00-\\u9fa5]");
-
-                XmlDocument doc = new XmlDocument();
-                doc.Load(filePath);
-                var entities = doc.SelectNodes("CardDefs/Entity");
-                foreach (XmlElement entity in entities)
-                {
-                    var cardId = entity.GetAttribute("CardID");
-                    var card = new Card();
-                    card.dbfId = entity.GetAttribute("ID");
-                    card.cardIDenum = this.cardIdstringToEnum(cardId);
-                    if (cardId.EndsWith("t") ||
-                        cardId.Equals("ds1_whelptoken") ||
-                        cardId.Equals("CS2_mirror") ||
-                        cardId.Equals("CS2_050") ||
-                        cardId.Equals("CS2_052") ||
-                        cardId.Equals("CS2_051") ||
-                        cardId.Equals("NEW1_009") ||
-                        cardId.Equals("CS2_152") ||
-                        cardId.Equals("CS2_boar") ||
-                        cardId.Equals("EX1_tk11") ||
-                        cardId.Equals("EX1_506a") ||
-                        cardId.Equals("skele21") ||
-                        cardId.Equals("EX1_tk9") ||
-                        cardId.Equals("EX1_finkle") ||
-                        cardId.Equals("EX1_598") ||
-                        cardId.Equals("EX1_tk34"))
-                    {
-                        card.isToken = true;
-                    }
-
-                    //parse tags
-                    foreach (XmlElement tag in entity.ChildNodes)
-                    {
-                        if (!tag.HasAttribute("enumID"))
-                            continue;
-                        if ("ReferencedTag".Equals(tag.Name))
-                        {
-                            // if (tag.GetAttribute("enumID") == "1518")
-                            // {
-                            //     card.dormant = 1;
-                            // }
-                            // if (tag.GetAttribute("enumID") == "190")
-                            // {
-                            //     card.tank = true;
-                            // }
-                            continue;
-                        }
-
-                        switch (tag.GetAttribute("enumID"))
-                        {
-                            case "32":
-                                {
-                                    card.TriggerVisual = int.Parse(tag.GetAttribute("value"));
-                                }
-                                break;
-                            case "643":
-                                {
-                                    card.Nature = true;
-                                }
-                                break;
-                            case "321":
-                                {
-                                    card.Collectable = true;
-                                }
-                                break;
-                            case "227":
-                                {
-                                    card.CantAttack = true;
-                                }
-                                break;
-                            case "45":
-                                {
-                                    card.Health = int.Parse(tag.GetAttribute("value"));
-                                }
-                                break;
-                            case "199":
-                                {
-                                    card.Class = int.Parse(tag.GetAttribute("value"));
-                                }
-                                break;
-                            case "47":
-                                {
-                                    card.Attack = int.Parse(tag.GetAttribute("value"));
-                                }
-                                break;
-                            case "200":
-                                {
-                                    card.race = (Race)int.Parse(tag.GetAttribute("value"));
-                                    //TODO:双种族代码
-                                    card.races.Add((Race)int.Parse(tag.GetAttribute("value")));
-                                }
-                                break;
-                            case "203":
-                                {
-                                    card.rarity = int.Parse(tag.GetAttribute("value"));
-                                }
-                                break;
-                            case "48":
-                                {
-                                    card.cost = int.Parse(tag.GetAttribute("value"));
-                                }
-                                break;
-                            case "202":
-                                {
-                                    card.type = (cardtype)int.Parse(tag.GetAttribute("value"));
-                                }
-                                break;
-                            case "184":
-                                {
-                                    foreach (XmlElement node in tag.ChildNodes)
-                                    {
-                                        if (node.Name == "zhCN")
-                                        {
-                                            card.textCN = node.InnerText;
-                                        }
-                                    }
-                                }
-                                break;
-                            case "185":
-                                {
-                                    foreach (XmlElement node in tag.ChildNodes)
-                                    {
-                                        if (node.Name == "enUS")
-                                        {
-                                            var nameEN = "";
-                                            foreach (Match m in reNameEN.Matches(node.InnerText))
-                                            {
-                                                if (m.Success)
-                                                    nameEN += m.Value;
-                                            }
-                                            if (nameEN == "continue" || nameEN == "protected")
-                                                nameEN = "@" + nameEN;
-                                            if (nameEN.Length > 0 && char.IsDigit(nameEN[0]))
-                                                nameEN = "_" + nameEN;
-                                            nameEN = nameEN.ToLower();
-                                            card.nameEN = this.cardNameENstringToEnum(nameEN);
-                                        }
-                                        else if (node.Name == "zhCN")
-                                        {
-                                            var nameCN = "";
-                                            foreach (Match m in reNameCN.Matches(node.InnerText))
-                                            {
-                                                if (m.Success)
-                                                    nameCN += m.Value;
-                                            }
-                                            if (nameCN == "continue" || nameCN == "protected")
-                                                nameCN = "@" + nameCN;
-                                            if (nameCN.Length > 0 && char.IsDigit(nameCN[0]))
-                                                nameCN = "_" + nameCN;
-                                            card.nameCN = this.cardNameCNstringToEnum(nameCN);
-                                        }
-                                    }
-                                }
-                                break;
-                            case "443":
-                                {
-                                    card.choice = true;
-                                }
-                                break;
-                            case "363":
-                                {
-                                    card.poisonous = true;
-                                }
-                                break;
-                            case "212":
-                                {
-                                    card.Enrage = true;
-                                }
-                                break;
-                            case "338":
-                                {
-                                    card.oneTurnEffect = true;
-                                }
-                                break;
-                            case "362":
-                                {
-                                    card.Aura = true;
-                                }
-                                break;
-                            case "190":
-                                {
-                                    if ("ReferencedTag".Equals(tag.Name))
-                                        card.tank = true;
-                                }
-                                break;
-                            case "218":
-                                {
-                                    card.battlecry = true;
-                                }
-                                break;
-                            case "415":
-                                {
-                                    card.discover = true;
-                                }
-                                break;
-                            case "189":
-                                {
-                                    card.windfury = true;
-                                }
-                                break;
-                            case "217":
-                                {
-                                    card.deathrattle = true;
-                                }
-                                break;
-                            case "403":
-                                {
-                                    card.Inspire = true;
-                                }
-                                break;
-                            case "187":
-                                {
-                                    card.Durability = int.Parse(tag.GetAttribute("value"));
-                                }
-                                break;
-                            case "114":
-                                {
-                                    card.Elite = true;
-                                }
-                                break;
-                            case "220":
-                                {
-                                    card.Combo = true;
-                                }
-                                break;
-                            case "1637":
-                                {
-                                    card.Frenzy = true;
-                                }
-                                break;
-                            case "1920":
-                                {
-                                    card.HonorableKill = true;
-                                }
-                                break;
-                            case "684":
-                                {
-                                    card.HideCost = true;
-                                    break;
-                                }
-                            case "936":
-                                {
-                                    card.ShiftingSpell = true;
-                                    break;
-                                }
-                            case "923":
-                                {
-                                    card.Overkill = true;
-                                    break;
-                                }
-                            case "215":
-                                {
-                                    card.overload = int.Parse(tag.GetAttribute("value"));
-                                }
-                                break;
-                            case "685":
-                                {
-                                    card.lifesteal = true;
-                                }
-                                break;
-                            case "448":
-                                {
-                                    card.untouchable = true;
-                                }
-                                break;
-                            case "191":
-                                {
-                                    card.Stealth = true;
-                                }
-                                break;
-                            case "219":
-                                {
-                                    card.Secret = true;
-                                }
-                                break;
-                            case "462":
-                                {
-                                    card.Quest = true;
-                                }
-                                break;
-                            case "1725":
-                                {
-                                    card.Questline = true;
-                                }
-                                break;
-                            case "208":
-                                {
-                                    card.Freeze = true;
-                                }
-                                break;
-                            case "350":
-                                {
-                                    card.AdjacentBuff = true;
-                                }
-                                break;
-                            case "194":
-                                {
-                                    card.Shield = true;
-                                }
-                                break;
-                            case "197":
-                                {
-                                    card.Charge = true;
-                                }
-                                break;
-                            case "339":
-                                {
-                                    card.Silence = true;
-                                }
-                                break;
-                            case "293":
-                                {
-                                    card.Morph = true;
-                                }
-                                break;
-                            case "192":
-                                {
-                                    card.Spellpower = true;
-                                    card.spellpowervalue = int.Parse(tag.GetAttribute("value"));
-                                }
-                                break;
-                            case "791":
-                                {
-                                    card.Rush = true;
-                                }
-                                break;
-                            case "1085":
-                                {
-                                    card.reborn = true;
-                                }
-                                break;
-                            case "1427":
-                                {
-                                    card.Spellburst = true;
-                                }
-                                break;
-                            case "1551":
-                                {
-                                    card.Corrupted = true;
-                                }
-                                break;
-                            case "1524":
-                                {
-                                    card.Corrupt = true;
-                                }
-                                break;
-                            case "1635":
-                                {
-                                    card.SpellSchool = (SpellSchool)int.Parse(tag.GetAttribute("value"));
-                                }
-                                break;
-                            case "1518":
-                                {
-                                    if ("ReferencedTag".Equals(tag.Name))
-                                        card.dormant = 1;
-                                }
-                                break;
-                            case "1333":
-                                {
-                                    card.Outcast = true;
-                                }
-                                break;
-                            case "1720":
-                                {
-                                    card.Tradeable = true;
-                                    // card.TradeCost = card.DECK_ACTION_COST;
-                                }
-                                break;
-                            case "1743":
-                                {
-                                    card.DECK_ACTION_COST = int.Parse(tag.GetAttribute("value"));
-                                    // if (card.Tradeable)
-                                    // {
-                                    //     card.TradeCost = card.DECK_ACTION_COST;
-                                    // }
-                                    // else if (card.Forge)
-                                    // {
-                                    //     card.ForgeCost = card.DECK_ACTION_COST;
-                                    // }
-                                }
-                                break;
-                            case "2":
-                                {
-                                    card.TAG_SCRIPT_DATA_NUM_1 = int.Parse(tag.GetAttribute("value"));
-                                }
-                                break;
-                            case "3":
-                                {
-                                    card.TAG_SCRIPT_DATA_NUM_2 = int.Parse(tag.GetAttribute("value"));
-                                }
-                                break;
-                            case "2889":
-                                {
-                                    card.TAG_SCRIPT_DATA_NUM_3 = int.Parse(tag.GetAttribute("value"));
-                                }
-                                break;
-                            case "2919":
-                                {
-                                    card.TAG_SCRIPT_DATA_NUM_4 = int.Parse(tag.GetAttribute("value"));
-                                }
-                                break;
-                            case "2332":
-                                {
-                                    card.Dredge = true;//探底
-                                }
-                                break;
-                            case "2456":
-                                {
-                                    //排除冥界侍从
-                                    if (cardId != "MAW_031")
-                                    {
-                                        card.Infuse = true;//注能
-                                                           // card.InfuseNum = card.TAG_SCRIPT_DATA_NUM_1;
-
-                                    }
-                                }
-                                break;
-                            case "2457":
-                                {
-                                    card.Infused = true;//已注能
-                                }
-                                break;
-                            case "2498":
-                                {
-                                    card.Manathirst = int.Parse(tag.GetAttribute("value"));//法力渴求
-                                }
-                                break;
-                            case "2820":
-                                {
-                                    card.Finale = true;//压轴
-                                }
-                                break;
-                            case "2821":
-                                if (!"ReferencedTag".Equals(tag.Name))
-                                {
-                                    card.Overheal = true;//过量治疗
-                                }
-                                break;
-                            case "2772":
-                                if (!"ReferencedTag".Equals(tag.Name))
-                                {
-                                    card.Titan = true;//泰坦
-                                }
-                                break;
-                            case "2785":
-                                {
-                                    card.Forge = true;//锻造
-                                                      // card.ForgeCost = card.DECK_ACTION_COST;
-
-                                }
-                                break;
-                            case "3011":
-                                {
-                                    card.Forged = true;//已锻造
-                                }
-                                break;
-                            case "2905":
-                                {
-                                    card.Quickdraw = true;//快枪
-                                }
-                                break;
-                            case "3114":
-                                {
-                                    card.Excavate = true;//发掘
-                                }
-                                break;
-                            case "1211":
-                                {
-                                    card.Elusive = true;//扰魔
-                                }
-                                break;
-                            case "846":
-                                {
-                                    card.Echo = true; // 回响
-                                }
-                                break;
-                            case "1114":
-                                {
-                                    card.nonKeywordEcho = true; // 非关键词回响
-                                    break;
-                                }
-                            case "1193":
-                                {
-                                    card.Twinspell = true; // 双生法术
-                                    break;
-                                }
-                            case "3630":
-                                {
-                                    card.Temporary = true;//临时
-                                }
-                                break;
-                            case "373":
-                                {
-                                    card.immuneWhileAttacking = true; // 攻击时免疫
-                                }
-                                break;
-                            case "380":
-                                {
-                                    card.heroPower = int.Parse(tag.GetAttribute("value")); // 英雄牌技能
-                                }
-                                break;
-                            case "292":
-                                {
-                                    card.armor = int.Parse(tag.GetAttribute("value")); // 英雄牌护甲
-                                }
-                                break;
-                            case "3382":
-                                {
-                                    card.KeepHeroClass = int.Parse(tag.GetAttribute("value"));//打出英雄保持原职业
-                                }
-                                break;
-                            case "1452":
-                                {
-                                    card.CollectionRelatedCardDataBaseId = int.Parse(tag.GetAttribute("value"));//收藏中关联的卡牌
-                                }
-                                break;
-                            case "858":
-                                {
-
-                                    card.TreatItAsTheSameCard = tag.GetAttribute("name");//套牌规则视为同一卡牌defid
-
-                                }
-                                break;
-                            case "2837":
-                                {
-                                    card.CollectionRelatedCardDataBaseId = int.Parse(tag.GetAttribute("value"));//法力水晶消耗类型 
-                                }
-                                break;
-                            case "3318":
-                                {
-                                    card.Miniaturize = int.Parse(tag.GetAttribute("value"));//微缩
-                                }
-                                break;
-                            case "3399":
-                                {
-                                    card.Gigantity = int.Parse(tag.GetAttribute("value"));//扩大
-                                }
-                                break;
-                            case "1077":
-                                {
-                                    card.CastsWhenDrawn = int.Parse(tag.GetAttribute("value")); // 抽到时触发效果的属性
-                                }
-                                break;
-                            case "1749":
-                                {
-                                    card.Objective = int.Parse(tag.GetAttribute("value")); // 光环 如救生光环
-                                }
-                                break;
-                            case "2311":
-                                {
-                                    card.ObjectiveAura = int.Parse(tag.GetAttribute("value")); // 会影响场面的光环 如征战平原
-                                }
-                                break;
-                            case "2329":
-                                {
-                                    card.Sigil = int.Parse(tag.GetAttribute("value")); // 咒符
-                                }
-                                break;
-                            case "2196":
-                                {
-                                    card.costBlood = int.Parse(tag.GetAttribute("value")); // 鲜血符文
-                                }
-                                break;
-                            case "2197":
-                                {
-                                    card.costFrost = int.Parse(tag.GetAttribute("value")); // 冰霜符文
-                                }
-                                break;
-                            case "2198":
-                                {
-                                    card.costUnholy = int.Parse(tag.GetAttribute("value")); // 邪恶符文
-                                }
-                                break;
-                            case "1086":
-                                {
-                                    card.upgradedHeroPower = int.Parse(tag.GetAttribute("value")); // 升级的英雄技能
-                                }
-                                break;
-                            case "994":
-                                {
-                                    card.markOfEvil = true; // 跟班
-                                }
-                                break;
-                            case "2831":
-                                {
-                                    card.Treant = true; // 树人
-
-                                }
-                                break;
-                            case "2871":
-                                {
-                                    card.Ancient = true; // 古树
-                                }
-                                break;
-                            case "1965":
-                                {
-                                    card.IMP = true; // 小鬼
-                                }
-                                break;
-                            case "2355":
-                                {
-                                    card.Whelp = true; // 雏龙
-                                }
-                                break;
-                            case "3555":
-                                {
-                                    card.Starship = true; // 星舰
-                                }
-                                break;
-                            case "3568":
-                                {
-                                    card.StarshipPiece = true; // 星舰组件
-                                }
-                                break;
-                            case "3631":
-                                {
-                                    card.Crewmate = true; // 乘务员
-                                }
-                                break;
-                            case "1678":
-                                {
-                                    card.SI_7 = true; // 军情七处
-                                }
-                                break;
-                            case "3444":
-                                {
-                                    card.SilverHandRecruit = true; // 白银之手新兵
-                                }
-                                break;
-                            case "3928":
-                                {
-                                    card.Rafaam = true; // 拉法姆
-
-                                }
-                                break;
-                            case "4392":
-                                {
-                                    card.Ysera = true; // 伊瑟拉
-
-                                }
-                                break;
-                            case "476":
-                                {
-                                    card.MultipleClasses = int.Parse(tag.GetAttribute("value")); // 194: 玉莲帮  296: 暗金教 532: 玉莲帮
-                                }
-                                break;
-                            case "3457":
-                                {
-                                    card.Zerg = true; // 异虫
-                                }
-                                break;
-                            case "3458":
-                                {
-                                    card.Terran = true; // 人族
-                                }
-                                break;
-                            case "3469":
-                                {
-                                    card.Protoss = true; // 星灵
-                                }
-                                break;
-                            case "3881":
-                                {
-                                    card.Wipe = true; // 小精灵
-
-                                }
-                                break;
-                            //TODO:双种族代码
-                            case "2525":
-                                {
-                                    card.races.Add(Race.DRAENEI); // 添加第二种族德莱尼
-                                }
-                                break;
-                            case "2534":
-                                {
-                                    card.races.Add(Race.UNDEAD); // 添加第二种族亡灵
-                                }
-                                break;
-                            case "2536":
-                                {
-                                    card.races.Add(Race.MURLOC); // 添加第二种族鱼人
-                                }
-                                break;
-                            case "2537":
-                                {
-                                    card.races.Add(Race.DEMON); // 添加第二种族恶魔
-                                }
-                                break;
-                            case "2539":
-                                {
-                                    card.races.Add(Race.MECHANICAL); // 添加第二种族机械
-                                }
-                                break;
-                            case "2540":
-                                {
-                                    card.races.Add(Race.ELEMENTAL); // 添加第二种族元素
-                                }
-                                break;
-                            case "2542":
-                                {
-                                    card.races.Add(Race.PET); // 添加第二种族野兽
-                                }
-                                break;
-                            case "2543":
-                                {
-                                    card.races.Add(Race.TOTEM); // 添加第二种族图腾
-                                }
-                                break;
-                            case "2522":
-                                {
-                                    card.races.Add(Race.PIRATE); // 添加第二种族海盗
-                                }
-                                break;
-                            case "2523":
-                                {
-                                    card.races.Add(Race.DRAGON); // 添加第二种族龙
-                                }
-                                break;
-                            case "2546":
-                                {
-                                    card.races.Add(Race.QUILBOAR); // 添加第二种族野猪人
-                                }
-                                break;
-                            case "2553":
-                                {
-                                    card.races.Add(Race.NAGA); // 添加第二种族龙
-                                }
-                                break;
-                            case "4090":
-                                {
-                                    card.InteractableObjectCost = int.Parse(tag.GetAttribute("value"));
-                                }
-                                break;
-                            case "1508":
-                                {
-                                    card.CanTargetCardsInHand = true;
-                                }
-                                break;
-                            case "4089":
-                                {
-                                    card.InteractableObject = true;
-                                }
-                                break;
-                            case "4257":
-                                {
-                                    card.UsesCharges = int.Parse(tag.GetAttribute("value")); ;
-                                }
-                                break;
-                            case "2859":
-                                {
-                                    card.magneticToRace = int.Parse(tag.GetAttribute("value")); ;
-                                }
-                                break;
-
-                        }
-                    }
-                    // card.updateDIYCard();
-                    cardlist.Add(card);
-                    if (!string.IsNullOrEmpty(card.dbfId))
-                        carddbfidToCardList[card.dbfId] = card;
-                    // carddbfidToCardList.Add(card.dbfId, card);
-                    if (card.cardIDenum != cardIDEnum.None)
-                        cardidToCardList[card.cardIDenum] = card;
-                    if (card.nameCN != cardNameCN.未知)
-                    {
-                        cardNameCNToCardList[card.nameCN] = card;
-                    }
-                    if (card.nameEN != cardNameEN.unknown)
-                    {
-                        cardNameENToCardList[card.nameEN] = card;
-                    }
+                    card.isToken = true;
                 }
 
-                //处理DECK_ACTION_COST、TAG_SCRIPT_DATA_NUM_1、TAG_SCRIPT_DATA_NUM_2等属性
-                foreach (Card item in cardlist)
+                //parse tags
+                foreach (XmlElement tag in entity.ChildNodes)
                 {
-                    if (item.Infuse)
+                    if (!tag.HasAttribute("enumID"))
+                        continue;
+                    if ("ReferencedTag".Equals(tag.Name))
                     {
-                        item.InfuseNum = item.TAG_SCRIPT_DATA_NUM_1;
-                    }
-                    if (item.Tradeable)
-                    {
-                        item.TradeCost = item.DECK_ACTION_COST;
-                    }
-                    if (item.Forge)
-                    {
-                        item.ForgeCost = item.DECK_ACTION_COST;
-                    }
-                    if (!string.IsNullOrWhiteSpace(item.TreatItAsTheSameCard))
-                    {
-                        Card OriginCard = this.getCardDataFromDbfID(item.TreatItAsTheSameCard);
-                        if (OriginCard != this.unknownCard)
-                            item.sim_card = OriginCard.sim_card;
+                        // if (tag.GetAttribute("enumID") == "1518")
+                        // {
+                        //     card.dormant = 1;
+                        // }
+                        // if (tag.GetAttribute("enumID") == "190")
+                        // {
+                        //     card.tank = true;
+                        // }
+                        continue;
                     }
 
+                    switch (tag.GetAttribute("enumID"))
+                    {
+                        case "32":
+                            {
+                                card.TriggerVisual = int.Parse(tag.GetAttribute("value"));
+                            }
+                            break;
+                        case "643":
+                            {
+                                card.Nature = true;
+                            }
+                            break;
+                        case "321":
+                            {
+                                card.Collectable = true;
+                            }
+                            break;
+                        case "227":
+                            {
+                                card.CantAttack = true;
+                            }
+                            break;
+                        case "45":
+                            {
+                                card.Health = int.Parse(tag.GetAttribute("value"));
+                            }
+                            break;
+                        case "199":
+                            {
+                                card.Class = int.Parse(tag.GetAttribute("value"));
+                            }
+                            break;
+                        case "47":
+                            {
+                                card.Attack = int.Parse(tag.GetAttribute("value"));
+                            }
+                            break;
+                        case "200":
+                            {
+                                card.race = (Race)int.Parse(tag.GetAttribute("value"));
+                                //TODO:双种族代码
+                                card.races.Add((Race)int.Parse(tag.GetAttribute("value")));
+                            }
+                            break;
+                        case "203":
+                            {
+                                card.rarity = int.Parse(tag.GetAttribute("value"));
+                            }
+                            break;
+                        case "48":
+                            {
+                                card.cost = int.Parse(tag.GetAttribute("value"));
+                            }
+                            break;
+                        case "202":
+                            {
+                                card.type = (cardtype)int.Parse(tag.GetAttribute("value"));
+                            }
+                            break;
+                        case "184":
+                            {
+                                foreach (XmlElement node in tag.ChildNodes)
+                                {
+                                    if (node.Name == "zhCN")
+                                    {
+                                        card.textCN = node.InnerText;
+                                    }
+                                }
+                            }
+                            break;
+                        case "185":
+                            {
+                                foreach (XmlElement node in tag.ChildNodes)
+                                {
+                                    if (node.Name == "enUS")
+                                    {
+                                        var nameEN = "";
+                                        foreach (Match m in reNameEN.Matches(node.InnerText))
+                                        {
+                                            if (m.Success)
+                                                nameEN += m.Value;
+                                        }
+                                        if (nameEN == "continue" || nameEN == "protected")
+                                            nameEN = "@" + nameEN;
+                                        if (nameEN.Length > 0 && char.IsDigit(nameEN[0]))
+                                            nameEN = "_" + nameEN;
+                                        nameEN = nameEN.ToLower();
+                                        card.nameEN = this.cardNameENstringToEnum(nameEN);
+                                    }
+                                    else if (node.Name == "zhCN")
+                                    {
+                                        var nameCN = "";
+                                        foreach (Match m in reNameCN.Matches(node.InnerText))
+                                        {
+                                            if (m.Success)
+                                                nameCN += m.Value;
+                                        }
+                                        if (nameCN == "continue" || nameCN == "protected")
+                                            nameCN = "@" + nameCN;
+                                        if (nameCN.Length > 0 && char.IsDigit(nameCN[0]))
+                                            nameCN = "_" + nameCN;
+                                        card.nameCN = this.cardNameCNstringToEnum(nameCN);
+                                    }
+                                }
+                            }
+                            break;
+                        case "443":
+                            {
+                                card.choice = true;
+                            }
+                            break;
+                        case "363":
+                            {
+                                card.poisonous = true;
+                            }
+                            break;
+                        case "212":
+                            {
+                                card.Enrage = true;
+                            }
+                            break;
+                        case "338":
+                            {
+                                card.oneTurnEffect = true;
+                            }
+                            break;
+                        case "362":
+                            {
+                                card.Aura = true;
+                            }
+                            break;
+                        case "190":
+                            {
+                                if ("ReferencedTag".Equals(tag.Name))
+                                    card.tank = true;
+                            }
+                            break;
+                        case "218":
+                            {
+                                card.battlecry = true;
+                            }
+                            break;
+                        case "415":
+                            {
+                                card.discover = true;
+                            }
+                            break;
+                        case "189":
+                            {
+                                card.windfury = true;
+                            }
+                            break;
+                        case "217":
+                            {
+                                card.deathrattle = true;
+                            }
+                            break;
+                        case "403":
+                            {
+                                card.Inspire = true;
+                            }
+                            break;
+                        case "187":
+                            {
+                                card.Durability = int.Parse(tag.GetAttribute("value"));
+                            }
+                            break;
+                        case "114":
+                            {
+                                card.Elite = true;
+                            }
+                            break;
+                        case "220":
+                            {
+                                card.Combo = true;
+                            }
+                            break;
+                        case "1637":
+                            {
+                                card.Frenzy = true;
+                            }
+                            break;
+                        case "1920":
+                            {
+                                card.HonorableKill = true;
+                            }
+                            break;
+                        case "684":
+                            {
+                                card.HideCost = true;
+                                break;
+                            }
+                        case "936":
+                            {
+                                card.ShiftingSpell = true;
+                                break;
+                            }
+                        case "923":
+                            {
+                                card.Overkill = true;
+                                break;
+                            }
+                        case "215":
+                            {
+                                card.overload = int.Parse(tag.GetAttribute("value"));
+                            }
+                            break;
+                        case "685":
+                            {
+                                card.lifesteal = true;
+                            }
+                            break;
+                        case "448":
+                            {
+                                card.untouchable = true;
+                            }
+                            break;
+                        case "191":
+                            {
+                                card.Stealth = true;
+                            }
+                            break;
+                        case "219":
+                            {
+                                card.Secret = true;
+                            }
+                            break;
+                        case "462":
+                            {
+                                card.Quest = true;
+                            }
+                            break;
+                        case "1725":
+                            {
+                                card.Questline = true;
+                            }
+                            break;
+                        case "208":
+                            {
+                                card.Freeze = true;
+                            }
+                            break;
+                        case "350":
+                            {
+                                card.AdjacentBuff = true;
+                            }
+                            break;
+                        case "194":
+                            {
+                                card.Shield = true;
+                            }
+                            break;
+                        case "197":
+                            {
+                                card.Charge = true;
+                            }
+                            break;
+                        case "339":
+                            {
+                                card.Silence = true;
+                            }
+                            break;
+                        case "293":
+                            {
+                                card.Morph = true;
+                            }
+                            break;
+                        case "192":
+                            {
+                                card.Spellpower = true;
+                                card.spellpowervalue = int.Parse(tag.GetAttribute("value"));
+                            }
+                            break;
+                        case "791":
+                            {
+                                card.Rush = true;
+                            }
+                            break;
+                        case "1085":
+                            {
+                                card.reborn = true;
+                            }
+                            break;
+                        case "1427":
+                            {
+                                card.Spellburst = true;
+                            }
+                            break;
+                        case "1551":
+                            {
+                                card.Corrupted = true;
+                            }
+                            break;
+                        case "1524":
+                            {
+                                card.Corrupt = true;
+                            }
+                            break;
+                        case "1635":
+                            {
+                                card.SpellSchool = (SpellSchool)int.Parse(tag.GetAttribute("value"));
+                            }
+                            break;
+                        case "1518":
+                            {
+                                if ("ReferencedTag".Equals(tag.Name))
+                                    card.dormant = 1;
+                            }
+                            break;
+                        case "1333":
+                            {
+                                card.Outcast = true;
+                            }
+                            break;
+                        case "1720":
+                            {
+                                card.Tradeable = true;
+                                // card.TradeCost = card.DECK_ACTION_COST;
+                            }
+                            break;
+                        case "1743":
+                            {
+                                card.DECK_ACTION_COST = int.Parse(tag.GetAttribute("value"));
+                                // if (card.Tradeable)
+                                // {
+                                //     card.TradeCost = card.DECK_ACTION_COST;
+                                // }
+                                // else if (card.Forge)
+                                // {
+                                //     card.ForgeCost = card.DECK_ACTION_COST;
+                                // }
+                            }
+                            break;
+                        case "2":
+                            {
+                                card.TAG_SCRIPT_DATA_NUM_1 = int.Parse(tag.GetAttribute("value"));
+                            }
+                            break;
+                        case "3":
+                            {
+                                card.TAG_SCRIPT_DATA_NUM_2 = int.Parse(tag.GetAttribute("value"));
+                            }
+                            break;
+                        case "2889":
+                            {
+                                card.TAG_SCRIPT_DATA_NUM_3 = int.Parse(tag.GetAttribute("value"));
+                            }
+                            break;
+                        case "2919":
+                            {
+                                card.TAG_SCRIPT_DATA_NUM_4 = int.Parse(tag.GetAttribute("value"));
+                            }
+                            break;
+                        case "2332":
+                            {
+                                card.Dredge = true;//探底
+                            }
+                            break;
+                        case "2456":
+                            {
+                                //排除冥界侍从
+                                if (cardId != "MAW_031")
+                                {
+                                    card.Infuse = true;//注能
+                                                       // card.InfuseNum = card.TAG_SCRIPT_DATA_NUM_1;
+
+                                }
+                            }
+                            break;
+                        case "2457":
+                            {
+                                card.Infused = true;//已注能
+                            }
+                            break;
+                        case "2498":
+                            {
+                                card.Manathirst = int.Parse(tag.GetAttribute("value"));//法力渴求
+                            }
+                            break;
+                        case "2820":
+                            {
+                                card.Finale = true;//压轴
+                            }
+                            break;
+                        case "2821":
+                            if (!"ReferencedTag".Equals(tag.Name))
+                            {
+                                card.Overheal = true;//过量治疗
+                            }
+                            break;
+                        case "2772":
+                            if (!"ReferencedTag".Equals(tag.Name))
+                            {
+                                card.Titan = true;//泰坦
+                            }
+                            break;
+                        case "2785":
+                            {
+                                card.Forge = true;//锻造
+                                                  // card.ForgeCost = card.DECK_ACTION_COST;
+
+                            }
+                            break;
+                        case "3011":
+                            {
+                                card.Forged = true;//已锻造
+                            }
+                            break;
+                        case "2905":
+                            {
+                                card.Quickdraw = true;//快枪
+                            }
+                            break;
+                        case "3114":
+                            {
+                                card.Excavate = true;//发掘
+                            }
+                            break;
+                        case "1211":
+                            {
+                                card.Elusive = true;//扰魔
+                            }
+                            break;
+                        case "846":
+                            {
+                                card.Echo = true; // 回响
+                            }
+                            break;
+                        case "1114":
+                            {
+                                card.nonKeywordEcho = true; // 非关键词回响
+                                break;
+                            }
+                        case "1193":
+                            {
+                                card.Twinspell = true; // 双生法术
+                                break;
+                            }
+                        case "3630":
+                            {
+                                card.Temporary = true;//临时
+                            }
+                            break;
+                        case "373":
+                            {
+                                card.immuneWhileAttacking = true; // 攻击时免疫
+                            }
+                            break;
+                        case "380":
+                            {
+                                card.heroPower = int.Parse(tag.GetAttribute("value")); // 英雄牌技能
+                            }
+                            break;
+                        case "292":
+                            {
+                                card.armor = int.Parse(tag.GetAttribute("value")); // 英雄牌护甲
+                            }
+                            break;
+                        case "3382":
+                            {
+                                card.KeepHeroClass = int.Parse(tag.GetAttribute("value"));//打出英雄保持原职业
+                            }
+                            break;
+                        case "1452":
+                            {
+                                card.CollectionRelatedCardDataBaseId = int.Parse(tag.GetAttribute("value"));//收藏中关联的卡牌
+                            }
+                            break;
+                        case "858":
+                            {
+
+                                card.TreatItAsTheSameCard = tag.GetAttribute("name");//套牌规则视为同一卡牌defid
+
+                            }
+                            break;
+                        case "2837":
+                            {
+                                card.CollectionRelatedCardDataBaseId = int.Parse(tag.GetAttribute("value"));//法力水晶消耗类型 
+                            }
+                            break;
+                        case "3318":
+                            {
+                                card.Miniaturize = int.Parse(tag.GetAttribute("value"));//微缩
+                            }
+                            break;
+                        case "3399":
+                            {
+                                card.Gigantity = int.Parse(tag.GetAttribute("value"));//扩大
+                            }
+                            break;
+                        case "1077":
+                            {
+                                card.CastsWhenDrawn = int.Parse(tag.GetAttribute("value")); // 抽到时触发效果的属性
+                            }
+                            break;
+                        case "1749":
+                            {
+                                card.Objective = int.Parse(tag.GetAttribute("value")); // 光环 如救生光环
+                            }
+                            break;
+                        case "2311":
+                            {
+                                card.ObjectiveAura = int.Parse(tag.GetAttribute("value")); // 会影响场面的光环 如征战平原
+                            }
+                            break;
+                        case "2329":
+                            {
+                                card.Sigil = int.Parse(tag.GetAttribute("value")); // 咒符
+                            }
+                            break;
+                        case "2196":
+                            {
+                                card.costBlood = int.Parse(tag.GetAttribute("value")); // 鲜血符文
+                            }
+                            break;
+                        case "2197":
+                            {
+                                card.costFrost = int.Parse(tag.GetAttribute("value")); // 冰霜符文
+                            }
+                            break;
+                        case "2198":
+                            {
+                                card.costUnholy = int.Parse(tag.GetAttribute("value")); // 邪恶符文
+                            }
+                            break;
+                        case "1086":
+                            {
+                                card.upgradedHeroPower = int.Parse(tag.GetAttribute("value")); // 升级的英雄技能
+                            }
+                            break;
+                        case "994":
+                            {
+                                card.markOfEvil = true; // 跟班
+                            }
+                            break;
+                        case "2831":
+                            {
+                                card.Treant = true; // 树人
+
+                            }
+                            break;
+                        case "2871":
+                            {
+                                card.Ancient = true; // 古树
+                            }
+                            break;
+                        case "1965":
+                            {
+                                card.IMP = true; // 小鬼
+                            }
+                            break;
+                        case "2355":
+                            {
+                                card.Whelp = true; // 雏龙
+                            }
+                            break;
+                        case "3555":
+                            {
+                                card.Starship = true; // 星舰
+                            }
+                            break;
+                        case "3568":
+                            {
+                                card.StarshipPiece = true; // 星舰组件
+                            }
+                            break;
+                        case "3631":
+                            {
+                                card.Crewmate = true; // 乘务员
+                            }
+                            break;
+                        case "1678":
+                            {
+                                card.SI_7 = true; // 军情七处
+                            }
+                            break;
+                        case "3444":
+                            {
+                                card.SilverHandRecruit = true; // 白银之手新兵
+                            }
+                            break;
+                        case "3928":
+                            {
+                                card.Rafaam = true; // 拉法姆
+
+                            }
+                            break;
+                        case "4392":
+                            {
+                                card.Ysera = true; // 伊瑟拉
+
+                            }
+                            break;
+                        case "476":
+                            {
+                                card.MultipleClasses = int.Parse(tag.GetAttribute("value")); // 194: 玉莲帮  296: 暗金教 532: 玉莲帮
+                            }
+                            break;
+                        case "3457":
+                            {
+                                card.Zerg = true; // 异虫
+                            }
+                            break;
+                        case "3458":
+                            {
+                                card.Terran = true; // 人族
+                            }
+                            break;
+                        case "3469":
+                            {
+                                card.Protoss = true; // 星灵
+                            }
+                            break;
+                        case "3881":
+                            {
+                                card.Wipe = true; // 小精灵
+
+                            }
+                            break;
+                        //TODO:双种族代码
+                        case "2525":
+                            {
+                                card.races.Add(Race.DRAENEI); // 添加第二种族德莱尼
+                            }
+                            break;
+                        case "2534":
+                            {
+                                card.races.Add(Race.UNDEAD); // 添加第二种族亡灵
+                            }
+                            break;
+                        case "2536":
+                            {
+                                card.races.Add(Race.MURLOC); // 添加第二种族鱼人
+                            }
+                            break;
+                        case "2537":
+                            {
+                                card.races.Add(Race.DEMON); // 添加第二种族恶魔
+                            }
+                            break;
+                        case "2539":
+                            {
+                                card.races.Add(Race.MECHANICAL); // 添加第二种族机械
+                            }
+                            break;
+                        case "2540":
+                            {
+                                card.races.Add(Race.ELEMENTAL); // 添加第二种族元素
+                            }
+                            break;
+                        case "2542":
+                            {
+                                card.races.Add(Race.PET); // 添加第二种族野兽
+                            }
+                            break;
+                        case "2543":
+                            {
+                                card.races.Add(Race.TOTEM); // 添加第二种族图腾
+                            }
+                            break;
+                        case "2522":
+                            {
+                                card.races.Add(Race.PIRATE); // 添加第二种族海盗
+                            }
+                            break;
+                        case "2523":
+                            {
+                                card.races.Add(Race.DRAGON); // 添加第二种族龙
+                            }
+                            break;
+                        case "2546":
+                            {
+                                card.races.Add(Race.QUILBOAR); // 添加第二种族野猪人
+                            }
+                            break;
+                        case "2553":
+                            {
+                                card.races.Add(Race.NAGA); // 添加第二种族龙
+                            }
+                            break;
+                        case "4090":
+                            {
+                                card.InteractableObjectCost = int.Parse(tag.GetAttribute("value"));
+                            }
+                            break;
+                        case "1508":
+                            {
+                                card.CanTargetCardsInHand = true;
+                            }
+                            break;
+                        case "4089":
+                            {
+                                card.InteractableObject = true;
+                            }
+                            break;
+                        case "4257":
+                            {
+                                card.UsesCharges = int.Parse(tag.GetAttribute("value")); ;
+                            }
+                            break;
+                        case "2859":
+                            {
+                                card.magneticToRace = int.Parse(tag.GetAttribute("value")); ;
+                            }
+                            break;
+
+                    }
+                }
+                // card.updateDIYCard();
+                cardlist.Add(card);
+                if (!string.IsNullOrEmpty(card.dbfId))
+                    carddbfidToCardList[card.dbfId] = card;
+                // carddbfidToCardList.Add(card.dbfId, card);
+                if (card.cardIDenum != cardIDEnum.None)
+                    cardidToCardList[card.cardIDenum] = card;
+                if (card.nameCN != cardNameCN.未知)
+                {
+                    cardNameCNToCardList[card.nameCN] = card;
+                }
+                if (card.nameEN != cardNameEN.unknown)
+                {
+                    cardNameENToCardList[card.nameEN] = card;
                 }
             }
+
+            //处理DECK_ACTION_COST、TAG_SCRIPT_DATA_NUM_1、TAG_SCRIPT_DATA_NUM_2等属性
+            foreach (Card item in cardlist)
+            {
+                if (item.Infuse)
+                {
+                    item.InfuseNum = item.TAG_SCRIPT_DATA_NUM_1;
+                }
+                if (item.Tradeable)
+                {
+                    item.TradeCost = item.DECK_ACTION_COST;
+                }
+                if (item.Forge)
+                {
+                    item.ForgeCost = item.DECK_ACTION_COST;
+                }
+                if (!string.IsNullOrWhiteSpace(item.TreatItAsTheSameCard))
+                {
+                    Card OriginCard = this.getCardDataFromDbfID(item.TreatItAsTheSameCard);
+                    if (OriginCard != this.unknownCard)
+                        item.sim_card = OriginCard.sim_card;
+                }
+
+            }
+        }
 
         /// <summary>
         /// 根据CardDB.cardNameEN卡名获取卡
@@ -2786,7 +2952,7 @@ namespace HREngine.Bots
                 return c;
             return this.unknownCard;
         }
- /// <summary>
+        /// <summary>
         /// 根据CardDB.cardNameCN卡名获取卡
         /// </summary>
         /// <param name="cardname"></param>
@@ -2798,7 +2964,7 @@ namespace HREngine.Bots
                 return c;
             return this.unknownCard;
         }
-        
+
 
         /// <summary>
         /// CardDB.cardIDEnum id获取卡
@@ -2826,149 +2992,149 @@ namespace HREngine.Bots
             return this.unknownCard;
         }
 
-            private void setAdditionalData()
+        private void setAdditionalData()
+        {
+            PenalityManager pen = PenalityManager.Instance;
+
+            foreach (Card c in this.cardlist)
             {
-                PenalityManager pen = PenalityManager.Instance;
+                if (c.cardIDenum == cardIDEnum.None)
+                    continue;                             //Todo: 为了确保Test能跑通
 
-                foreach (Card c in this.cardlist)
+                if (pen.cardDrawBattleCryDatabase.ContainsKey(c.nameEN))
                 {
-                    if (c.cardIDenum == cardIDEnum.None)
-                        continue;                             //Todo: 为了确保Test能跑通
-
-                    if (pen.cardDrawBattleCryDatabase.ContainsKey(c.nameEN))
-                    {
-                        c.isCarddraw = pen.cardDrawBattleCryDatabase[c.nameEN];
-                    }
-
-                    if (pen.DamageTargetSpecialDatabase.ContainsKey(c.nameEN))
-                    {
-                        c.damagesTargetWithSpecial = true;
-                    }
-
-                    if (pen.DamageTargetDatabase.ContainsKey(c.nameEN))
-                    {
-                        c.damagesTarget = true;
-                    }
-
-                    if (pen.priorityTargets.ContainsKey(c.nameEN))
-                    {
-                        c.targetPriority = pen.priorityTargets[c.nameEN];
-                    }
-
-                    if (pen.specialMinions.ContainsKey(c.nameEN))
-                    {
-                        c.isSpecialMinion = true;
-                    }
-
-
-                    c.trigers = new List<cardtrigers>();
-                    Type trigerType = c.sim_card.GetType();
-                    foreach (string trigerName in Enum.GetNames(typeof(cardtrigers)))
-                    {
-                        try
-                        {
-                            foreach (var m in trigerType.GetMethods().Where(e => e.Name.Equals(trigerName, StringComparison.Ordinal)))
-                            {
-                                if (m.DeclaringType == trigerType)
-                                    c.trigers.Add((cardtrigers)Enum.Parse(typeof(cardtrigers), trigerName));
-                            }
-                        }
-                        catch
-                        {
-                        }
-                    }
-                    if (c.trigers.Count > 20) c.trigers.Clear();
+                    c.isCarddraw = pen.cardDrawBattleCryDatabase[c.nameEN];
                 }
-            }
-        }
 
-        /// <summary>
-        /// 目标
-        /// </summary>
-        public struct targett
-        {
-            public int target;//目标
-            public int targetEntity;//目标实体
-
-            public targett(int targ, int ent)
-            {
-                this.target = targ;
-                this.targetEntity = ent;
-            }
-        }
-
-        /// <summary>
-        /// 打出卡牌要求
-        /// </summary>
-        public struct PlayReq
-        {
-            public CardDB.ErrorType2 errorType;
-            public int param;
-
-            public PlayReq(CardDB.ErrorType2 errorType, int param)
-            {
-                this.errorType = errorType;
-                this.param = param;
-            }
-            public PlayReq(CardDB.ErrorType2 errorType, CardDB.Race race)
-            {
-                this.errorType = errorType;
-                this.param = (int)race;
-            }
-            public PlayReq(CardDB.ErrorType2 errorType, CardDB.Specialtags specialtags)
-            {
-                this.errorType = errorType;
-                this.param = (int)specialtags;
-            }
-
-            public PlayReq(CardDB.ErrorType2 errorType)
-            {
-                this.errorType = errorType;
-                this.param = -1;
-            }
-            public void UpdateCardAttr(CardDB.Card card)
-            {
-                switch (errorType)
+                if (pen.DamageTargetSpecialDatabase.ContainsKey(c.nameEN))
                 {
-                    case CardDB.ErrorType2.REQ_TARGET_MAX_ATTACK:
-                        card.needWithMaxAttackValueOf = param;
-                        break;
-                    case CardDB.ErrorType2.REQ_TARGET_MIN_ATTACK:
-                        card.needWithMinAttackValueOf = param;
-                        break;
-                    case CardDB.ErrorType2.REQ_TARGET_EXACT_ATTACK:
-                        card.needWithExactAttackValueOf = param;
-                        break;
-                    case CardDB.ErrorType2.REQ_MINIMUM_CORPSES:
-                        card.needWithMinimumCorpeses = param;
-                        break;
-                    case CardDB.ErrorType2.REQ_TARGET_WITH_RACE:
-                        card.needRaceForPlaying = param;
-                        break;
-                    case CardDB.ErrorType2.REQ_FRIENDLY_MINION_OF_RACE_IN_HAND:
-                        card.needRaceInHand = param;
-                        break;
-                    case CardDB.ErrorType2.REQ_NUM_MINION_SLOTS:
-                        card.needEmptyPlacesForPlaying = param;
-                        break;
-                    case CardDB.ErrorType2.REQ_MINION_CAP_IF_TARGET_AVAILABLE:
-                        card.needMinionsCapIfAvailable = param;
-                        break;
-                    case CardDB.ErrorType2.REQ_MINIMUM_ENEMY_MINIONS:
-                        card.needMinNumberOfEnemy = param;
-                        break;
-                    case CardDB.ErrorType2.REQ_MINIMUM_TOTAL_MINIONS:
-                        card.needMinTotalMinions = param;
-                        break;
-                    case CardDB.ErrorType2.REQ_TARGET_IF_AVAILABLE_AND_MINIMUM_FRIENDLY_MINIONS:
-                        card.needMinOwnMinions = param;
-                        break;
-                    case CardDB.ErrorType2.REQ_TARGET_IF_AVAILABLE_AND_MINIMUM_FRIENDLY_SECRETS:
-                        card.needControlaSecret = param;
-                        break;
-                    case CardDB.ErrorType2.REQ_TARGET_MUST_HAVE_TAG:
-                        card.needTagForPlaying = (CardDB.Specialtags)param;
-                        break;
+                    c.damagesTargetWithSpecial = true;
+                }
+
+                if (pen.DamageTargetDatabase.ContainsKey(c.nameEN))
+                {
+                    c.damagesTarget = true;
+                }
+
+                if (pen.priorityTargets.ContainsKey(c.nameEN))
+                {
+                    c.targetPriority = pen.priorityTargets[c.nameEN];
+                }
+
+                if (pen.specialMinions.ContainsKey(c.nameEN))
+                {
+                    c.isSpecialMinion = true;
+                }
+
+
+                c.trigers = new List<cardtrigers>();
+                Type trigerType = c.sim_card.GetType();
+                foreach (string trigerName in Enum.GetNames(typeof(cardtrigers)))
+                {
+                    try
+                    {
+                        foreach (var m in trigerType.GetMethods().Where(e => e.Name.Equals(trigerName, StringComparison.Ordinal)))
+                        {
+                            if (m.DeclaringType == trigerType)
+                                c.trigers.Add((cardtrigers)Enum.Parse(typeof(cardtrigers), trigerName));
+                        }
+                    }
+                    catch
+                    {
+                    }
+                }
+                if (c.trigers.Count > 20) c.trigers.Clear();
+            }
+        }
+    }
+
+    /// <summary>
+    /// 目标
+    /// </summary>
+    public struct targett
+    {
+        public int target;//目标
+        public int targetEntity;//目标实体
+
+        public targett(int targ, int ent)
+        {
+            this.target = targ;
+            this.targetEntity = ent;
+        }
+    }
+
+    /// <summary>
+    /// 打出卡牌要求
+    /// </summary>
+    public struct PlayReq
+    {
+        public CardDB.ErrorType2 errorType;
+        public int param;
+
+        public PlayReq(CardDB.ErrorType2 errorType, int param)
+        {
+            this.errorType = errorType;
+            this.param = param;
+        }
+        public PlayReq(CardDB.ErrorType2 errorType, CardDB.Race race)
+        {
+            this.errorType = errorType;
+            this.param = (int)race;
+        }
+        public PlayReq(CardDB.ErrorType2 errorType, CardDB.Specialtags specialtags)
+        {
+            this.errorType = errorType;
+            this.param = (int)specialtags;
+        }
+
+        public PlayReq(CardDB.ErrorType2 errorType)
+        {
+            this.errorType = errorType;
+            this.param = -1;
+        }
+        public void UpdateCardAttr(CardDB.Card card)
+        {
+            switch (errorType)
+            {
+                case CardDB.ErrorType2.REQ_TARGET_MAX_ATTACK:
+                    card.needWithMaxAttackValueOf = param;
+                    break;
+                case CardDB.ErrorType2.REQ_TARGET_MIN_ATTACK:
+                    card.needWithMinAttackValueOf = param;
+                    break;
+                case CardDB.ErrorType2.REQ_TARGET_EXACT_ATTACK:
+                    card.needWithExactAttackValueOf = param;
+                    break;
+                case CardDB.ErrorType2.REQ_MINIMUM_CORPSES:
+                    card.needWithMinimumCorpeses = param;
+                    break;
+                case CardDB.ErrorType2.REQ_TARGET_WITH_RACE:
+                    card.needRaceForPlaying = param;
+                    break;
+                case CardDB.ErrorType2.REQ_FRIENDLY_MINION_OF_RACE_IN_HAND:
+                    card.needRaceInHand = param;
+                    break;
+                case CardDB.ErrorType2.REQ_NUM_MINION_SLOTS:
+                    card.needEmptyPlacesForPlaying = param;
+                    break;
+                case CardDB.ErrorType2.REQ_MINION_CAP_IF_TARGET_AVAILABLE:
+                    card.needMinionsCapIfAvailable = param;
+                    break;
+                case CardDB.ErrorType2.REQ_MINIMUM_ENEMY_MINIONS:
+                    card.needMinNumberOfEnemy = param;
+                    break;
+                case CardDB.ErrorType2.REQ_MINIMUM_TOTAL_MINIONS:
+                    card.needMinTotalMinions = param;
+                    break;
+                case CardDB.ErrorType2.REQ_TARGET_IF_AVAILABLE_AND_MINIMUM_FRIENDLY_MINIONS:
+                    card.needMinOwnMinions = param;
+                    break;
+                case CardDB.ErrorType2.REQ_TARGET_IF_AVAILABLE_AND_MINIMUM_FRIENDLY_SECRETS:
+                    card.needControlaSecret = param;
+                    break;
+                case CardDB.ErrorType2.REQ_TARGET_MUST_HAVE_TAG:
+                    card.needTagForPlaying = (CardDB.Specialtags)param;
+                    break;
             }
         }
     }

@@ -506,24 +506,6 @@ def Execute():
                         throw new Exception("The SettingsControl could not be created.");
                     }
 
-                    // 快速模式
-                    if (
-                        !Wpf.SetupComboBoxItemsBinding(root, "fastModeComboBox", "AllFastModes",
-                            BindingMode.OneWay, DefaultRoutineSettings.Instance))
-                    {
-                        Log.DebugFormat(
-                            "[SettingsControl] SetupComboBoxItemsBinding failed for 'fastModeComboBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (
-                        !Wpf.SetupComboBoxSelectedItemBinding(root, "fastModeComboBox",
-                            "FastModeString", BindingMode.TwoWay, DefaultRoutineSettings.Instance))
-                    {
-                        Log.DebugFormat(
-                            "[SettingsControl] SetupComboBoxSelectedItemBinding failed for 'fastModeComboBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
 
                     var openButton = Wpf.FindControlByName<Button>(root, "lastMatch");
                     openButton.Click += LastMatchOnClick;
@@ -1050,7 +1032,7 @@ def Execute():
 
                     Log.WarnFormat("处于回溯状态");
 
-                    if (RewindUIManager.Get().rewindButton == null || RewindUIManager.Get().keepButton == null)
+                    if (RewindUIManager.Get().m_rewindButton == null || RewindUIManager.Get().m_keepButton == null)
                     {
                         Log.WarnFormat("回溯或保持当前时间线按钮位空");
                         return;
@@ -1127,7 +1109,7 @@ def Execute():
             {
                 Log.Info("处于选择模式...");
 
-                await Coroutine.Sleep(222) + makeChoice();
+                await Coroutine.Sleep(222 + makeChoice());
                 switch (dirtychoice)
                 {
                     case 0:
