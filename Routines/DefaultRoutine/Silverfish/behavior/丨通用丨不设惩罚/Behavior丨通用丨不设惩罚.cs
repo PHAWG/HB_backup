@@ -98,6 +98,10 @@ namespace HREngine.Bots
                         continue;
                     // 英雄攻击
                     case actionEnum.attackWithHero:
+                        if(p.ownWeapon.card.cardIDenum == CardDB.cardIDEnum.AIBot_DruidTrainee_002_hb)
+                        {
+                            a.penalty -= 1000;
+                        }
                         continue;
                     case actionEnum.useHeroPower:
                         a.penalty -= 50;
@@ -108,7 +112,7 @@ namespace HREngine.Bots
                     default:
                         continue;
                 }
-                switch (a.card.card.nameCN)
+                switch (a.hc.card.nameCN)
                 {
                     case CardDB.cardNameCN.幸运币:
                         retval -= i;
@@ -393,7 +397,6 @@ namespace HREngine.Bots
             }
             return penalty;
         }
-
         /// <summary>
         /// 获取使用泰坦技能的惩罚值
         /// </summary>

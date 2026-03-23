@@ -47,7 +47,7 @@ namespace HREngine.Bots
         }
 
         //英雄攻击惩罚
-        public override int getAttackWithHeroPenality(Minion target, Playfield p) // 奥秘法没有英雄带刀进攻
+        public override int getAttackWithHeroPenality(Playfield p, Minion hero, Minion target) // 奥秘法没有英雄带刀进攻
         {
             if (target.untouchable)
                 return 1000;
@@ -82,12 +82,12 @@ namespace HREngine.Bots
                 {
                     Action a = p.playactions[i];
                     // 设置爆炸陷阱的情况下不下怪
-                    if (a.actionType == actionEnum.playcard && a.card.card.type == CardDB.cardtype.MOB && !a.card.card.Charge && !a.card.card.Stealth)
+                    if (a.actionType == actionEnum.playcard && a.hc.card.type == CardDB.cardtype.MOB && !a.hc.card.Charge && !a.hc.card.Stealth)
                     {
                         return -15000; // 不可接受，抛弃本牌面以及子牌面
                     }
                     // 不打对手随从
-                    if (a.actionType == actionEnum.playcard && (a.card.card.nameCN == CardDB.cardNameCN.杀戮命令 || a.card.card.nameCN == CardDB.cardNameCN.奥术射击) && a.target != null && a.target != p.enemyHero && a.target.Hp <= 2)
+                    if (a.actionType == actionEnum.playcard && (a.hc.card.nameCN == CardDB.cardNameCN.杀戮命令 || a.hc.card.nameCN == CardDB.cardNameCN.奥术射击) && a.target != null && a.target != p.enemyHero && a.target.Hp <= 2)
                     {
                         return -15000; // 不可接受，抛弃本牌面以及子牌面
                     }
@@ -131,7 +131,7 @@ namespace HREngine.Bots
                         Action a = p.playactions[i];
                         if (a.actionType == actionEnum.playcard)
                         {
-                            if (a.card.card.type == CardDB.cardtype.MOB) //出了随从
+                            if (a.hc.card.type == CardDB.cardtype.MOB) //出了随从
                                 return -15000; // 不可接受，抛弃本牌面以及子牌面
                         }
                     }

@@ -57,10 +57,11 @@ namespace HREngine.Bots
         /// <summary>
         /// 英雄攻击评分
         /// </summary>
-        /// <param name="target"></param>
         /// <param name="p"></param>
+        /// <param name="hero"></param>
         /// <returns></returns>
-        public override int getAttackWithHeroPenality(Minion target, Playfield p)
+        /// <param name="target"></param>
+        public override int getAttackWithHeroPenality(Playfield p, Minion hero, Minion target)
         {
             if (target.untouchable)
                 return 1000;
@@ -131,13 +132,13 @@ namespace HREngine.Bots
                 Action a = p.playactions[i];
                 if (a.actionType == actionEnum.playcard)
                 {
-                    if (a.card.card.nameCN == CardDB.cardNameCN.幸运币) flag |= 1;
-                    if (a.card.card.nameCN == CardDB.cardNameCN.空降歹徒) flag |= 2;
-                    if (a.card.card.nameCN == CardDB.cardNameCN.洞穴探宝者) flag |= 2;
-                    if (a.card.card.nameCN == CardDB.cardNameCN.匕首精通) flag |= 2;
+                    if (a.hc.card.nameCN == CardDB.cardNameCN.幸运币) flag |= 1;
+                    if (a.hc.card.nameCN == CardDB.cardNameCN.空降歹徒) flag |= 2;
+                    if (a.hc.card.nameCN == CardDB.cardNameCN.洞穴探宝者) flag |= 2;
+                    if (a.hc.card.nameCN == CardDB.cardNameCN.匕首精通) flag |= 2;
 
-                    if (a.card.card.nameCN == CardDB.cardNameCN.船载火炮) first = i;
-                    if (a.card.card.nameCN == CardDB.cardNameCN.空中炮艇) first = i;
+                    if (a.hc.card.nameCN == CardDB.cardNameCN.船载火炮) first = i;
+                    if (a.hc.card.nameCN == CardDB.cardNameCN.空中炮艇) first = i;
                 }
             }
             if (flag == 3) return -15000;
@@ -145,7 +146,7 @@ namespace HREngine.Bots
             for (int i = 0; i < first; i++)
             {
                 Action a = p.playactions[i];
-                if (a.actionType == actionEnum.playcard && a.card.card.race == CardDB.Race.PIRATE) return -15000;
+                if (a.actionType == actionEnum.playcard && a.hc.card.race == CardDB.Race.PIRATE) return -15000;
             }
             if (p.enemySecretCount == 0)
                 return 0;
@@ -183,7 +184,7 @@ namespace HREngine.Bots
                     for (int i = 0; i < first_attack_hero; i++)
                     {
                         Action a = p.playactions[i];
-                        if (a.actionType == actionEnum.playcard && a.card.card.type == CardDB.cardtype.MOB)
+                        if (a.actionType == actionEnum.playcard && a.hc.card.type == CardDB.cardtype.MOB)
                         {
                             playCardBefore = true;
                         }
@@ -247,7 +248,7 @@ namespace HREngine.Bots
                         Action a = p.playactions[i];
                         if (a.actionType == actionEnum.playcard)
                         {
-                            if (a.card.card.type == CardDB.cardtype.MOB) //出了随从
+                            if (a.hc.card.type == CardDB.cardtype.MOB) //出了随从
                                 return -15000; // 不可接受，抛弃本牌面以及子牌面
                         }
                     }

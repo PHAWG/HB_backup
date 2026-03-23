@@ -1902,7 +1902,7 @@ namespace HREngine.Bots
                     switch (a.actionType)
                     {
                         case actionEnum.playcard:
-                            retval += a.card.entity;
+                            retval += a.hc.entity;
                             if (a.target != null)
                             {
                                 retval += a.target.entitiyID;
@@ -1932,7 +1932,7 @@ namespace HREngine.Bots
                             continue;
                     }
                 }
-                if (this.playactions[this.playactions.Count - 1].card != null && this.playactions[this.playactions.Count - 1].card.card.type == CardDB.cardtype.MOB) retval++;
+                if (this.playactions[this.playactions.Count - 1].hc != null && this.playactions[this.playactions.Count - 1].hc.card.type == CardDB.cardtype.MOB) retval++;
                 retval += this.manaTurnEnd;
             }
 
@@ -4172,7 +4172,7 @@ namespace HREngine.Bots
                 case actionEnum.playcard:
                     if (this.isOwnTurn)
                     {
-                        PlayACard(a.card, a.target, a.place, a.druidchoice, a.penalty); // 打出一张卡牌
+                        PlayACard(a.hc, a.target, a.place, a.druidchoice, a.penalty); // 打出一张卡牌
                         // HandleTamsinRoameEffect(a); // 处2理塔姆辛·罗姆的效果
                         HandlePatchesSummon(a); // 处理帕奇斯召唤
                         HandleQuestCompletion(); // 处理任务完成
@@ -4269,14 +4269,14 @@ namespace HREngine.Bots
         /// </summary>
         private Handmanager.Handcard FindHandCard(Action aa)
         {
-            if (aa.card == null) return null;
+            if (aa.hc == null) return null;
 
             if (aa.actionType == actionEnum.useHeroPower)
             {
                 return this.isOwnTurn ? this.ownHeroAblility : this.enemyHeroAblility;
             }
 
-            return this.owncards.FirstOrDefault(hh => hh.entity == aa.card.entity);
+            return this.owncards.FirstOrDefault(hh => hh.entity == aa.hc.entity);
         }
 
         /// <summary>
@@ -4304,11 +4304,11 @@ namespace HREngine.Bots
         /// </summary>
         private void HandleTamsinRoameEffect(Action a)
         {
-            if (this.anzTamsinroame > 0 && a.card.card.SpellSchool == CardDB.SpellSchool.SHADOW && a.card.card.getManaCost(this, a.card.getManaCost(this)) > 0)
+            if (this.anzTamsinroame > 0 && a.hc.card.SpellSchool == CardDB.SpellSchool.SHADOW && a.hc.card.getManaCost(this, a.hc.getManaCost(this)) > 0)
             {
                 for (int i = 0; i < this.anzTamsinroame; i++)
                 {
-                    this.drawACard(a.card.card.cardIDenum, true, true);
+                    this.drawACard(a.hc.card.cardIDenum, true, true);
                     this.owncards[this.owncards.Count - 1].manacost = 0;
                     this.evaluatePenality -= 10;
                 }
@@ -4320,7 +4320,7 @@ namespace HREngine.Bots
         /// </summary>
         private void HandlePatchesSummon(Action a)
         {
-            if (patchesInDeck && (a.card.card.race == CardDB.Race.PIRATE || a.card.card.race == CardDB.Race.ALL))
+            if (patchesInDeck && (a.hc.card.race == CardDB.Race.PIRATE || a.hc.card.race == CardDB.Race.ALL))
             {
                 if (this.ownMinions.Any(m => m.handcard.card.nameCN == CardDB.cardNameCN.海盗帕奇斯) ||
                     this.owncards.Any(hc => hc.card.nameCN == CardDB.cardNameCN.海盗帕奇斯))
@@ -4361,17 +4361,17 @@ namespace HREngine.Bots
         /// </summary>
         private void HandleTrade(Action a)
         {
-            this.mana -= a.card.card.TradeCost;
+            this.mana -= a.hc.card.TradeCost;
             this.drawACard(CardDB.cardIDEnum.None, true);
-            removeCard(a.card);
+            removeCard(a.hc);
 
-            if (this.prozis.turnDeck.ContainsKey(a.card.card.cardIDenum))
+            if (this.prozis.turnDeck.ContainsKey(a.hc.card.cardIDenum))
             {
-                this.prozis.turnDeck[a.card.card.cardIDenum]++;
+                this.prozis.turnDeck[a.hc.card.cardIDenum]++;
             }
             else
             {
-                this.prozis.turnDeck.Add(a.card.card.cardIDenum, 1);
+                this.prozis.turnDeck.Add(a.hc.card.cardIDenum, 1);
             }
         }
 
@@ -4381,8 +4381,8 @@ namespace HREngine.Bots
         /// <param name="a"></param>
         private void HandleForge(Action a)
         {
-            this.mana -= a.card.card.ForgeCost;
-            a.card.card = CardDB.Instance.getCardDataFromDbfID(a.card.card.CollectionRelatedCardDataBaseId.ToString());
+            this.mana -= a.hc.card.ForgeCost;
+            a.hc.card = CardDB.Instance.getCardDataFromDbfID(a.hc.card.CollectionRelatedCardDataBaseId.ToString());
             // a.card.card.Forged = true;
         }
 
@@ -12402,7 +12402,7 @@ namespace HREngine.Bots
         {
             if (a.actionType == actionEnum.playcard)
             {
-                Helpfunctions.Instance.ErrorLog("printActionforDummies - play " + a.card.card.nameEN);
+                Helpfunctions.Instance.ErrorLog("printActionforDummies - play " + a.hc.card.nameEN);
                 if (a.druidchoice >= 1)
                 {
                     string choose = (a.druidchoice == 1) ? "left card" : "right card";

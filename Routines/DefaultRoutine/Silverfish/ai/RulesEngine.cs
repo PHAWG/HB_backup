@@ -1024,17 +1024,17 @@ namespace HREngine.Bots
                 switch (a.actionType)
                 {
                     case actionEnum.playcard:
-                        cardID = a.card.card.cardIDenum;
+                        cardID = a.hc.card.cardIDenum;
                         if (CardIdRulesGame.ContainsKey(cardID))
                         {
                             possibleRules.AddRange(CardIdRulesGame[cardID].Keys);
                             if (playedCardsWRule.ContainsKey(cardID))
                             {
-                                playedCardsWRule[cardID].Add(new actUnit(cardID, a, a.card.entity));
+                                playedCardsWRule[cardID].Add(new actUnit(cardID, a, a.hc.entity));
                             }
                             else
                             {
-                                playedCardsWRule.Add(cardID, new List<actUnit> { new actUnit(cardID, a, a.card.entity) });
+                                playedCardsWRule.Add(cardID, new List<actUnit> { new actUnit(cardID, a, a.hc.entity) });
                                 playedCardsWRulePen.Add(cardID, 0);
                             }
                         }

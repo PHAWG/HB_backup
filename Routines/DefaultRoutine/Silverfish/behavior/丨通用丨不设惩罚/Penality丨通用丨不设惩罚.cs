@@ -28,12 +28,14 @@ namespace HREngine.Bots
         }
 
         //英雄攻击惩罚
-        public override int getAttackWithHeroPenality(Minion target, Playfield p) 
+        public override int getAttackWithHeroPenality(Playfield p, Minion hero, Minion target)
         {
             if (target.untouchable)
                 return 1000;
             int pen = -10;
-            if (target.isHero && p.calTotalAngr() >= p.enemyHero.Hp) return -1000;
+            if (hero.Hp <= 15) return 1000;
+            if (target.Angr > 6) return target.Angr;
+            if (target.isHero && p.calTotalAngr() >= p.enemyHero.Hp) return 1000;
             return pen;
         }
 

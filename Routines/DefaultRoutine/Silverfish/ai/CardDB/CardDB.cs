@@ -1523,7 +1523,7 @@ namespace HREngine.Bots
                             {
                                 if (a.actionType == actionEnum.playcard)
                                 {
-                                    switch (a.card.card.nameEN)
+                                    switch (a.hc.card.nameEN)
                                     {
                                         case cardNameEN.tuskarrtotemic: retval -= p.ownBrannBronzebeard + 1; break;
                                         case cardNameEN.splittingaxe://分裂战斧
@@ -1535,13 +1535,13 @@ namespace HREngine.Bots
                                             retval -= ownTotemsCount;
                                             break;
                                         default:
-                                            if ((TAG_RACE)a.card.card.race == TAG_RACE.TOTEM) retval--;
+                                            if ((TAG_RACE)a.hc.card.race == TAG_RACE.TOTEM) retval--;
                                             break;
                                     }
                                 }
                                 else if (a.actionType == actionEnum.useHeroPower)
                                 {
-                                    switch (a.card.card.nameEN)
+                                    switch (a.hc.card.nameEN)
                                     {
                                         case cardNameEN.totemiccall: retval--; break;
                                         case cardNameEN.totemicslam: retval--; break;

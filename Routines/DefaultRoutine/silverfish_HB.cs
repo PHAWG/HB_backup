@@ -1196,7 +1196,7 @@ namespace HREngine.Bots
                     hc.SCRIPT_DATA_NUM_2 = entity.GetTag(GAME_TAG.TAG_SCRIPT_DATA_NUM_2);
                     hc.temporary = entity.GetTag(3630) > 0;
                     hc.valeeraShadow = entity.GetTag(779) > 0;
-                    // entity.GetTag(GAME_TAG.LITERALLY_UNPLAYABLE);//无法使用
+                    hc.literallyUnplayable = entity.HasTag(GAME_TAG.LITERALLY_UNPLAYABLE);//无法使用
                     // entity.GetTag(GAME_TAG.UNPLAYABLE_VISUALS);
                     hc.addattack = entity.GetATK() - entity.GetDefATK();
                     hc.addHp = entity.GetHealth() - entity.GetDefHealth();

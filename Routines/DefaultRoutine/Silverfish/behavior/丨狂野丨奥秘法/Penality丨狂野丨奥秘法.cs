@@ -32,7 +32,7 @@ namespace HREngine.Bots
             return ret;
         }
         //英雄攻击惩罚
-        public override int getAttackWithHeroPenality(Minion target, Playfield p) // 奥秘法没有英雄带刀进攻
+        public override int getAttackWithHeroPenality(Playfield p, Minion hero, Minion target) // 奥秘法没有英雄带刀进攻
         {
             return 0;
         }

@@ -124,7 +124,7 @@ namespace HREngine.Bots
             foreach (Handmanager.Handcard hc in p.owncards)
             {
                 // 跳过未知卡牌和隐藏费用的卡牌
-                if (hc.card.nameEN == CardDB.cardNameEN.unknown || hc.card.HideCost) continue;
+                if (hc.literallyUnplayable || hc.card.nameEN == CardDB.cardNameEN.unknown || hc.card.HideCost) continue;
 
                 // 随从和地标卡牌需要检查场上随从数量上限（7个）
                 if (hc.card.type == CardDB.cardtype.MOB || hc.card.type == CardDB.cardtype.LOCATION)
@@ -269,7 +269,7 @@ namespace HREngine.Bots
             hero.updateReadyness();
 
             // 检查英雄是否可以攻击（已就绪且有攻击力）
-            if ((own && p.ownHero.Ready && p.ownHero.Angr >= 1) || (!own && p.enemyHero.Ready && p.enemyHero.Angr >= 1))
+            if (hero.Ready)
             {
                 foreach (Minion target in targets)
                 {
@@ -277,7 +277,7 @@ namespace HREngine.Bots
                     if ((own ? p.ownWeapon.cantAttackHeroes : p.enemyWeapon.cantAttackHeroes) && target.isHero) continue;
 
                     // 计算英雄攻击惩罚值
-                    int heroAttackPen = usePenalityManager ? pen.getAttackWithHeroPenality(target, p) : 0;
+                    int heroAttackPen = usePenalityManager ? pen.getAttackWithHeroPenality(p, hero, target) : 0;
                     // 惩罚值<=499的动作才添加
                     if (heroAttackPen <= 499)
                     {
@@ -304,11 +304,11 @@ namespace HREngine.Bots
             {
                 CardDB.Card c = p.ownHeroAblility.card;
                 // 抉择类英雄技能有两个选择，普通英雄技能只有一个
-                int choiceCount = c.choice ? 2 : 1;
+                int choiceCount = c.choice ? 2 : 0;
                 // 获取英雄技能的有效目标
                 targets = p.ownHeroAblility.card.getTargetsForHeroPower(p, true);
 
-                for (int choice = 1; choice <= choiceCount; choice++)
+                for (int choice = c.choice ? 1 : 0; choice <= choiceCount; choice++)
                 {
                     CardDB.Card chosenCard = c;
 

@@ -37,7 +37,7 @@ namespace HREngine.Bots
         }
 
         //英雄攻击惩罚
-        public override int getAttackWithHeroPenality(Minion target, Playfield p)
+        public override int getAttackWithHeroPenality(Playfield p, Minion hero, Minion target)
         {
             if(p.ownWeapon.card.nameCN == CardDB.cardNameCN.石雕凿刀)
             {
@@ -90,7 +90,7 @@ namespace HREngine.Bots
                     for (int i = 0; i < first_attack_hero; i++)
                     {
                         Action a = p.playactions[i];
-                        if (a.actionType == actionEnum.playcard && a.card.card.type == CardDB.cardtype.MOB)
+                        if (a.actionType == actionEnum.playcard && a.hc.card.type == CardDB.cardtype.MOB)
                         {
                             playCardBefore = true;
                         }
@@ -154,7 +154,7 @@ namespace HREngine.Bots
                         Action a = p.playactions[i];
                         if (a.actionType == actionEnum.playcard)
                         {
-                            if (a.card.card.type == CardDB.cardtype.MOB) //出了随从
+                            if (a.hc.card.type == CardDB.cardtype.MOB) //出了随从
                                 return -15000; // 不可接受，抛弃本牌面以及子牌面
                         }
                     }

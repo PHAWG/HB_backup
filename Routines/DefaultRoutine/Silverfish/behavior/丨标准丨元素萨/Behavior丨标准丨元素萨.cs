@@ -847,7 +847,7 @@ namespace HREngine.Bots
                 }
         
                 //// 出牌排序优先
-                switch (a.card.card.nameCN)
+                switch (a.hc.card.nameCN)
                 {
                     
                     

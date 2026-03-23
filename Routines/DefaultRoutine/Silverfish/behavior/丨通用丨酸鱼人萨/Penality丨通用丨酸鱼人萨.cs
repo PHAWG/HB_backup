@@ -74,7 +74,7 @@ namespace HREngine.Bots
         }
 
         //英雄攻击惩罚
-        public override int getAttackWithHeroPenality(Minion target, Playfield p) // 奥秘法没有英雄带刀进攻
+        public override int getAttackWithHeroPenality(Playfield p, Minion hero, Minion target) // 奥秘法没有英雄带刀进攻
         {
             int pen = -10;
             // 谁莫名其妙给我设置了 16 点杀怪奖励？
@@ -133,7 +133,7 @@ namespace HREngine.Bots
                         {
                             playCardBefore = true;
                         }
-                        if (a.actionType == actionEnum.playcard && (a.card.card.nameCN == CardDB.cardNameCN.鱼人恩典 || a.card.card.nameCN == CardDB.cardNameCN.鱼勇可贾))
+                        if (a.actionType == actionEnum.playcard && (a.hc.card.nameCN == CardDB.cardNameCN.鱼人恩典 || a.hc.card.nameCN == CardDB.cardNameCN.鱼勇可贾))
                         {
                             int savedMinion = 0;
                             foreach(Minion m in p.ownMinions)
@@ -161,7 +161,7 @@ namespace HREngine.Bots
                         Action a = p.playactions[i];
                         if (a.actionType == actionEnum.playcard)
                         {
-                            if (a.card.card.nameCN == CardDB.cardNameCN.鱼人恩典 || a.card.card.nameCN == CardDB.cardNameCN.鱼勇可贾)
+                            if (a.hc.card.nameCN == CardDB.cardNameCN.鱼人恩典 || a.hc.card.nameCN == CardDB.cardNameCN.鱼勇可贾)
                                 return -15000; // 不可接受，抛弃本牌面以及子牌面
                         }
                         if (a.actionType == actionEnum.attackWithMinion && !a.target.isHero && a.own.Hp < 3 && !a.own.divineshild)
@@ -248,7 +248,7 @@ namespace HREngine.Bots
                         Action a = p.playactions[i];
                         if (a.actionType == actionEnum.playcard)
                         {
-                            if (a.card.card.type == CardDB.cardtype.MOB) //出了随从
+                            if (a.hc.card.type == CardDB.cardtype.MOB) //出了随从
                                 return -15000; // 不可接受，抛弃本牌面以及子牌面
                         }
                     }

@@ -1878,7 +1878,7 @@ namespace HREngine.Bots
             }
             else if (doneMove.actionType == actionEnum.playcard)
             {
-                if (doneMove.card.card.type == CardDB.cardtype.SPELL)
+                if (doneMove.hc.card.type == CardDB.cardtype.SPELL)
                 {
                     cattrick = true;
                     counterspell = true;

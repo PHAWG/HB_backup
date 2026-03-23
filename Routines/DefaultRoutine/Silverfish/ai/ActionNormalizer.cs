@@ -13,12 +13,12 @@ namespace HREngine.Bots
         /// 惩罚管理器实例 - 用于获取伤害相关的数据库
         /// </summary>
         PenalityManager penman = PenalityManager.Instance;
-        
+
         /// <summary>
         /// 辅助功能实例 - 用于日志记录等操作
         /// </summary>
         Helpfunctions help = Helpfunctions.Instance;
-        
+
         /// <summary>
         /// 设置实例 - 用于获取AI设置参数
         /// </summary>
@@ -33,7 +33,7 @@ namespace HREngine.Bots
             /// 目标实体ID
             /// </summary>
             public int targetEntity;
-            
+
             /// <summary>
             /// 受到的伤害值
             /// </summary>
@@ -77,10 +77,10 @@ namespace HREngine.Bots
             {
                 // 如果当前场地值低于10000，说明不是致命伤害场景，不调整
                 if (Ai.Instance.botBase.getPlayfieldValue(p) < 10000) return;
-                
+
                 // 创建临时游戏状态用于模拟
                 Playfield tmpPf = new Playfield();
-                
+
                 // 如果敌方有嘲讽随从，无法直接攻击敌方英雄，不调整
                 if (tmpPf.anzEnemyTaunt > 0) return;
 
@@ -88,12 +88,12 @@ namespace HREngine.Bots
                 Dictionary<Action, int> actDmgDict = new Dictionary<Action, int>();
                 // 初始化敌方英雄血量为30
                 tmpPf.enemyHero.Hp = 30;
-                
+
                 try
                 {
                     // 记录英雄技能和英雄攻击的使用次数
                     int useability = 0;
-                    
+
                     // 遍历所有动作，计算每个动作对敌方英雄造成的伤害
                     foreach (Action a in p.playactions)
                     {
@@ -101,7 +101,7 @@ namespace HREngine.Bots
                         if (a.actionType == actionEnum.useHeroPower) useability = 1;
                         // 如果使用英雄攻击，次数加1
                         if (a.actionType == actionEnum.attackWithHero) useability++;
-                        
+
                         // 记录当前敌方英雄的总生命值（血量+护甲）
                         int actDmd = tmpPf.enemyHero.Hp + tmpPf.enemyHero.armor;
                         // 执行动作
@@ -111,7 +111,7 @@ namespace HREngine.Bots
                         // 将动作和对应的伤害添加到字典中
                         actDmgDict.Add(a, actDmd);
                     }
-                    
+
                     // 如果英雄技能和英雄攻击的使用次数超过1，不调整
                     if (useability > 1) return;
                 }
@@ -158,7 +158,7 @@ namespace HREngine.Bots
                 // 标记是否在AOE伤害前有随机伤害
                 bool rndBeforeDamageAll = false;
                 Action aa;
-                
+
                 // 第一次遍历，检查是否有随机伤害和AOE伤害的组合
                 for (int i = 0; i < p.playactions.Count; i++)
                 {
@@ -167,9 +167,9 @@ namespace HREngine.Bots
                     {
                         case actionEnum.playcard:
                             // 如果已经有随机伤害，且当前是AOE伤害，则标记为随机伤害在AOE伤害前
-                            if (damageRandom && penman.DamageAllEnemysDatabase.ContainsKey(aa.card.card.nameEN)) rndBeforeDamageAll = true;
+                            if (damageRandom && penman.DamageAllEnemysDatabase.ContainsKey(aa.hc.card.nameEN)) rndBeforeDamageAll = true;
                             // 如果当前是随机伤害，标记为有随机伤害
-                            else if (penman.DamageRandomDatabase.ContainsKey(aa.card.card.nameEN)) damageRandom = true;
+                            else if (penman.DamageRandomDatabase.ContainsKey(aa.hc.card.nameEN)) damageRandom = true;
                             break;
                     }
                 }
@@ -183,7 +183,7 @@ namespace HREngine.Bots
                 // 存储随机伤害动作的列表
                 List<Action> rndAct = new List<Action>();
                 List<Action> rndActTmp = new List<Action>();
-                
+
                 // 第二次遍历，调整动作顺序
                 for (int i = 0; i < p.playactions.Count; i++)
                 {
@@ -192,22 +192,22 @@ namespace HREngine.Bots
                     aa = p.playactions[i];
                     // 将当前动作添加到重排序列表
                     reorderedActions.Add(aa);
-                    
+
                     switch (aa.actionType)
                     {
                         case actionEnum.useHeroPower:
                             // 如果使用的是图腾召唤英雄技能，标记为使用了图腾召唤
-                            if (aa.card.card.nameEN == CardDB.cardNameEN.totemiccall) totemiccall = true;
+                            if (aa.hc.card.nameEN == CardDB.cardNameEN.totemiccall) totemiccall = true;
                             break;
                         case actionEnum.playcard:
                             // 如果当前是AOE伤害法术
-                            if (penman.DamageAllEnemysDatabase.ContainsKey(aa.card.card.nameEN))
+                            if (penman.DamageAllEnemysDatabase.ContainsKey(aa.hc.card.nameEN))
                             {
                                 // 如果AOE法术不在正确的位置
                                 if (i != aoeEnNum)
                                 {
                                     // 如果使用了图腾召唤且当前是法术，不调整
-                                    if (totemiccall && aa.card.card.type == CardDB.cardtype.SPELL) return;
+                                    if (totemiccall && aa.hc.card.type == CardDB.cardtype.SPELL) return;
                                     // 从当前位置移除AOE法术
                                     reorderedActions.RemoveAt(i);
                                     // 将AOE法术插入到正确的位置
@@ -219,7 +219,7 @@ namespace HREngine.Bots
                                 aoeEnNum++;
                             }
                             // 如果有随机伤害在AOE伤害前，且当前是随机伤害法术
-                            else if (rndBeforeDamageAll && aa.card.card.type == CardDB.cardtype.SPELL && penman.DamageRandomDatabase.ContainsKey(aa.card.card.nameEN))
+                            else if (rndBeforeDamageAll && aa.hc.card.type == CardDB.cardtype.SPELL && penman.DamageRandomDatabase.ContainsKey(aa.hc.card.nameEN))
                             {
                                 // 标记为随机伤害
                                 damageRandom = true;
@@ -230,14 +230,14 @@ namespace HREngine.Bots
 
                                 // 存储随机伤害的目标和伤害值
                                 Dictionary<int, int> actIdDmg = new Dictionary<int, int>();
-                                
+
                                 // 检查敌方英雄是否受到伤害
-                                if (tmp.enemyHero.Hp != tmpPlOld.enemyHero.Hp) 
+                                if (tmp.enemyHero.Hp != tmpPlOld.enemyHero.Hp)
                                     actIdDmg.Add(tmpPlOld.enemyHero.entitiyID, tmp.enemyHero.Hp - tmpPlOld.enemyHero.Hp);
                                 // 检查己方英雄是否受到伤害
-                                if (tmp.ownHero.Hp != tmpPlOld.ownHero.Hp) 
+                                if (tmp.ownHero.Hp != tmpPlOld.ownHero.Hp)
                                     actIdDmg.Add(tmpPlOld.ownHero.entitiyID, tmp.ownHero.Hp - tmpPlOld.ownHero.Hp);
-                                
+
                                 bool found = false;
                                 // 检查敌方随从是否受到伤害
                                 foreach (Minion m in tmp.enemyMinions)
@@ -274,7 +274,7 @@ namespace HREngine.Bots
                                     if (!found) actIdDmg.Add(m.entitiyID, m.Hp);
                                 }
                                 // 将随机伤害的结果添加到字典中
-                                rndActIdsDmg.Add(aa.card.entity, actIdDmg);
+                                rndActIdsDmg.Add(aa.hc.entity, actIdDmg);
                             }
                             break;
                     }
@@ -294,14 +294,14 @@ namespace HREngine.Bots
                     try
                     {
                         // 如果不是随机伤害法术，直接执行动作
-                        if (!(a.actionType == actionEnum.playcard && rndActIdsDmg.ContainsKey(a.card.entity)))
+                        if (!(a.actionType == actionEnum.playcard && rndActIdsDmg.ContainsKey(a.hc.entity)))
                             tmpPf.doAction(a);
                         else
                         {
                             // 如果是随机伤害法术，手动处理伤害
                             tmpPf.playactions.Add(a);
                             // 获取随机伤害的结果
-                            Dictionary<int, int> actIdDmg = rndActIdsDmg[a.card.entity];
+                            Dictionary<int, int> actIdDmg = rndActIdsDmg[a.hc.entity];
                             // 处理敌方英雄的伤害
                             if (actIdDmg.ContainsKey(tmpPf.enemyHero.entitiyID))
                                 tmpPf.minionGetDamageOrHeal(tmpPf.enemyHero, actIdDmg[tmpPf.enemyHero.entitiyID]);
@@ -342,7 +342,7 @@ namespace HREngine.Bots
                 // 如果调整后的场地值比原来低，不调整
                 if (oldval > newval) return;
             }
-            
+
             // 打印调整前的动作顺序
             help.logg("Old order of actions:");
             foreach (Action a in p.playactions) a.print();
@@ -371,25 +371,34 @@ namespace HREngine.Bots
             switch (a.actionType)
             {
                 case actionEnum.playcard:
-                    // 检查是否可以打出卡牌
-                    foreach (Handmanager.Handcard hc in p.owncards)
                     {
-                        // 找到对应的手牌
-                        if (hc.entity == a.card.entity)
+                        Handmanager.Handcard handCard = a.hc;
+                        if (handCard.literallyUnplayable) return actionFound;
+                        // 检查是否可以打出卡牌
+                        if (p.mana >= handCard.card.getManaCost(p, handCard.manacost))
+                            if (p.ownMinions.Count >= 7)
+                                if (handCard.card.type == CardDB.cardtype.MOB || handCard.card.type == CardDB.cardtype.LOCATION)
+                                    return actionFound;
+                        actionFound = true;
+                        /*foreach (Handmanager.Handcard hc in p.owncards)
                         {
-                            // 判断法力值是否足够
-                            if (p.mana >= hc.card.getManaCost(p, hc.manacost))
+                            // 找到对应的手牌
+                            if (hc.entity == a.hc.entity)
                             {
-                                // 如果随从已满且尝试打出随从或地标，则返回 false
-                                if (p.ownMinions.Count >= 7)
-                                    if (hc.card.type == CardDB.cardtype.MOB || hc.card.type == CardDB.cardtype.LOCATION)
-                                        return actionFound;
+                                // 判断法力值是否足够
+                                if (p.mana >= hc.card.getManaCost(p, hc.manacost))
+                                {
+                                    // 如果随从已满且尝试打出随从或地标，则返回 false
+                                    if (p.ownMinions.Count >= 7)
+                                        if (hc.card.type == CardDB.cardtype.MOB || hc.card.type == CardDB.cardtype.LOCATION)
+                                            return actionFound;
 
-                                // 动作可行
-                                actionFound = true;
+                                    // 动作可行
+                                    actionFound = true;
+                                }
+                                break;
                             }
-                            break;
-                        }
+                        }*/
                     }
                     break;
 
@@ -428,7 +437,7 @@ namespace HREngine.Bots
                     // 检查卡牌是否可以交易
                     foreach (Handmanager.Handcard hc in p.owncards)
                     {
-                        if (hc.entity == a.card.entity)
+                        if (hc.entity == a.hc.entity)
                         {
                             // 检查是否满足交易的条件
                             if (hc.card.Tradeable && p.mana >= hc.card.TradeCost && p.ownDeckSize > 0)
@@ -476,7 +485,7 @@ namespace HREngine.Bots
                     // 检查卡牌是否可以锻造
                     foreach (Handmanager.Handcard hc in p.owncards)
                     {
-                        if (hc.entity == a.card.entity)
+                        if (hc.entity == a.hc.entity)
                         {
                             // 检查是否满足锻造的条件
                             if (hc.card.Forge && p.mana >= hc.card.ForgeCost && !hc.card.Forged)
@@ -578,7 +587,7 @@ namespace HREngine.Bots
                 // 执行动作
                 tmpPf.doAction(a);
             }
-            
+
             // 创建迷你模拟器，用于重新计算最佳动作序列
             MiniSimulator mainTurnSimulator = new MiniSimulator(6, 3000, 0);
             // 设置第二回合模拟参数

@@ -120,7 +120,7 @@ namespace HREngine.Bots
         }
 
         //英雄攻击惩罚
-        public override int getAttackWithHeroPenality(Minion target, Playfield p)
+        public override int getAttackWithHeroPenality(Playfield p, Minion hero, Minion target)
         {
             if (target.untouchable)
                 return 1000;

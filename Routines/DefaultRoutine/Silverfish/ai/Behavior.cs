@@ -175,7 +175,7 @@ namespace HREngine.Bots
                     default:
                         continue;
                 }
-                switch (a.card.card.nameCN)
+                switch (a.hc.card.nameCN)
                 {
                     // 排序优先
                     case CardDB.cardNameCN.雷霆绽放:
@@ -190,11 +190,11 @@ namespace HREngine.Bots
                         break;
                 }
                 // 连击
-                if (a.card.card.Combo && i > 0) wasCombo++;
+                if (a.hc.card.Combo && i > 0) wasCombo++;
                 if (a.target == null) continue;
                 //save spell for all classes
                 // 法术不打脸？
-                if (a.card.card.type == CardDB.cardtype.SPELL && (a.target.isHero && !a.target.own))
+                if (a.hc.card.type == CardDB.cardtype.SPELL && (a.target.isHero && !a.target.own))
                 {
                     if (i == 0) firstSpellToEnHero = true;
                     retval -= 11;
@@ -411,7 +411,7 @@ namespace HREngine.Bots
             return 0;
         }
 
-        public virtual int getAttackWithHeroPenality(Minion target, Playfield p)
+        public virtual int getAttackWithHeroPenality(Playfield p, Minion hero, Minion target)
         {
             return 0;
         }

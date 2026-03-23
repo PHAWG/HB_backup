@@ -253,7 +253,7 @@ namespace HREngine.Bots
             }
             return ai.botBase.getAttackWithMininonPenality(m, p, target) - enfaceReward;
         }
-        public int getAttackWithHeroPenality(Minion target, Playfield p)
+        public int getAttackWithHeroPenality(Playfield p, Minion hero, Minion target)
         {
             if (target == null || target.untouchable || target.Hp <= 0) return 1000;
             int enfaceReward = 0;
@@ -261,7 +261,7 @@ namespace HREngine.Bots
             {
                 enfaceReward = printUtils.enfaceReward;
             }
-            return ai.botBase.getAttackWithHeroPenality(target, p) - enfaceReward;
+            return ai.botBase.getAttackWithHeroPenality(p, target, target) - enfaceReward;
         }
 
         public int getPlayCardPenality(CardDB.Card card, Minion target, Playfield p, Handmanager.Handcard nowHandcard)

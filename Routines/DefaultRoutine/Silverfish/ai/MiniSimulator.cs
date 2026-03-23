@@ -655,7 +655,7 @@ namespace HREngine.Bots
                                 if (a.actionType == actionEnum.playcard)
                                 {
                                     // 检查是否出了战吼相关的牌
-                                    if (pen.cardDrawBattleCryDatabase.ContainsKey(a.card.card.nameEN)) secondChance = true;
+                                    if (pen.cardDrawBattleCryDatabase.ContainsKey(a.hc.card.nameEN)) secondChance = true;
                                 }
                             }
                             // 如果有战吼相关的牌，增加价值
