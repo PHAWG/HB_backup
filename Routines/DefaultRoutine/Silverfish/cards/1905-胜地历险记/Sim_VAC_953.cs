@@ -17,13 +17,13 @@ namespace HREngine.Bots
             bool minionDied = false;
 
             // 对所有随从造成2点伤害
-            foreach (Minion m in p.ownMinions)
+            foreach (Minion m in p.ownMinions.ToArray())
             {
                 p.minionGetDamageOrHeal(m, damage);
                 if (m.Hp <= 0) minionDied = true;
             }
 
-            foreach (Minion m in p.enemyMinions)
+            foreach (Minion m in p.enemyMinions.ToArray())
             {
                 p.minionGetDamageOrHeal(m, damage);
                 if (m.Hp <= 0) minionDied = true;
@@ -32,12 +32,12 @@ namespace HREngine.Bots
             // 如果没有随从死亡，再造成2点伤害
             if (!minionDied)
             {
-                foreach (Minion m in p.ownMinions)
+                foreach (Minion m in p.ownMinions.ToArray())
                 {
                     p.minionGetDamageOrHeal(m, damage);
                 }
 
-                foreach (Minion m in p.enemyMinions)
+                foreach (Minion m in p.enemyMinions.ToArray())
                 {
                     p.minionGetDamageOrHeal(m, damage);
                 }
