@@ -42,27 +42,80 @@ namespace Triton.Bot.Logic.Bots.DefaultBot
         {
             Reload(GetSettingsFilePath(Configuration.Instance.Name,
                 string.Format("{0}.json", "DefaultBot" + GetMyHashCode())));
+            string argValue;
             if (CommandLine.Arguments.Exists("rule"))
             {
-                ConstructedGameRule = (VisualsFormatType)(int.Parse(CommandLine.Arguments.Single("rule")) + 1);
-                ilog_0.ErrorFormat("[中控设置] 传统对战模式 = {0}.", ConstructedGameRule);
+                argValue = CommandLine.Arguments.Single("rule");
+                if (!string.IsNullOrEmpty(argValue))
+                {
+                    ConstructedGameRule = (VisualsFormatType)(int.Parse(argValue) + 1);
+                    ilog_0.ErrorFormat("[中控设置] 传统对战模式 = {0}.", ConstructedGameRule);
+                }
             }
             if (CommandLine.Arguments.Exists("deck"))
             {
-                ConstructedCustomDeck = CommandLine.Arguments.Single("deck");
-                ilog_0.ErrorFormat("[中控设置] 对战卡组名称 = {0}.", ConstructedCustomDeck);
+                argValue = CommandLine.Arguments.Single("deck");
+                if (!string.IsNullOrEmpty(argValue))
+                {
+                    ConstructedCustomDeck = argValue;
+                    ilog_0.ErrorFormat("[中控设置] 对战卡组名称 = {0}.", ConstructedCustomDeck);
+                }
             }
             if (CommandLine.Arguments.Exists("width"))
             {
-                ReleaseLimit = true;
-                ReleaseLimitW = int.Parse(CommandLine.Arguments.Single("width"));
-                ilog_0.ErrorFormat("[中控设置] 炉石窗口宽度 = {0}.", ReleaseLimitW);
+                argValue = CommandLine.Arguments.Single("width");
+                if (!string.IsNullOrEmpty(argValue))
+                {
+                    ReleaseLimit = true;
+                    ReleaseLimitW = int.Parse(argValue);
+                    ilog_0.ErrorFormat("[中控设置] 炉石窗口宽度 = {0}.", ReleaseLimitW);
+                }
             }
             if (CommandLine.Arguments.Exists("height"))
             {
-                ReleaseLimit = true;
-                ReleaseLimitH = int.Parse(CommandLine.Arguments.Single("height"));
-                ilog_0.ErrorFormat("[中控设置] 炉石窗口高度 = {0}.", ReleaseLimitH);
+                argValue = CommandLine.Arguments.Single("height");
+                if (!string.IsNullOrEmpty(argValue))
+                {
+                    ReleaseLimit = true;
+                    ReleaseLimitH = int.Parse(argValue);
+                    ilog_0.ErrorFormat("[中控设置] 炉石窗口高度 = {0}.", ReleaseLimitH);
+                }
+            }
+            if (CommandLine.Arguments.Exists("keepRank"))
+            {
+                argValue = CommandLine.Arguments.Single("keepRank");
+                if (!string.IsNullOrEmpty(argValue))
+                {
+                    AutoConcedeAfterConstructedWin = argValue.Equals("1", StringComparison.OrdinalIgnoreCase) || argValue.Equals("True", StringComparison.OrdinalIgnoreCase);
+                    ilog_0.ErrorFormat("[中控设置] 保持排名 = {0}.", AutoConcedeAfterConstructedWin);
+                }
+            }
+            if (CommandLine.Arguments.Exists("winCount"))
+            {
+                argValue = CommandLine.Arguments.Single("winCount");
+                if (!string.IsNullOrEmpty(argValue))
+                {
+                    AutoConcedeNumberOfWins = int.Parse(argValue);
+                    ilog_0.ErrorFormat("[中控设置] 赢几局 = {0}.", AutoConcedeNumberOfWins);
+                }
+            }
+            if (CommandLine.Arguments.Exists("loseCount"))
+            {
+                argValue = CommandLine.Arguments.Single("loseCount");
+                if (!string.IsNullOrEmpty(argValue))
+                {
+                    AutoConcedeNumberOfLosses = int.Parse(argValue);
+                    ilog_0.ErrorFormat("[中控设置] 输几局 = {0}.", AutoConcedeNumberOfLosses);
+                }
+            }
+            if (CommandLine.Arguments.Exists("judgeOpponent"))
+            {
+                argValue = CommandLine.Arguments.Single("judgeOpponent");
+                if (!string.IsNullOrEmpty(argValue))
+                {
+                    JudgmentOpponentNameConcede = argValue.Equals("1", StringComparison.OrdinalIgnoreCase) || argValue.Equals("True", StringComparison.OrdinalIgnoreCase);
+                    ilog_0.ErrorFormat("[中控设置] 判断对面名字投降 = {0}.", JudgmentOpponentNameConcede);
+                }
             }
         }
 

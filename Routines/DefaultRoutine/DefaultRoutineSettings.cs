@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using log4net;
 using Newtonsoft.Json;
 using Triton.Bot.Settings;
@@ -40,27 +42,80 @@ namespace HREngine.Bots
         {
             Reload(GetSettingsFilePath(Configuration.Instance.Name,
                 string.Format("{0}.json", "DefaultRoutine" + GetMyHashCode())));
+            string argValue;
             if (CommandLine.Arguments.Exists("behavior"))
             {
-                string[] name =
+                argValue = CommandLine.Arguments.Single("behavior");
+                if (!string.IsNullOrEmpty(argValue))
                 {
-                    "丨通用丨不设惩罚",
-                    "丨通用丨暗牧",
-                    "丨通用丨酸鱼人萨",
-                    "丨标准丨快攻DK",
-                    "丨标准丨酸快攻德",
-                    "丨标准丨元素法",
-                    "丨标准丨元素萨",
-                    "丨狂野丨奥秘法",
-                    "丨狂野丨剑鱼贼",
-                    "丨狂野丨偶数萨",
-                    "丨狂野丨快攻暗牧",
-                    "丨狂野丨锁喉剑鱼贼",
-                    "丨过时丨任务海盗战",
-                    "丨狂野丨宇宙兽王猎",
-                };
-                DefaultBehavior = name[int.Parse(CommandLine.Arguments.Single("behavior"))];
-                Log.ErrorFormat("[中控设置] 天梯对战策略 = {0}.", DefaultBehavior);
+                    string behaviorJsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Behavior.json");
+                    string[] name = JsonConvert.DeserializeObject<string[]>(File.ReadAllText(behaviorJsonPath));
+                    DefaultBehavior = name[int.Parse(argValue)];
+                    Log.ErrorFormat("[中控设置] 天梯对战策略 = {0}.", DefaultBehavior);
+                }
+            }
+            if (CommandLine.Arguments.Exists("maxWide"))
+            {
+                argValue = CommandLine.Arguments.Single("maxWide");
+                if (!string.IsNullOrEmpty(argValue))
+                {
+                    MaxWide = int.Parse(argValue);
+                    Log.ErrorFormat("[中控设置] AI值(maxWide) = {0}.", MaxWide);
+                }
+            }
+            if (CommandLine.Arguments.Exists("maxDeep"))
+            {
+                argValue = CommandLine.Arguments.Single("maxDeep");
+                if (!string.IsNullOrEmpty(argValue))
+                {
+                    MaxDeep = int.Parse(argValue);
+                    Log.ErrorFormat("[中控设置] 最大考虑步数(maxDeep) = {0}.", MaxDeep);
+                }
+            }
+            if (CommandLine.Arguments.Exists("maxCal"))
+            {
+                argValue = CommandLine.Arguments.Single("maxCal");
+                if (!string.IsNullOrEmpty(argValue))
+                {
+                    MaxCal = int.Parse(argValue);
+                    Log.ErrorFormat("[中控设置] 每步最大保留场面数(maxCal) = {0}.", MaxCal);
+                }
+            }
+            if (CommandLine.Arguments.Exists("enfaceReward"))
+            {
+                argValue = CommandLine.Arguments.Single("enfaceReward");
+                if (!string.IsNullOrEmpty(argValue))
+                {
+                    EnfaceReward = int.Parse(argValue);
+                    Log.ErrorFormat("[中控设置] 打脸奖励(enfaceReward) = {0}.", EnfaceReward);
+                }
+            }
+            if (CommandLine.Arguments.Exists("secondTurnAmount"))
+            {
+                argValue = CommandLine.Arguments.Single("secondTurnAmount");
+                if (!string.IsNullOrEmpty(argValue))
+                {
+                    SecondTurnAmount = int.Parse(argValue);
+                    Log.ErrorFormat("[中控设置] 两回合模拟数量(secondTurnAmount) = {0}.", SecondTurnAmount);
+                }
+            }
+            if (CommandLine.Arguments.Exists("noLog"))
+            {
+                argValue = CommandLine.Arguments.Single("noLog");
+                if (!string.IsNullOrEmpty(argValue))
+                {
+                    SetLog = argValue.Equals("1", StringComparison.OrdinalIgnoreCase) || argValue.Equals("True", StringComparison.OrdinalIgnoreCase);
+                    Log.ErrorFormat("[中控设置] 不生成对战日志(noLog) = {0}.", SetLog);
+                }
+            }
+            if (CommandLine.Arguments.Exists("setTwoTurnSimulation"))
+            {
+                argValue = CommandLine.Arguments.Single("setTwoTurnSimulation");
+                if (!string.IsNullOrEmpty(argValue))
+                {
+                    SetTwoTurnSimulation = argValue.Equals("1", StringComparison.OrdinalIgnoreCase) || argValue.Equals("True", StringComparison.OrdinalIgnoreCase);
+                    Log.ErrorFormat("[中控设置] 两回合模拟(setTwoTurnSimulation) = {0}.", SetTwoTurnSimulation);
+                }
             }
         }
 
