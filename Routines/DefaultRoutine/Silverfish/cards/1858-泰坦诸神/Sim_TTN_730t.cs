@@ -11,7 +11,13 @@ namespace HREngine.Bots
 	//<b>已锻造磁力</b>。在你的回合结束时，召唤一个本随从的复制。
 	class Sim_TTN_730t : SimTemplate
 	{
-		
-		
-	}
+        public override void onTurnEndsTrigger(Playfield p, Minion triggerEffectMinion, bool turnEndOfOwner)
+        {
+            if (triggerEffectMinion.own == turnEndOfOwner)
+            {
+                p.CallMinionCopy(triggerEffectMinion, triggerEffectMinion.own);
+            }
+        }
+
+    }
 }
