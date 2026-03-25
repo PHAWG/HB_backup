@@ -4173,7 +4173,6 @@ namespace HREngine.Bots
                     if (this.isOwnTurn)
                     {
                         PlayACard(a.hc, a.target, a.place, a.druidchoice, a.penalty); // 打出一张卡牌
-                        // HandleTamsinRoameEffect(a); // 处2理塔姆辛·罗姆的效果
                         HandlePatchesSummon(a); // 处理帕奇斯召唤
                         HandleQuestCompletion(); // 处理任务完成
                     }
@@ -4296,22 +4295,6 @@ namespace HREngine.Bots
             if (a.own != null && a.own.Hp >= 1)
             {
                 minionAttacksMinion(a.own, target);
-            }
-        }
-
-        /// <summary>
-        /// 处理塔姆辛·罗姆的特效。
-        /// </summary>
-        private void HandleTamsinRoameEffect(Action a)
-        {
-            if (this.anzTamsinroame > 0 && a.hc.card.SpellSchool == CardDB.SpellSchool.SHADOW && a.hc.card.getManaCost(this, a.hc.getManaCost(this)) > 0)
-            {
-                for (int i = 0; i < this.anzTamsinroame; i++)
-                {
-                    this.drawACard(a.hc.card.cardIDenum, true, true);
-                    this.owncards[this.owncards.Count - 1].manacost = 0;
-                    this.evaluatePenality -= 10;
-                }
             }
         }
 
@@ -5676,6 +5659,8 @@ namespace HREngine.Bots
         private void HandleHeroPlay(Handmanager.Handcard hc, int choice)
         {
 
+            hc.card.sim_card.onCardPlay(this, this.ownHero, hc.target, choice, hc);
+            this.minionGetArmor(this.ownHero, hc.card.armor);
             hc.card.sim_card.getBattlecryEffect(this, this.ownHero, hc.target, choice);
             if (this.ownBrannBronzebeard > 0)
             {
@@ -5684,9 +5669,6 @@ namespace HREngine.Bots
                     hc.card.sim_card.getBattlecryEffect(this, this.ownHero, hc.target, choice);
                 }
             }
-            hc.card.sim_card.onCardPlay(this, this.ownHero, hc.target, choice, hc);
-            this.setNewHeroPower(CardDB.Instance.getCardDataFromDbfID(hc.card.heroPower.ToString()).cardIDenum, true);
-            this.minionGetArmor(this.ownHero, hc.card.armor);
             Minion hero = new Minion
             {
                 Hp = ownHero.Hp,
@@ -5697,6 +5679,7 @@ namespace HREngine.Bots
                 own = true,
                 isHero = true,
                 entitiyID = hc.entity,
+                frozen = false,
                 // playedThisTurn = true,
                 // numAttacksThisTurn = 0,
                 divineshild = ownHero.divineshild,
@@ -5707,6 +5690,8 @@ namespace HREngine.Bots
             };
             ownHero = hero;
             ownHeroStartClass = hero.cardClass;
+            this.setNewHeroPower(CardDB.Instance.getCardDataFromDbfID(hc.card.heroPower.ToString()).cardIDenum, true);
+
 
         }
 
@@ -6182,6 +6167,83 @@ namespace HREngine.Bots
             {
                 doDmgTriggers(); // 递归调用以处理新触发的事件
             }
+
+            // 清理针对已死亡随从的无效action
+            RemoveInvalidActions();
+        }
+
+        /// <summary>
+        /// 移除针对已死亡随从的无效action
+        /// </summary>
+        private void RemoveInvalidActions()
+        {
+            if (this.playactions.Count == 0) return;
+
+            List<Action> validActions = new List<Action>();
+
+            foreach (Action a in this.playactions)
+            {
+                bool isValid = true;
+
+                // 检查目标是否还存在
+                if (a.target != null && !a.target.isHero)
+                {
+                    bool targetExists = false;
+
+                    foreach (Minion m in this.ownMinions)
+                    {
+                        if (m.entitiyID == a.target.entitiyID)
+                        {
+                            targetExists = true;
+                            break;
+                        }
+                    }
+
+                    if (!targetExists)
+                    {
+                        foreach (Minion m in this.enemyMinions)
+                        {
+                            if (m.entitiyID == a.target.entitiyID)
+                            {
+                                targetExists = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!targetExists)
+                    {
+                        isValid = false;
+                    }
+                }
+
+                // 检查执行者是否还存在（对于随从攻击）
+                if (isValid && a.own != null && !a.own.isHero)
+                {
+                    bool ownExists = false;
+
+                    foreach (Minion m in this.ownMinions)
+                    {
+                        if (m.entitiyID == a.own.entitiyID)
+                        {
+                            ownExists = true;
+                            break;
+                        }
+                    }
+
+                    if (!ownExists)
+                    {
+                        isValid = false;
+                    }
+                }
+
+                if (isValid)
+                {
+                    validActions.Add(a);
+                }
+            }
+
+            this.playactions = validActions;
         }
 
         /// <summary>
@@ -6550,9 +6612,8 @@ namespace HREngine.Bots
                             break;
                         default:
                             {
-                                // 升级卡牌并标记为已注能
+                                // 升级卡牌并标记
                                 hc.card = CardDB.Instance.getCardDataFromDbfID(hc.card.CollectionRelatedCardDataBaseId.ToString());
-                                hc.card.Infused = true;
                             }
                             break;
                     }
@@ -12834,6 +12895,7 @@ namespace HREngine.Bots
                     break;
                 case 2:
                     if (own.TitanAbilityUsed2) flag = false;
+                    
                     break;
                 case 3:
                     if (own.TitanAbilityUsed3) flag = false;
@@ -12843,6 +12905,19 @@ namespace HREngine.Bots
             {
                 // 触发技能的使用效果
                 own.handcard.card.sim_card.useTitanAbility(this, own, titanAbilityNO, target);
+                // 添加：标记技能已使用
+                switch (titanAbilityNO)
+                {
+                    case 1:
+                        own.TitanAbilityUsed1 = true;
+                        break;
+                    case 2:
+                        own.TitanAbilityUsed2 = true;
+                        break;
+                    case 3:
+                        own.TitanAbilityUsed3 = true;
+                        break;
+                }
             }
         }
 
