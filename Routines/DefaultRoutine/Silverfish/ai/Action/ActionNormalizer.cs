@@ -372,15 +372,15 @@ namespace HREngine.Bots
             {
                 case actionEnum.playcard:
                     {
-                        Handmanager.Handcard handCard = a.hc;
+                        /* Handmanager.Handcard handCard = a.hc;
                         if (handCard.literallyUnplayable) return actionFound;
                         // 检查是否可以打出卡牌
                         if (p.mana >= handCard.card.getManaCost(p, handCard.manacost))
                             if (p.ownMinions.Count >= 7)
                                 if (handCard.card.type == CardDB.cardtype.MOB || handCard.card.type == CardDB.cardtype.LOCATION)
                                     return actionFound;
-                        actionFound = true;
-                        /*foreach (Handmanager.Handcard hc in p.owncards)
+                        actionFound = true; */
+                        foreach (Handmanager.Handcard hc in p.owncards)
                         {
                             // 找到对应的手牌
                             if (hc.entity == a.hc.entity)
@@ -398,7 +398,7 @@ namespace HREngine.Bots
                                 }
                                 break;
                             }
-                        }*/
+                        }
                     }
                     break;
 

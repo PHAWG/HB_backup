@@ -153,8 +153,11 @@ namespace HREngine.Bots
                 bool isChoice = hc.card.choice;
                 CardDB.Card c = hc.card;
 
-                // 抉择卡牌需要遍历两个选择，普通卡牌只处理一次（choice=0）
-                for (int choice = isChoice ? 1 : 0; choice <= (isChoice ? 2 : 0); choice++)
+                // 获取卡牌的抉择数
+                int chooseCount = isChoice ? pen.getChooseCount(hc.card.cardIDenum) : 0;
+
+                // 抉择卡牌需要遍历所有选择，普通卡牌只处理一次（choice=0）
+                for (int choice = isChoice ? 1 : 0; choice <= (isChoice ? chooseCount : 0); choice++)
                 {
                     if (isChoice)
                     {
@@ -302,32 +305,34 @@ namespace HREngine.Bots
             // 检查英雄技能是否可用：己方回合、技能已就绪、有足够法力值
             if (own && p.ownAbilityReady && p.mana >= p.ownHeroAblility.card.getManaCost(p, p.ownHeroAblility.manacost))
             {
-                CardDB.Card c = p.ownHeroAblility.card;
-                // 抉择类英雄技能有两个选择，普通英雄技能只有一个
-                int choiceCount = c.choice ? 2 : 0;
-                // 获取英雄技能的有效目标
-                targets = p.ownHeroAblility.card.getTargetsForHeroPower(p, true);
+                CardDB.Card card = p.ownHeroAblility.card;
+                bool isChoice = card.choice;
 
-                for (int choice = c.choice ? 1 : 0; choice <= choiceCount; choice++)
+                // 获取英雄技能的抉择数
+                int chooseCount = isChoice ? pen.getChooseCount(p.ownHeroAblility.card.cardIDenum) : 0;
+
+                // 抉择类英雄技能需要遍历所有选择，普通英雄技能只有一个
+                for (int choice = isChoice ? 1 : 0; choice <= (isChoice ? chooseCount : 0); choice++)
                 {
-                    CardDB.Card chosenCard = c;
+                    CardDB.Card chosenCard = card;
 
                     // 如果是抉择类英雄技能，根据choice获取对应的卡牌
-                    if (c.choice)
+                    if (isChoice)
                     {
                         chosenCard = pen.getChooseCard(p.ownHeroAblility.card, choice);
                     }
+
+                    // 获取抉择后英雄技能的有效目标（仿照出牌抉择的处理逻辑）
+                    targets = chosenCard.getTargetsForHeroPower(p, true);
+
+                    // 没有可用目标时跳过
+                    if (targets.Count == 0) continue;
 
                     int playCardPenalty = 0;
                     int place = p.ownMinions.Count + 1;
 
                     foreach (Minion target in targets)
                     {
-                        // 特殊处理盗贼英雄技能的名称
-                        if (p.ownHeroAblility.card.nameCN == CardDB.cardNameCN.未知 && p.ownHeroName == HeroEnum.thief)
-                        {
-                            p.ownHeroAblility.card.nameCN = CardDB.cardNameCN.匕首精通;
-                        }
 
                         // 计算使用英雄技能的惩罚值
                         if (usePenalityManager)
