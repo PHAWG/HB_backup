@@ -132,8 +132,7 @@ namespace HREngine.Bots
                         continue;
 
                 // 计算卡牌的实际费用
-                int cardCost = hc.card.getManaCost(p, hc.manacost);
-
+                int cardCost = hc.getManaCost(p);
                 // 检查特殊打出条件：本回合法术消耗生命值或鱼人消耗生命值
                 if ((p.nextSpellThisTurnCostHealth && hc.card.type == CardDB.cardtype.SPELL) ||
                     (p.nextMurlocThisTurnCostHealth && hc.card.race == CardDB.Race.MURLOC))

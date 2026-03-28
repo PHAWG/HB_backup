@@ -894,9 +894,9 @@ def Execute():
                     case 1: TritonHs.ChooseOneClickLeft(); break;
                     default:
                         {
-                            List<Card> friendlyCards = ChoiceCardMgr.Get().GetFriendlyCards();
+                            List<Card> friendlyCards = ChoiceCardMgr.Get()?.GetFriendlyCards();
 
-                            if (friendlyCards.Count > dirty)
+                            if (friendlyCards != null && friendlyCards.Count > dirty)
                                 Client.LeftClickAt(Client.CardInteractPoint(friendlyCards[dirty]));
                             else
                                 TritonHs.ChooseOneClickRight();//抉择
@@ -1025,6 +1025,9 @@ def Execute():
                     playEmote(EmoteType.THANKS);
                 }
             } */
+            while (TritonHs.GameState.IsBusy())
+                await Coroutine.Sleep(random.Next(100, 150));
+
             if (RewindUIManager.m_isShowingRewindUI)
             {
                 try
@@ -1469,12 +1472,18 @@ def Execute():
                 HSCard target = getEntityWithNumber(moveTodo.target.entitiyID);
                 if (target != null)
                 {
-                    Log.WarnFormat("使用英雄技能: {0} 目标为 {0}    惩罚值：{2}", cardtoplay.Name, target.Name, moveTodo.penalty);
+                    Log.WarnFormat("使用英雄技能: {0} 目标为 {1} 抉择:{2}    惩罚值：{3}", cardtoplay.Name, target.Name, moveTodo.druidchoice, moveTodo.penalty);
                     if (moveTodo.druidchoice >= 1)
                     {
                         dirtytarget = moveTodo.target.entitiyID;
                         dirtychoice = moveTodo.druidchoice;
-                        choiceCardId = moveTodo.hc.card.cardIDenum.ToString();
+                        if (moveTodo.hc != null)
+                        {
+                            choiceCardId = moveTodo.hc.card.cardIDenum.ToString();
+                        }
+                        // 等待一小段时间，确保游戏客户端已进入抉择界面
+                        await Coroutine.Sleep(333);
+                        // 执行抉择点击
                         ChooseOneClick(dirtychoice);
 
                     }
@@ -1494,11 +1503,17 @@ def Execute():
             }
             else
             {
-                Log.WarnFormat("使用英雄技能: {0} 暂时没有目标    惩罚值：{1}", cardtoplay.Name, moveTodo.penalty);
+                Log.WarnFormat("使用英雄技能: {0} 暂时没有目标 抉择:{1}   惩罚值：{2}", cardtoplay.Name, moveTodo.druidchoice, moveTodo.penalty);
                 if (moveTodo.druidchoice >= 1)
                 {
                     dirtychoice = moveTodo.druidchoice;
-                    choiceCardId = moveTodo.hc.card.cardIDenum.ToString();
+                    if (moveTodo.hc != null)
+                    {
+                        choiceCardId = moveTodo.hc.card.cardIDenum.ToString();
+                    }
+                    // 等待一小段时间，确保游戏客户端已进入抉择界面
+                    await Coroutine.Sleep(333);
+                    // 执行抉择点击
                     ChooseOneClick(dirtychoice);
 
                 }
@@ -1617,11 +1632,13 @@ def Execute():
         {
             if (dirtychoice < 1)
             {
-                var ccm = ChoiceCardMgr.Get();
+                ChoiceCardMgr ccm = ChoiceCardMgr.Get();
                 var lscc = ccm.m_lastShownChoiceState;
                 GAME_TAG choiceMode = GAME_TAG.CHOOSE_ONE;
                 int sourceEntityId = -1;
                 CardDB.cardIDEnum sourceEntityCId = CardDB.cardIDEnum.None;
+                // ChoiceCardMgr.ChoiceState ChoiceState = ccm.GetLastChoiceState();
+
                 if (lscc != null)
                 {
                     sourceEntityId = lscc.m_sourceEntityId;

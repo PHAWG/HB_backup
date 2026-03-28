@@ -79,9 +79,13 @@ namespace HREngine.Bots
         //有用 需要保持
         Dictionary<CardDB.cardNameEN, int> UsefulNeedKeepDatabase = new Dictionary<CardDB.cardNameEN, int>();
         //选择1
-        Dictionary<CardDB.cardNameEN, CardDB.cardIDEnum> choose1database = new Dictionary<CardDB.cardNameEN, CardDB.cardIDEnum>();
+        Dictionary<CardDB.cardIDEnum, CardDB.cardIDEnum> choose1database = new Dictionary<CardDB.cardIDEnum, CardDB.cardIDEnum>();
         //选择2
-        Dictionary<CardDB.cardNameEN, CardDB.cardIDEnum> choose2database = new Dictionary<CardDB.cardNameEN, CardDB.cardIDEnum>();
+        Dictionary<CardDB.cardIDEnum, CardDB.cardIDEnum> choose2database = new Dictionary<CardDB.cardIDEnum, CardDB.cardIDEnum>();
+        //选择3
+        Dictionary<CardDB.cardIDEnum, CardDB.cardIDEnum> choose3database = new Dictionary<CardDB.cardIDEnum, CardDB.cardIDEnum>();
+        //选择4
+        Dictionary<CardDB.cardIDEnum, CardDB.cardIDEnum> choose4database = new Dictionary<CardDB.cardIDEnum, CardDB.cardIDEnum>();
         //伤害目标
         public Dictionary<CardDB.cardNameEN, int> DamageTargetDatabase = new Dictionary<CardDB.cardNameEN, int>();
         //伤害目标特殊
@@ -261,7 +265,7 @@ namespace HREngine.Bots
             {
                 enfaceReward = printUtils.enfaceReward;
             }
-            return ai.botBase.getAttackWithHeroPenality(p, target, target) - enfaceReward;
+            return ai.botBase.getAttackWithHeroPenality(p, hero, target) - enfaceReward;
         }
 
         public int getPlayCardPenality(CardDB.Card card, Minion target, Playfield p, Handmanager.Handcard nowHandcard)
@@ -273,13 +277,24 @@ namespace HREngine.Bots
 
         public CardDB.Card getChooseCard(CardDB.Card c, int choice)
         {
-            if (choice == 1 && this.choose1database.ContainsKey(c.nameEN))
+            switch (choice)
             {
-                c = cdb.getCardDataFromID(this.choose1database[c.nameEN]);
-            }
-            else if (choice == 2 && this.choose2database.ContainsKey(c.nameEN))
-            {
-                c = cdb.getCardDataFromID(this.choose2database[c.nameEN]);
+                case 1:
+                    if (this.choose1database.ContainsKey(c.cardIDenum))
+                        c = cdb.getCardDataFromID(this.choose1database[c.cardIDenum]);
+                    break;
+                case 2:
+                    if (this.choose2database.ContainsKey(c.cardIDenum))
+                        c = cdb.getCardDataFromID(this.choose2database[c.cardIDenum]);
+                    break;
+                case 3:
+                    if (this.choose3database.ContainsKey(c.cardIDenum))
+                        c = cdb.getCardDataFromID(this.choose3database[c.cardIDenum]);
+                    break;
+                case 4:
+                    if (this.choose4database.ContainsKey(c.cardIDenum))
+                        c = cdb.getCardDataFromID(this.choose4database[c.cardIDenum]);
+                    break;
             }
             return c;
         }
@@ -2429,63 +2444,194 @@ namespace HREngine.Bots
         }
 
 
+        // 获取卡牌的抉择数
+        public int getChooseCount(CardDB.cardIDEnum cardId)
+        {
+            int count = 0;
+            if (this.choose1database.ContainsKey(cardId)) count++;
+            if (this.choose2database.ContainsKey(cardId)) count++;
+            if (this.choose3database.ContainsKey(cardId)) count++;
+            if (this.choose4database.ContainsKey(cardId)) count++;
+            return count;
+        }
+
         private void setupChooseDatabase()
         {
-            this.choose1database.Add(CardDB.cardNameEN.ancientoflore, CardDB.cardIDEnum.NEW1_008a);
-            this.choose1database.Add(CardDB.cardNameEN.ancientofwar, CardDB.cardIDEnum.EX1_178b);
-            this.choose1database.Add(CardDB.cardNameEN.anodizedrobocub, CardDB.cardIDEnum.GVG_030a);
-            this.choose1database.Add(CardDB.cardNameEN.cenarius, CardDB.cardIDEnum.EX1_573a);
-            this.choose1database.Add(CardDB.cardNameEN.darkwispers, CardDB.cardIDEnum.GVG_041b);
-            this.choose1database.Add(CardDB.cardNameEN.druidoftheclaw, CardDB.cardIDEnum.EX1_165t1);
-            this.choose1database.Add(CardDB.cardNameEN.druidoftheflame, CardDB.cardIDEnum.BRM_010t);
-            this.choose1database.Add(CardDB.cardNameEN.druidofthesaber, CardDB.cardIDEnum.AT_042t);
-            this.choose1database.Add(CardDB.cardNameEN.feralrage, CardDB.cardIDEnum.OG_047a);
-            this.choose1database.Add(CardDB.cardNameEN.grovetender, CardDB.cardIDEnum.GVG_032a);
-            this.choose1database.Add(CardDB.cardNameEN.jadeidol, CardDB.cardIDEnum.CFM_602a);
-            this.choose1database.Add(CardDB.cardNameEN.keeperofthegrove, CardDB.cardIDEnum.EX1_166a);
-            this.choose1database.Add(CardDB.cardNameEN.kuntheforgottenking, CardDB.cardIDEnum.CFM_308a);
-            this.choose1database.Add(CardDB.cardNameEN.livingroots, CardDB.cardIDEnum.AT_037a);
-            this.choose1database.Add(CardDB.cardNameEN.markofnature, CardDB.cardIDEnum.EX1_155a);
-            this.choose1database.Add(CardDB.cardNameEN.mirekeeper, CardDB.cardIDEnum.OG_202a);
-            this.choose1database.Add(CardDB.cardNameEN.nourish, CardDB.cardIDEnum.EX1_164a);
-            this.choose1database.Add(CardDB.cardNameEN.powerofthewild, CardDB.cardIDEnum.EX1_160b);
-            this.choose1database.Add(CardDB.cardNameEN.ravenidol, CardDB.cardIDEnum.LOE_115a);
-            this.choose1database.Add(CardDB.cardNameEN.shellshifter, CardDB.cardIDEnum.UNG_101t);
-            this.choose1database.Add(CardDB.cardNameEN.starfall, CardDB.cardIDEnum.NEW1_007b);
-            this.choose1database.Add(CardDB.cardNameEN.wispsoftheoldgods, CardDB.cardIDEnum.OG_195a);
-            this.choose1database.Add(CardDB.cardNameEN.wrath, CardDB.cardIDEnum.EX1_154a);
-            this.choose1database.Add(CardDB.cardNameEN.malfurionthepestilent, CardDB.cardIDEnum.ICC_832b);
-            this.choose1database.Add(CardDB.cardNameEN.plaguelord, CardDB.cardIDEnum.ICC_832pb);
-            this.choose1database.Add(CardDB.cardNameEN.druidoftheswarm, CardDB.cardIDEnum.ICC_051t);
-            this.choose1database.Add(CardDB.cardNameEN.nurture, CardDB.cardIDEnum.AV_205pb);
-
-            this.choose2database.Add(CardDB.cardNameEN.ancientoflore, CardDB.cardIDEnum.NEW1_008b);
-            this.choose2database.Add(CardDB.cardNameEN.ancientofwar, CardDB.cardIDEnum.EX1_178a);
-            this.choose2database.Add(CardDB.cardNameEN.anodizedrobocub, CardDB.cardIDEnum.GVG_030b);
-            this.choose2database.Add(CardDB.cardNameEN.cenarius, CardDB.cardIDEnum.EX1_573b);
-            this.choose2database.Add(CardDB.cardNameEN.darkwispers, CardDB.cardIDEnum.GVG_041a);
-            this.choose2database.Add(CardDB.cardNameEN.druidoftheclaw, CardDB.cardIDEnum.EX1_165t2);
-            this.choose2database.Add(CardDB.cardNameEN.druidoftheflame, CardDB.cardIDEnum.BRM_010t2);
-            this.choose2database.Add(CardDB.cardNameEN.druidofthesaber, CardDB.cardIDEnum.AT_042t2);
-            this.choose2database.Add(CardDB.cardNameEN.feralrage, CardDB.cardIDEnum.OG_047b);
-            this.choose2database.Add(CardDB.cardNameEN.grovetender, CardDB.cardIDEnum.GVG_032b);
-            this.choose2database.Add(CardDB.cardNameEN.jadeidol, CardDB.cardIDEnum.CFM_602b);
-            this.choose2database.Add(CardDB.cardNameEN.keeperofthegrove, CardDB.cardIDEnum.EX1_166b);
-            this.choose2database.Add(CardDB.cardNameEN.kuntheforgottenking, CardDB.cardIDEnum.CFM_308b);
-            this.choose2database.Add(CardDB.cardNameEN.livingroots, CardDB.cardIDEnum.AT_037b);
-            this.choose2database.Add(CardDB.cardNameEN.markofnature, CardDB.cardIDEnum.EX1_155b);
-            this.choose2database.Add(CardDB.cardNameEN.mirekeeper, CardDB.cardIDEnum.OG_202ae);
-            this.choose2database.Add(CardDB.cardNameEN.nourish, CardDB.cardIDEnum.EX1_164b);
-            this.choose2database.Add(CardDB.cardNameEN.powerofthewild, CardDB.cardIDEnum.EX1_160t);
-            this.choose2database.Add(CardDB.cardNameEN.ravenidol, CardDB.cardIDEnum.LOE_115b);
-            this.choose2database.Add(CardDB.cardNameEN.shellshifter, CardDB.cardIDEnum.UNG_101t2);
-            this.choose2database.Add(CardDB.cardNameEN.starfall, CardDB.cardIDEnum.NEW1_007a);
-            this.choose2database.Add(CardDB.cardNameEN.wispsoftheoldgods, CardDB.cardIDEnum.OG_195b);
-            this.choose2database.Add(CardDB.cardNameEN.wrath, CardDB.cardIDEnum.EX1_154b);
-            this.choose2database.Add(CardDB.cardNameEN.malfurionthepestilent, CardDB.cardIDEnum.ICC_832a);
-            this.choose2database.Add(CardDB.cardNameEN.plaguelord, CardDB.cardIDEnum.ICC_832pa);
-            this.choose2database.Add(CardDB.cardNameEN.druidoftheswarm, CardDB.cardIDEnum.ICC_051t2);
-            this.choose2database.Add(CardDB.cardNameEN.nurture, CardDB.cardIDEnum.AV_205a);
+            this.choose1database.Add(CardDB.cardIDEnum.AT_037, CardDB.cardIDEnum.AT_037a); // 活体根须
+            this.choose2database.Add(CardDB.cardIDEnum.AT_037, CardDB.cardIDEnum.AT_037b); // 活体根须
+            this.choose1database.Add(CardDB.cardIDEnum.AT_042, CardDB.cardIDEnum.AT_042a); // 刃牙德鲁伊
+            this.choose2database.Add(CardDB.cardIDEnum.AT_042, CardDB.cardIDEnum.AT_042b); // 刃牙德鲁伊
+            this.choose1database.Add(CardDB.cardIDEnum.AV_295, CardDB.cardIDEnum.AV_295a); // 占领冷齿矿洞
+            this.choose2database.Add(CardDB.cardIDEnum.AV_295, CardDB.cardIDEnum.AV_295b); // 占领冷齿矿洞
+            this.choose1database.Add(CardDB.cardIDEnum.BOT_422, CardDB.cardIDEnum.BOT_422a); // 牛头人园丁
+            this.choose2database.Add(CardDB.cardIDEnum.BOT_422, CardDB.cardIDEnum.BOT_422b); // 牛头人园丁
+            this.choose1database.Add(CardDB.cardIDEnum.BRM_010, CardDB.cardIDEnum.BRM_010a); // 烈焰德鲁伊
+            this.choose2database.Add(CardDB.cardIDEnum.BRM_010, CardDB.cardIDEnum.BRM_010b); // 烈焰德鲁伊
+            this.choose1database.Add(CardDB.cardIDEnum.CFM_308, CardDB.cardIDEnum.CFM_308a); // 遗忘之王库恩
+            this.choose2database.Add(CardDB.cardIDEnum.CFM_308, CardDB.cardIDEnum.CFM_308b); // 遗忘之王库恩
+            this.choose1database.Add(CardDB.cardIDEnum.CFM_602, CardDB.cardIDEnum.CFM_602a); // 青玉护符
+            this.choose2database.Add(CardDB.cardIDEnum.CFM_602, CardDB.cardIDEnum.CFM_602b); // 青玉护符
+            this.choose1database.Add(CardDB.cardIDEnum.DAL_350, CardDB.cardIDEnum.DAL_350a); // 水晶之力
+            this.choose2database.Add(CardDB.cardIDEnum.DAL_350, CardDB.cardIDEnum.DAL_350b); // 水晶之力
+            this.choose1database.Add(CardDB.cardIDEnum.DED_001, CardDB.cardIDEnum.DED_001a); // 暗礁德鲁伊
+            this.choose2database.Add(CardDB.cardIDEnum.DED_001, CardDB.cardIDEnum.DED_001b); // 暗礁德鲁伊
+            this.choose1database.Add(CardDB.cardIDEnum.DEEP_027, CardDB.cardIDEnum.DEEP_027a); // 暗石守卫
+            this.choose2database.Add(CardDB.cardIDEnum.DEEP_027, CardDB.cardIDEnum.DEEP_027b); // 暗石守卫
+            this.choose1database.Add(CardDB.cardIDEnum.DMF_061, CardDB.cardIDEnum.DMF_061a); // 马戏团树艺师
+            this.choose2database.Add(CardDB.cardIDEnum.DMF_061, CardDB.cardIDEnum.DMF_061b); // 马戏团树艺师
+            this.choose1database.Add(CardDB.cardIDEnum.DRG_311, CardDB.cardIDEnum.DRG_311a); // 树木援军
+            this.choose2database.Add(CardDB.cardIDEnum.DRG_311, CardDB.cardIDEnum.DRG_311b); // 树木援军
+            this.choose1database.Add(CardDB.cardIDEnum.EDR_233, CardDB.cardIDEnum.EDR_233a); // 森林之灵
+            this.choose2database.Add(CardDB.cardIDEnum.EDR_233, CardDB.cardIDEnum.EDR_233b); // 森林之灵
+            this.choose1database.Add(CardDB.cardIDEnum.EDR_257, CardDB.cardIDEnum.EDR_257a); // 圣光抚愈者
+            this.choose2database.Add(CardDB.cardIDEnum.EDR_257, CardDB.cardIDEnum.EDR_257b); // 圣光抚愈者
+            this.choose1database.Add(CardDB.cardIDEnum.EDR_263, CardDB.cardIDEnum.EDR_263a); // 巨狼的恩赐
+            this.choose2database.Add(CardDB.cardIDEnum.EDR_263, CardDB.cardIDEnum.EDR_263b); // 巨狼的恩赐
+            this.choose1database.Add(CardDB.cardIDEnum.EDR_463, CardDB.cardIDEnum.EDR_463a); // 暮光侵扰
+            this.choose2database.Add(CardDB.cardIDEnum.EDR_463, CardDB.cardIDEnum.EDR_463b); // 暮光侵扰
+            this.choose1database.Add(CardDB.cardIDEnum.EDR_490, CardDB.cardIDEnum.EDR_490a); // 麻痹睡眠
+            this.choose2database.Add(CardDB.cardIDEnum.EDR_490, CardDB.cardIDEnum.EDR_490b); // 麻痹睡眠
+            this.choose1database.Add(CardDB.cardIDEnum.EDR_525, CardDB.cardIDEnum.EDR_525A); // 倒刺荆棘
+            this.choose2database.Add(CardDB.cardIDEnum.EDR_525, CardDB.cardIDEnum.EDR_525B); // 倒刺荆棘
+            this.choose1database.Add(CardDB.cardIDEnum.EDR_570, CardDB.cardIDEnum.EDR_570A); // 凶险梦魇
+            this.choose2database.Add(CardDB.cardIDEnum.EDR_570, CardDB.cardIDEnum.EDR_570B); // 凶险梦魇
+            this.choose1database.Add(CardDB.cardIDEnum.EDR_813, CardDB.cardIDEnum.EDR_813a); // 病变虫群
+            this.choose2database.Add(CardDB.cardIDEnum.EDR_813, CardDB.cardIDEnum.EDR_813b); // 病变虫群
+            this.choose1database.Add(CardDB.cardIDEnum.EDR_820, CardDB.cardIDEnum.EDR_820a); // 飞龙之眠
+            this.choose2database.Add(CardDB.cardIDEnum.EDR_820, CardDB.cardIDEnum.EDR_820b); // 飞龙之眠
+            this.choose1database.Add(CardDB.cardIDEnum.EDR_843, CardDB.cardIDEnum.EDR_843a); // 森林再生
+            this.choose2database.Add(CardDB.cardIDEnum.EDR_843, CardDB.cardIDEnum.EDR_843b); // 森林再生
+            this.choose1database.Add(CardDB.cardIDEnum.EDR_872, CardDB.cardIDEnum.EDR_872A); // 生命火花
+            this.choose2database.Add(CardDB.cardIDEnum.EDR_872, CardDB.cardIDEnum.EDR_872B); // 生命火花
+            this.choose1database.Add(CardDB.cardIDEnum.END_010, CardDB.cardIDEnum.END_010a); // 暮光时空撕裂者
+            this.choose2database.Add(CardDB.cardIDEnum.END_010, CardDB.cardIDEnum.END_010b); // 暮光时空撕裂者
+            this.choose1database.Add(CardDB.cardIDEnum.ETC_373, CardDB.cardIDEnum.ETC_373a); // 集会鼓圈
+            this.choose2database.Add(CardDB.cardIDEnum.ETC_373, CardDB.cardIDEnum.ETC_373b); // 集会鼓圈
+            this.choose1database.Add(CardDB.cardIDEnum.ETC_375, CardDB.cardIDEnum.ETC_375a); // 沉静的吹笛人
+            this.choose2database.Add(CardDB.cardIDEnum.ETC_375, CardDB.cardIDEnum.ETC_375b); // 沉静的吹笛人
+            this.choose1database.Add(CardDB.cardIDEnum.ETC_387, CardDB.cardIDEnum.ETC_387b); // 根音古韵
+            this.choose2database.Add(CardDB.cardIDEnum.ETC_387, CardDB.cardIDEnum.ETC_387c); // 根音古韵
+            this.choose1database.Add(CardDB.cardIDEnum.EX1_154, CardDB.cardIDEnum.EX1_154a); // 愤怒
+            this.choose2database.Add(CardDB.cardIDEnum.EX1_154, CardDB.cardIDEnum.EX1_154b); // 愤怒
+            this.choose1database.Add(CardDB.cardIDEnum.EX1_155, CardDB.cardIDEnum.EX1_155a); // 自然印记
+            this.choose2database.Add(CardDB.cardIDEnum.EX1_155, CardDB.cardIDEnum.EX1_155b); // 自然印记
+            this.choose1database.Add(CardDB.cardIDEnum.EX1_160, CardDB.cardIDEnum.EX1_160a); // 野性之力
+            this.choose2database.Add(CardDB.cardIDEnum.EX1_160, CardDB.cardIDEnum.EX1_160b); // 野性之力
+            this.choose1database.Add(CardDB.cardIDEnum.EX1_164, CardDB.cardIDEnum.EX1_164a); // 滋养
+            this.choose2database.Add(CardDB.cardIDEnum.EX1_164, CardDB.cardIDEnum.EX1_164b); // 滋养
+            this.choose1database.Add(CardDB.cardIDEnum.EX1_165, CardDB.cardIDEnum.EX1_165a); // 利爪德鲁伊
+            this.choose2database.Add(CardDB.cardIDEnum.EX1_165, CardDB.cardIDEnum.EX1_165b); // 利爪德鲁伊
+            this.choose1database.Add(CardDB.cardIDEnum.EX1_166, CardDB.cardIDEnum.EX1_166a); // 丛林守护者
+            this.choose2database.Add(CardDB.cardIDEnum.EX1_166, CardDB.cardIDEnum.EX1_166b); // 丛林守护者
+            this.choose1database.Add(CardDB.cardIDEnum.EX1_178, CardDB.cardIDEnum.EX1_178a); // 战争古树
+            this.choose2database.Add(CardDB.cardIDEnum.EX1_178, CardDB.cardIDEnum.EX1_178b); // 战争古树
+            this.choose1database.Add(CardDB.cardIDEnum.EX1_573, CardDB.cardIDEnum.EX1_573a); // 塞纳留斯
+            this.choose2database.Add(CardDB.cardIDEnum.EX1_573, CardDB.cardIDEnum.EX1_573b); // 塞纳留斯
+            this.choose1database.Add(CardDB.cardIDEnum.GDB_851, CardDB.cardIDEnum.GDB_851a); // 星域相变射线
+            this.choose2database.Add(CardDB.cardIDEnum.GDB_851, CardDB.cardIDEnum.GDB_851b); // 星域相变射线
+            this.choose1database.Add(CardDB.cardIDEnum.GIL_188, CardDB.cardIDEnum.GIL_188a); // 镰刀德鲁伊
+            this.choose2database.Add(CardDB.cardIDEnum.GIL_188, CardDB.cardIDEnum.GIL_188b); // 镰刀德鲁伊
+            this.choose1database.Add(CardDB.cardIDEnum.GVG_030, CardDB.cardIDEnum.GVG_030a); // 电镀机械熊仔
+            this.choose2database.Add(CardDB.cardIDEnum.GVG_030, CardDB.cardIDEnum.GVG_030b); // 电镀机械熊仔
+            this.choose1database.Add(CardDB.cardIDEnum.GVG_032, CardDB.cardIDEnum.GVG_032a); // 林地树妖
+            this.choose2database.Add(CardDB.cardIDEnum.GVG_032, CardDB.cardIDEnum.GVG_032b); // 林地树妖
+            this.choose1database.Add(CardDB.cardIDEnum.GVG_041, CardDB.cardIDEnum.GVG_041a); // 黑暗私语
+            this.choose2database.Add(CardDB.cardIDEnum.GVG_041, CardDB.cardIDEnum.GVG_041b); // 黑暗私语
+            this.choose1database.Add(CardDB.cardIDEnum.ICC_047, CardDB.cardIDEnum.ICC_047a); // 命运织网蛛
+            this.choose2database.Add(CardDB.cardIDEnum.ICC_047, CardDB.cardIDEnum.ICC_047b); // 命运织网蛛
+            this.choose1database.Add(CardDB.cardIDEnum.ICC_051, CardDB.cardIDEnum.ICC_051a); // 虫群德鲁伊
+            this.choose2database.Add(CardDB.cardIDEnum.ICC_051, CardDB.cardIDEnum.ICC_051b); // 虫群德鲁伊
+            this.choose1database.Add(CardDB.cardIDEnum.ICC_832, CardDB.cardIDEnum.ICC_832a); // 污染者玛法里奥
+            this.choose2database.Add(CardDB.cardIDEnum.ICC_832, CardDB.cardIDEnum.ICC_832b); // 污染者玛法里奥
+            this.choose1database.Add(CardDB.cardIDEnum.JAM_026, CardDB.cardIDEnum.JAM_026a); // 人气树精
+            this.choose2database.Add(CardDB.cardIDEnum.JAM_026, CardDB.cardIDEnum.JAM_026b); // 人气树精
+            this.choose1database.Add(CardDB.cardIDEnum.JAM_027, CardDB.cardIDEnum.JAM_027a); // 饭圈迷弟
+            this.choose2database.Add(CardDB.cardIDEnum.JAM_027, CardDB.cardIDEnum.JAM_027b); // 饭圈迷弟
+            this.choose1database.Add(CardDB.cardIDEnum.LOE_115, CardDB.cardIDEnum.LOE_115a); // 乌鸦神像
+            this.choose2database.Add(CardDB.cardIDEnum.LOE_115, CardDB.cardIDEnum.LOE_115b); // 乌鸦神像
+            this.choose1database.Add(CardDB.cardIDEnum.MAW_025, CardDB.cardIDEnum.MAW_025a); // 噬渊律师
+            this.choose2database.Add(CardDB.cardIDEnum.MAW_025, CardDB.cardIDEnum.MAW_025b); // 噬渊律师
+            this.choose1database.Add(CardDB.cardIDEnum.NEW1_007, CardDB.cardIDEnum.NEW1_007a); // 星辰坠落
+            this.choose2database.Add(CardDB.cardIDEnum.NEW1_007, CardDB.cardIDEnum.NEW1_007b); // 星辰坠落
+            this.choose1database.Add(CardDB.cardIDEnum.NEW1_008, CardDB.cardIDEnum.NEW1_008a); // 知识古树
+            this.choose2database.Add(CardDB.cardIDEnum.NEW1_008, CardDB.cardIDEnum.NEW1_008b); // 知识古树
+            this.choose1database.Add(CardDB.cardIDEnum.OG_047, CardDB.cardIDEnum.OG_047a); // 野性之怒
+            this.choose2database.Add(CardDB.cardIDEnum.OG_047, CardDB.cardIDEnum.OG_047b); // 野性之怒
+            this.choose1database.Add(CardDB.cardIDEnum.OG_195, CardDB.cardIDEnum.OG_195a); // 上古之神的小精灵
+            this.choose2database.Add(CardDB.cardIDEnum.OG_195, CardDB.cardIDEnum.OG_195b); // 上古之神的小精灵
+            this.choose1database.Add(CardDB.cardIDEnum.OG_202, CardDB.cardIDEnum.OG_202a); // 泥潭守护者
+            this.choose2database.Add(CardDB.cardIDEnum.OG_202, CardDB.cardIDEnum.OG_202b); // 泥潭守护者
+            this.choose1database.Add(CardDB.cardIDEnum.ONY_018, CardDB.cardIDEnum.ONY_018t); // 暴烈枭兽
+            this.choose2database.Add(CardDB.cardIDEnum.ONY_018, CardDB.cardIDEnum.ONY_018t2); // 暴烈枭兽
+            this.choose1database.Add(CardDB.cardIDEnum.REV_311, CardDB.cardIDEnum.REV_311t); // 夜影花蕾
+            this.choose2database.Add(CardDB.cardIDEnum.REV_311, CardDB.cardIDEnum.REV_311t2); // 夜影花蕾
+            this.choose1database.Add(CardDB.cardIDEnum.RLK_654, CardDB.cardIDEnum.RLK_654a); // 甲虫通灵术
+            this.choose2database.Add(CardDB.cardIDEnum.RLK_654, CardDB.cardIDEnum.RLK_654b); // 甲虫通灵术
+            this.choose1database.Add(CardDB.cardIDEnum.SCH_607, CardDB.cardIDEnum.SCH_607a); // 大导师野爪
+            this.choose2database.Add(CardDB.cardIDEnum.SCH_607, CardDB.cardIDEnum.SCH_607b); // 大导师野爪
+            this.choose1database.Add(CardDB.cardIDEnum.SCH_612, CardDB.cardIDEnum.SCH_612a); // 雕琢符文
+            this.choose2database.Add(CardDB.cardIDEnum.SCH_612, CardDB.cardIDEnum.SCH_612b); // 雕琢符文
+            this.choose1database.Add(CardDB.cardIDEnum.SW_422, CardDB.cardIDEnum.SW_422a); // 播种施肥
+            this.choose2database.Add(CardDB.cardIDEnum.SW_422, CardDB.cardIDEnum.SW_422b); // 播种施肥
+            this.choose1database.Add(CardDB.cardIDEnum.TIME_211, CardDB.cardIDEnum.TIME_211a); // 艾萨拉女士
+            this.choose2database.Add(CardDB.cardIDEnum.TIME_211, CardDB.cardIDEnum.TIME_211b); // 艾萨拉女士
+            this.choose1database.Add(CardDB.cardIDEnum.TOY_801, CardDB.cardIDEnum.TOY_801a); // 绿植幼龙
+            this.choose2database.Add(CardDB.cardIDEnum.TOY_801, CardDB.cardIDEnum.TOY_801b); // 绿植幼龙
+            this.choose1database.Add(CardDB.cardIDEnum.TRL_254, CardDB.cardIDEnum.TRL_254a); // 神灵印记
+            this.choose2database.Add(CardDB.cardIDEnum.TRL_254, CardDB.cardIDEnum.TRL_254b); // 神灵印记
+            this.choose1database.Add(CardDB.cardIDEnum.TRL_343, CardDB.cardIDEnum.TRL_343at1); // 战争德鲁伊罗缇
+            this.choose2database.Add(CardDB.cardIDEnum.TRL_343, CardDB.cardIDEnum.TRL_343at2); // 战争德鲁伊罗缇
+            this.choose3database.Add(CardDB.cardIDEnum.TRL_343, CardDB.cardIDEnum.TRL_343bt1); // 战争德鲁伊罗缇
+            this.choose4database.Add(CardDB.cardIDEnum.TRL_343, CardDB.cardIDEnum.TRL_343bt2); // 战争德鲁伊罗缇
+            this.choose1database.Add(CardDB.cardIDEnum.TSC_650, CardDB.cardIDEnum.TSC_650a); // 划水好友
+            this.choose2database.Add(CardDB.cardIDEnum.TSC_650, CardDB.cardIDEnum.TSC_650d); // 划水好友
+            this.choose1database.Add(CardDB.cardIDEnum.TTN_926, CardDB.cardIDEnum.TTN_926a); // 生长古树
+            this.choose2database.Add(CardDB.cardIDEnum.TTN_926, CardDB.cardIDEnum.TTN_926b); // 生长古树
+            this.choose1database.Add(CardDB.cardIDEnum.TTN_940, CardDB.cardIDEnum.TTN_940a); // 自然守护者弗蕾亚
+            this.choose2database.Add(CardDB.cardIDEnum.TTN_940, CardDB.cardIDEnum.TTN_940b); // 自然守护者弗蕾亚
+            this.choose1database.Add(CardDB.cardIDEnum.TTN_955, CardDB.cardIDEnum.TTN_955A); // 生命缚誓者的礼物
+            this.choose2database.Add(CardDB.cardIDEnum.TTN_955, CardDB.cardIDEnum.TTN_955B); // 生命缚誓者的礼物
+            this.choose1database.Add(CardDB.cardIDEnum.ULD_135, CardDB.cardIDEnum.ULD_135a); // 隐秘绿洲
+            this.choose2database.Add(CardDB.cardIDEnum.ULD_135, CardDB.cardIDEnum.ULD_135b); // 隐秘绿洲
+            this.choose1database.Add(CardDB.cardIDEnum.ULD_292, CardDB.cardIDEnum.ULD_292a); // 绿洲涌动者
+            this.choose2database.Add(CardDB.cardIDEnum.ULD_292, CardDB.cardIDEnum.ULD_292b); // 绿洲涌动者
+            this.choose1database.Add(CardDB.cardIDEnum.UNG_101, CardDB.cardIDEnum.UNG_101a); // 变形神龟
+            this.choose2database.Add(CardDB.cardIDEnum.UNG_101, CardDB.cardIDEnum.UNG_101b); // 变形神龟
+            this.choose1database.Add(CardDB.cardIDEnum.VAN_EX1_154, CardDB.cardIDEnum.VAN_EX1_154a); // 愤怒
+            this.choose2database.Add(CardDB.cardIDEnum.VAN_EX1_154, CardDB.cardIDEnum.VAN_EX1_154b); // 愤怒
+            this.choose1database.Add(CardDB.cardIDEnum.VAN_EX1_155, CardDB.cardIDEnum.VAN_EX1_155a); // 自然印记
+            this.choose2database.Add(CardDB.cardIDEnum.VAN_EX1_155, CardDB.cardIDEnum.VAN_EX1_155b); // 自然印记
+            this.choose1database.Add(CardDB.cardIDEnum.VAN_EX1_160, CardDB.cardIDEnum.VAN_EX1_160a); // 野性之力
+            this.choose2database.Add(CardDB.cardIDEnum.VAN_EX1_160, CardDB.cardIDEnum.VAN_EX1_160b); // 野性之力
+            this.choose1database.Add(CardDB.cardIDEnum.VAN_EX1_164, CardDB.cardIDEnum.VAN_EX1_164a); // 滋养
+            this.choose2database.Add(CardDB.cardIDEnum.VAN_EX1_164, CardDB.cardIDEnum.VAN_EX1_164b); // 滋养
+            this.choose1database.Add(CardDB.cardIDEnum.VAN_EX1_165, CardDB.cardIDEnum.VAN_EX1_165a); // 利爪德鲁伊
+            this.choose2database.Add(CardDB.cardIDEnum.VAN_EX1_165, CardDB.cardIDEnum.VAN_EX1_165b); // 利爪德鲁伊
+            this.choose1database.Add(CardDB.cardIDEnum.VAN_EX1_166, CardDB.cardIDEnum.VAN_EX1_166a); // 丛林守护者
+            this.choose2database.Add(CardDB.cardIDEnum.VAN_EX1_166, CardDB.cardIDEnum.VAN_EX1_166b); // 丛林守护者
+            this.choose1database.Add(CardDB.cardIDEnum.VAN_EX1_178, CardDB.cardIDEnum.VAN_EX1_178a); // 战争古树
+            this.choose2database.Add(CardDB.cardIDEnum.VAN_EX1_178, CardDB.cardIDEnum.VAN_EX1_178b); // 战争古树
+            this.choose1database.Add(CardDB.cardIDEnum.VAN_EX1_573, CardDB.cardIDEnum.VAN_EX1_573a); // 塞纳留斯
+            this.choose2database.Add(CardDB.cardIDEnum.VAN_EX1_573, CardDB.cardIDEnum.VAN_EX1_573b); // 塞纳留斯
+            this.choose1database.Add(CardDB.cardIDEnum.VAN_NEW1_007, CardDB.cardIDEnum.VAN_NEW1_007a); // 星辰坠落
+            this.choose2database.Add(CardDB.cardIDEnum.VAN_NEW1_007, CardDB.cardIDEnum.VAN_NEW1_007b); // 星辰坠落
+            this.choose1database.Add(CardDB.cardIDEnum.VAN_NEW1_008, CardDB.cardIDEnum.VAN_NEW1_008a); // 知识古树
+            this.choose2database.Add(CardDB.cardIDEnum.VAN_NEW1_008, CardDB.cardIDEnum.VAN_NEW1_008b); // 知识古树
+            this.choose1database.Add(CardDB.cardIDEnum.WON_014, CardDB.cardIDEnum.WON_014s); // 鼓舞
+            this.choose2database.Add(CardDB.cardIDEnum.WON_014, CardDB.cardIDEnum.WON_014s2); // 鼓舞
+            this.choose1database.Add(CardDB.cardIDEnum.WW_821, CardDB.cardIDEnum.WW_821t1); // 巨龙传说
+            this.choose2database.Add(CardDB.cardIDEnum.WW_821, CardDB.cardIDEnum.WW_821t2); // 巨龙传说
+            this.choose1database.Add(CardDB.cardIDEnum.YOD_001, CardDB.cardIDEnum.YOD_001b); // 乘风而起
+            this.choose2database.Add(CardDB.cardIDEnum.YOD_001, CardDB.cardIDEnum.YOD_001c); // 乘风而起
+            this.choose1database.Add(CardDB.cardIDEnum.YOD_001ts, CardDB.cardIDEnum.YOD_001b); // 乘风而起（双生法术）
+            this.choose2database.Add(CardDB.cardIDEnum.YOD_001ts, CardDB.cardIDEnum.YOD_001c); // 乘风而起（双生法术）
+            this.choose1database.Add(CardDB.cardIDEnum.YOG_529, CardDB.cardIDEnum.YOG_529a); // 禁忌之果
+            this.choose2database.Add(CardDB.cardIDEnum.YOG_529, CardDB.cardIDEnum.YOG_529b); // 禁忌之果
+            // 德鲁伊抉择技能
+            this.choose1database.Add(CardDB.cardIDEnum.AV_205p, CardDB.cardIDEnum.AV_205a); // 德鲁伊技能
+            this.choose2database.Add(CardDB.cardIDEnum.AV_205p, CardDB.cardIDEnum.AV_205pb); // 德鲁伊技能
+            this.choose1database.Add(CardDB.cardIDEnum.ICC_832p, CardDB.cardIDEnum.ICC_832pa); // 污染者玛法里奥技能
+            this.choose2database.Add(CardDB.cardIDEnum.ICC_832p, CardDB.cardIDEnum.ICC_832pb); // 污染者玛法里奥技能
         }
 
 
@@ -2858,8 +3004,8 @@ namespace HREngine.Bots
 
             // 如果泰坦随从本身有特殊条件，例如冷却中或无技能可用
             // !技能1冷却 || !技能2冷却 || !技能3冷却
-            if ((!titanMinion.TitanAbilityUsed1 && !titanMinion.TitanAbilityUsed2 && !titanMinion.TitanAbilityUsed3)
-                || titanMinion.handcard.card.Health <= 0)
+            if ((titanMinion.TitanAbilityUsed1 && titanMinion.TitanAbilityUsed2 && titanMinion.TitanAbilityUsed3)
+                || titanMinion.Hp <= 0)
             {
                 return 1000; // 泰坦技能在冷却或已无可用资源，不应使用
             }
