@@ -21,8 +21,10 @@ namespace HREngine.Bots
             p.callKid(kid, pos, ownplay);
 			p.callKid(kid, pos, ownplay);
 			p.callKid(kid, pos, ownplay);
-			
-		}
+			p.callKid(kid, pos, ownplay);
+			p.callKid(kid, pos, ownplay);
+
+        }
 
         public override PlayReq[] GetPlayReqs()
         {
