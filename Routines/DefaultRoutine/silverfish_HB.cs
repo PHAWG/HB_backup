@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -271,13 +271,13 @@ namespace HREngine.Bots
             bool hasCachedActions = Ai.Instance.bestActions.Count > 0;
             int currentTurn = TritonHs.GameState.GetTurn();
             bool sameTurn = (cachedTurn == currentTurn);
-            
+
             // 如果有缓存的行动且是同一回合，尝试使用预测状态
             if (hasCachedActions && sameTurn && Ai.Instance.nextMoveGuess.mana != -100)
             {
                 sleepRetry = false;
                 Log.Info("[AI] 使用缓存行动，跳过数据读取");
-                
+
                 // 直接使用预测状态，不重新读取数据
                 Ai.Instance.doNextCalcedMove();
                 return true;
@@ -650,9 +650,9 @@ namespace HREngine.Bots
             if (m.handcard.card.Titan)
             {
                 minionStr.Append("[泰坦]");
-                minionStr.Append(m.TitanAbilityUsed1 ? " 技能1可以使用" : " 技能1冷却");
-                minionStr.Append(m.TitanAbilityUsed2 ? " 技能2可以使用" : " 技能2冷却");
-                minionStr.Append(m.TitanAbilityUsed3 ? " 技能3可以使用" : " 技能3冷却");
+                minionStr.Append(!m.TitanAbilityUsed1 ? " 技能1可以使用" : " 技能1冷却");
+                minionStr.Append(!m.TitanAbilityUsed2 ? " 技能2可以使用" : " 技能2冷却");
+                minionStr.Append(!m.TitanAbilityUsed3 ? " 技能3可以使用" : " 技能3冷却");
             }
         }
         private void printstuff()  //会输出到文件夹UltimateLogs里面
@@ -708,9 +708,9 @@ namespace HREngine.Bots
                 // if (m.handcard.card.Titan)
                 // {
                 //     myVal.Append("[泰坦]");
-                //     myVal.Append(m.TitanAbilityUsed1 ? " 技能1可以使用" : " 技能1冷却");
-                //     myVal.Append(m.TitanAbilityUsed2 ? " 技能2可以使用" : " 技能2冷却");
-                //     myVal.Append(m.TitanAbilityUsed3 ? " 技能3可以使用" : " 技能3冷却");
+                //     myVal.Append(!m.TitanAbilityUsed1 ? " 技能1可以使用" : " 技能1冷却");
+                //     myVal.Append(!m.TitanAbilityUsed2 ? " 技能2可以使用" : " 技能2冷却");
+                //     myVal.Append(!m.TitanAbilityUsed3 ? " 技能3可以使用" : " 技能3冷却");
                 // }
                 BuilderMinionStringInfo(myVal, m);
             }
@@ -1036,7 +1036,7 @@ namespace HREngine.Bots
                     m.maxHp = entity.GetHealth();
                     m.Hp = entity.GetCurrentHealth();
                     if (m.Hp <= 0)
-                        return;
+                        continue;
                     m.wounded = m.maxHp > m.Hp;
                     m.own = ControlledByFriendly;
 
@@ -1162,13 +1162,14 @@ namespace HREngine.Bots
             List<Card> Handcards = player.GetHandZone().GetCards();
             if (ControlledByFriendly)
             {
-                anzcards = handCards.Count;
+                anzcards = Handcards.Count;
             }
             else
             {
-                enemyAnzCards = handCards.Count;
+                enemyAnzCards = Handcards.Count;
                 return;
             }
+            
             foreach (Card card in Handcards)
             {
                 Entity entity = card.GetEntity();
@@ -1259,11 +1260,11 @@ namespace HREngine.Bots
                     if (ControlledByFriendly)
                     {
 
-                        Questmanager.Instance.updateQuestStuff(cardId, currentQuestProgress, questProgressTotal, true);
+                        Questmanager.Instance.updateQuestStuff(cardId, currentQuestProgress, questProgressTotal, ControlledByFriendly);
                     }
                     else
                     {
-                        Questmanager.Instance.updateQuestStuff(cardId, currentQuestProgress, questProgressTotal, true);
+                        Questmanager.Instance.updateQuestStuff(cardId, currentQuestProgress, questProgressTotal, ControlledByFriendly);
 
                     }
 
@@ -1274,7 +1275,6 @@ namespace HREngine.Bots
                     string cardId = secret.GetCardId();
                     int currentQuestProgress = entity.GetTag(GAME_TAG.QUEST_PROGRESS);
                     int questProgressTotal = entity.GetTag(GAME_TAG.QUEST_PROGRESS_TOTAL);
-                    Questmanager.Instance.updateQuestStuff(cardId, currentQuestProgress, questProgressTotal, true);
                     if (ControlledByFriendly)
                         ownSecretList.Add(cardId);
                     else
