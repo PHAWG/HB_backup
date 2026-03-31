@@ -1504,6 +1504,8 @@ def Execute():
             else
             {
                 Log.WarnFormat("使用英雄技能: {0} 暂时没有目标 抉择:{1}   惩罚值：{2}", cardtoplay.Name, moveTodo.druidchoice, moveTodo.penalty);
+                await cardtoplay.Pickup();
+                
                 if (moveTodo.druidchoice >= 1)
                 {
                     dirtychoice = moveTodo.druidchoice;
@@ -1517,7 +1519,6 @@ def Execute():
                     ChooseOneClick(dirtychoice);
 
                 }
-                await cardtoplay.Pickup();
                 dirtyTargetSource = -1;
                 dirtytarget = -1;
             }
