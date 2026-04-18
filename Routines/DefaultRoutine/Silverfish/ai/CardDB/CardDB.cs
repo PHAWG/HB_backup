@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Reflection;
 using Logger = Triton.Common.LogUtilities.Logger;
 using log4net;
 
@@ -1522,7 +1523,7 @@ namespace HREngine.Bots
                             {
                                 if (a.actionType == actionEnum.playcard)
                                 {
-                                    switch (a.card.card.nameEN)
+                                    switch (a.hc.card.nameEN)
                                     {
                                         case cardNameEN.tuskarrtotemic: retval -= p.ownBrannBronzebeard + 1; break;
                                         case cardNameEN.splittingaxe://分裂战斧
@@ -1534,13 +1535,13 @@ namespace HREngine.Bots
                                             retval -= ownTotemsCount;
                                             break;
                                         default:
-                                            if ((TAG_RACE)a.card.card.race == TAG_RACE.TOTEM) retval--;
+                                            if ((TAG_RACE)a.hc.card.race == TAG_RACE.TOTEM) retval--;
                                             break;
                                     }
                                 }
                                 else if (a.actionType == actionEnum.useHeroPower)
                                 {
-                                    switch (a.card.card.nameEN)
+                                    switch (a.hc.card.nameEN)
                                     {
                                         case cardNameEN.totemiccall: retval--; break;
                                         case cardNameEN.totemicslam: retval--; break;
@@ -1920,10 +1921,10 @@ namespace HREngine.Bots
                             foreach (var pr in c.sim_card.GetPlayReqs()) pr.UpdateCardAttr(c);
                         }
 
-                        // 处理「套牌规则视为同一卡牌」的替换逻辑
-foreach (Card c in instance.cardlist)
-                        {
-if (!string.IsNullOrWhiteSpace(c.TreatItAsTheSameCard))
+                    // 处理「套牌规则视为同一卡牌」的替换逻辑
+                    foreach (Card c in instance.cardlist)
+                    {
+                        if (!string.IsNullOrWhiteSpace(c.TreatItAsTheSameCard))
                         {
                             Card targetCard = instance.getCardDataFromDbfID(c.TreatItAsTheSameCard);
                             if (targetCard != instance.unknownCard)
@@ -2010,7 +2011,7 @@ if (!string.IsNullOrWhiteSpace(c.TreatItAsTheSameCard))
                     //    }
                     //    // 恶魔猎手技能 - 恶魔之爪
                     //    if (c.nameCN == CardDB.cardNameCN.恶魔之爪 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_10bp)
-                        //    {
+                    //    {
                     //        c.sim_card = HERO_10bp;
                     //    }
                     //    // 死亡骑士技能 - 食尸鬼冲锋
@@ -2028,7 +2029,7 @@ if (!string.IsNullOrWhiteSpace(c.TreatItAsTheSameCard))
                     //    if (c.nameCN == CardDB.cardNameCN.图腾崇拜 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_02bp2)
                     //    {
                     //        c.sim_card = HERO_02bp2;
-                        //    }
+                    //    }
                     //    // 潜行者技能 - 浸毒匕首
                     //    if (c.nameCN == CardDB.cardNameCN.浸毒匕首 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_03bp2)
                     //    {

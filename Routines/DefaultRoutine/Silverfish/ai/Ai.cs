@@ -915,7 +915,7 @@ namespace HREngine.Bots
                 // 更新行动中的目标实体ID
                 if (a.target != null && a.target.entitiyID == old) a.target.entitiyID = newone;
                 // 更新行动中的卡牌实体ID
-                if (a.card != null && a.card.entity == old) a.card.entity = newone;
+                if (a.hc != null && a.hc.entity == old) a.hc.entity = newone;
             }
 
         }

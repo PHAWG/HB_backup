@@ -167,9 +167,9 @@ namespace HREngine.Bots
                     {
                         case actionEnum.playcard:
                             // 如果已经有随机伤害，且当前是AOE伤害，则标记为随机伤害在AOE伤害前
-                            if (damageRandom && penman.DamageAllEnemysDatabase.ContainsKey(aa.card.card.nameEN)) rndBeforeDamageAll = true;
+                            if (damageRandom && penman.DamageAllEnemysDatabase.ContainsKey(aa.hc.card.nameEN)) rndBeforeDamageAll = true;
                             // 如果当前是随机伤害，标记为有随机伤害
-                            else if (penman.DamageRandomDatabase.ContainsKey(aa.card.card.nameEN)) damageRandom = true;
+                            else if (penman.DamageRandomDatabase.ContainsKey(aa.hc.card.nameEN)) damageRandom = true;
                             break;
                     }
                 }
@@ -197,17 +197,17 @@ namespace HREngine.Bots
                     {
                         case actionEnum.useHeroPower:
                             // 如果使用的是图腾召唤英雄技能，标记为使用了图腾召唤
-                            if (aa.card.card.nameEN == CardDB.cardNameEN.totemiccall) totemiccall = true;
+                            if (aa.hc.card.nameEN == CardDB.cardNameEN.totemiccall) totemiccall = true;
                             break;
                         case actionEnum.playcard:
                             // 如果当前是AOE伤害法术
-                            if (penman.DamageAllEnemysDatabase.ContainsKey(aa.card.card.nameEN))
+                            if (penman.DamageAllEnemysDatabase.ContainsKey(aa.hc.card.nameEN))
                             {
                                 // 如果AOE法术不在正确的位置
                                 if (i != aoeEnNum)
                                 {
                                     // 如果使用了图腾召唤且当前是法术，不调整
-                                    if (totemiccall && aa.card.card.type == CardDB.cardtype.SPELL) return;
+                                    if (totemiccall && aa.hc.card.type == CardDB.cardtype.SPELL) return;
                                     // 从当前位置移除AOE法术
                                     reorderedActions.RemoveAt(i);
                                     // 将AOE法术插入到正确的位置
@@ -219,7 +219,7 @@ namespace HREngine.Bots
                                 aoeEnNum++;
                             }
                             // 如果有随机伤害在AOE伤害前，且当前是随机伤害法术
-                            else if (rndBeforeDamageAll && aa.card.card.type == CardDB.cardtype.SPELL && penman.DamageRandomDatabase.ContainsKey(aa.card.card.nameEN))
+                            else if (rndBeforeDamageAll && aa.hc.card.type == CardDB.cardtype.SPELL && penman.DamageRandomDatabase.ContainsKey(aa.hc.card.nameEN))
                             {
                                 // 标记为随机伤害
                                 damageRandom = true;
@@ -274,7 +274,7 @@ namespace HREngine.Bots
                                     if (!found) actIdDmg.Add(m.entitiyID, m.Hp);
                                 }
                                 // 将随机伤害的结果添加到字典中
-                                rndActIdsDmg.Add(aa.card.entity, actIdDmg);
+                                rndActIdsDmg.Add(aa.hc.entity, actIdDmg);
                             }
                             break;
                     }
@@ -294,14 +294,14 @@ namespace HREngine.Bots
                     try
                     {
                         // 如果不是随机伤害法术，直接执行动作
-                        if (!(a.actionType == actionEnum.playcard && rndActIdsDmg.ContainsKey(a.card.entity)))
+                        if (!(a.actionType == actionEnum.playcard && rndActIdsDmg.ContainsKey(a.hc.entity)))
                             tmpPf.doAction(a);
                         else
                         {
                             // 如果是随机伤害法术，手动处理伤害
                             tmpPf.playactions.Add(a);
                             // 获取随机伤害的结果
-                            Dictionary<int, int> actIdDmg = rndActIdsDmg[a.card.entity];
+                            Dictionary<int, int> actIdDmg = rndActIdsDmg[a.hc.entity];
                             // 处理敌方英雄的伤害
                             if (actIdDmg.ContainsKey(tmpPf.enemyHero.entitiyID))
                                 tmpPf.minionGetDamageOrHeal(tmpPf.enemyHero, actIdDmg[tmpPf.enemyHero.entitiyID]);
@@ -375,7 +375,7 @@ namespace HREngine.Bots
                     foreach (Handmanager.Handcard hc in p.owncards)
                     {
                         // 找到对应的手牌
-                        if (hc.entity == a.card.entity)
+                        if (hc.entity == a.hc.entity)
                         {
                             // 判断法力值是否足够
                             if (p.mana >= hc.card.getManaCost(p, hc.manacost))
@@ -428,7 +428,7 @@ namespace HREngine.Bots
                     // 检查卡牌是否可以交易
                     foreach (Handmanager.Handcard hc in p.owncards)
                     {
-                        if (hc.entity == a.card.entity)
+                        if (hc.entity == a.hc.entity)
                         {
                             // 检查是否满足交易的条件
                             if (hc.card.Tradeable && p.mana >= hc.card.TradeCost && p.ownDeckSize > 0)
@@ -476,7 +476,7 @@ namespace HREngine.Bots
                     // 检查卡牌是否可以锻造
                     foreach (Handmanager.Handcard hc in p.owncards)
                     {
-                        if (hc.entity == a.card.entity)
+                        if (hc.entity == a.hc.entity)
                         {
                             // 检查是否满足锻造的条件
                             if (hc.card.Forge && p.mana >= hc.card.ForgeCost && !hc.card.Forged)

@@ -678,7 +678,7 @@ namespace HREngine.Bots
             foreach (Action a in alist)
             {
                 if (a.actionType != actionEnum.playcard) continue;
-                CardDB.Card crd = a.card.card;
+                CardDB.Card crd = a.hc.card;
                 foreach (combo c in this.combos)
                 {
                     if ((c.oHero == HeroEnum.None || c.oHero == p.ownHeroName) && c.isCardInCombo(crd))
@@ -692,7 +692,7 @@ namespace HREngine.Bots
                         }
                         if (iic == 2)
                         {
-                            playedcards.Add(a.card); // add only the cards, which dont get a penalty
+                            playedcards.Add(a.hc); // add only the cards, which dont get a penalty
                         }
                     }
                 }

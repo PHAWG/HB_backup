@@ -32,7 +32,7 @@ namespace HREngine.Bots
         // 用于记录操作的类型。
         public actionEnum actionType;
         // 记录出的牌，在attackWithHero、attackWithMinion、useLocation操作中为null
-        public Handmanager.Handcard card;
+        public Handmanager.Handcard hc;
         // 用于记录位置，如actionType为playcard时就会有内容，
         // 比如出一个随从就会标记出放置的位置（最左边为0），
         // 如果是出一张法术牌的话，具体内容没有研究，应该是有赋值的
@@ -59,7 +59,7 @@ namespace HREngine.Bots
         public Action(actionEnum type, Handmanager.Handcard hc, Minion ownM, int place, Minion targetM, int pen, int choice)
         {
             this.actionType = type;
-            this.card = hc;
+            this.hc = hc;
             this.own = ownM;
             this.place = place;
             this.target = targetM;
@@ -72,7 +72,7 @@ namespace HREngine.Bots
         public Action(actionEnum type, Handmanager.Handcard hc, Minion ownM, int place, Minion targetM, int pen, int choice, int abilityNO)
         {
             this.actionType = type;
-            this.card = hc;
+            this.hc = hc;
             this.own = ownM;
             this.place = place;
             this.target = targetM;
@@ -86,7 +86,7 @@ namespace HREngine.Bots
         public Action(Action a)
         {
             this.actionType = a.actionType;
-            this.card = a.card;
+            this.hc = a.hc;
             this.place = a.place;
             this.own = a.own;
             this.target = a.target;
@@ -115,7 +115,7 @@ namespace HREngine.Bots
                         str.Append("回合结束");
                         break;
                     case actionEnum.playcard:
-                        str.AppendFormat("打出 {0} 目标 {1} 惩罚值: {2}", this.card?.card?.chnInfo() ?? "无", this.target?.info() ?? "空", this.penalty);
+                        str.AppendFormat("打出 {0} 目标 {1} 惩罚值: {2}", this.hc?.card?.chnInfo() ?? "无", this.target?.info() ?? "空", this.penalty);
                         break;
                     case actionEnum.attackWithHero:
                         str.AppendFormat("让英雄攻击 {0} 惩罚值: {1}", this.target?.info() ?? "空", this.penalty);
@@ -127,7 +127,7 @@ namespace HREngine.Bots
                         str.AppendFormat("使用随从 {0} 攻击 {1} 惩罚值: {2}", this.own.info(), this.target?.info() ?? "空", this.penalty);
                         break;
                     case actionEnum.trade:
-                        str.AppendFormat("使用随从 {0} 交易 惩罚值: {1}", this.card?.card?.chnInfo() ?? "无", this.penalty);
+                        str.AppendFormat("使用随从 {0} 交易 惩罚值: {1}", this.hc?.card?.chnInfo() ?? "无", this.penalty);
                         break;
                     case actionEnum.useLocation:
                         str.AppendFormat("使用地标 {0} 目标 {1} 惩罚值: {2}", this.own.info(), this.target?.info() ?? "空", this.penalty);
@@ -250,7 +250,7 @@ namespace HREngine.Bots
                     str.Append("回合结束");
                     break;
                 case actionEnum.playcard:
-                    str.AppendFormat("打出 {0} 目标 {1} 惩罚值：{2} ", this.card?.card?.chnInfo() ?? "无", this.target?.info() ?? "空", this.penalty);
+                    str.AppendFormat("打出 {0} 目标 {1} 惩罚值：{2} ", this.hc?.card?.chnInfo() ?? "无", this.target?.info() ?? "空", this.penalty);
                     break;
                 case actionEnum.attackWithHero:
                     str.AppendFormat("让英雄攻击 {0} 惩罚值：{1} ", this.target?.info() ?? "空", this.penalty);
@@ -262,7 +262,7 @@ namespace HREngine.Bots
                     str.AppendFormat("使用随从 {0} 攻击 {1} 惩罚值：{2} ", this.own.info(), this.target?.info() ?? "空", this.penalty);
                     break;
                 case actionEnum.trade:
-                    str.AppendFormat("使用随从 {0} 交易 惩罚值：{1} ", this.card?.card?.chnInfo() ?? "无", this.penalty);
+                    str.AppendFormat("使用随从 {0} 交易 惩罚值：{1} ", this.hc?.card?.chnInfo() ?? "无", this.penalty);
                     break;
                 case actionEnum.useLocation:
                     str.AppendFormat("使用地标 {0} 目标 {1} 惩罚值：{2} ", this.own.info(), this.target?.info() ?? "空", this.penalty);
@@ -365,7 +365,7 @@ namespace HREngine.Bots
             switch (this.actionType)
             {
                 case actionEnum.playcard:
-                    retval.AppendFormat("打出 {0}", this.card?.card?.chnInfo() ?? "无");
+                    retval.AppendFormat("打出 {0}", this.hc?.card?.chnInfo() ?? "无");
                     retval.AppendFormat(" 目标 {0}", this.target?.info() ?? "空");
 
                     if (this.place >= 0)
@@ -388,10 +388,10 @@ namespace HREngine.Bots
                     retval.AppendFormat("使用英雄技能 目标 {0}", this.target?.info() ?? "空");
                     break;
                 case actionEnum.trade:
-                    retval.AppendFormat("使用随从 {0} 交易 ", this.card?.card?.chnInfo() ?? "无");
+                    retval.AppendFormat("使用随从 {0} 交易 ", this.hc?.card?.chnInfo() ?? "无");
                     break;
                 case actionEnum.useLocation:
-                    retval.AppendFormat("使用随从 {0} 地标 目标 {1} 惩罚值", this.own, this.card?.card?.chnInfo() ?? "无", this, penalty);
+                    retval.AppendFormat("使用随从 {0} 地标 目标 {1} 惩罚值", this.own, this.hc?.card?.chnInfo() ?? "无", this, penalty);
                     break;
                 case actionEnum.useTitanAbility:
                     retval.Append("使用泰坦技能 ");
