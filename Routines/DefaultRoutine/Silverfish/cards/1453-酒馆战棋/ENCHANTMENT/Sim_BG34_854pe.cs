@@ -5,10 +5,10 @@ using System.Text;
 namespace HREngine.Bots
 {
 	//附魔 中立 费用：0
-	//Right-most Tavern Minion Buff Player Ench [DNT]
-	//Right-most Tavern Minion Buff Player Ench [DNT]
-	//The right-most minion in the Tavern has increased stats.
-	//酒馆中最右边的随从拥有的属性值提高。
+	//Random minion Tavern Minion Buff Player Ench [DNT]
+	//碎击碎从酒馆增益玩家附加效果[DNT]
+	//A random minion in the Tavern gains stats.
+	//酒馆中的一个随机随从获得属性值。
 	class Sim_BG34_854pe : SimTemplate
 	{
 		

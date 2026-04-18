@@ -4,11 +4,11 @@ using System.Text;
 
 namespace HREngine.Bots
 {
-	//BATTLEGROUND_TRINKET 中立 费用：0
+	//BATTLEGROUND_TRINKET 中立 费用：2
 	//Gilded Anchor
 	//镀金船锚
-	//At the end of each turn, give your Golden minions +8/+8.
-	//在每个回合结束时，使你的金色随从获得+8/+8。
+	//At the end of each turn, give your Golden minions +{0}/+{1}.
+	//在每个回合结束时，使你的金色随从获得+{0}/+{1}。
 	class Sim_BG32_MagicItem_231t : SimTemplate
 	{
 		

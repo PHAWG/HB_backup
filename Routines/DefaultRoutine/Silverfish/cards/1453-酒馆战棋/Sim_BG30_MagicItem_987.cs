@@ -4,7 +4,7 @@ using System.Text;
 
 namespace HREngine.Bots
 {
-	//BATTLEGROUND_TRINKET 中立 费用：7
+	//BATTLEGROUND_TRINKET 中立 费用：5
 	//Balladist Portrait
 	//民谣歌手肖像
 	//[x]Get a Lovesick Balladist.At the start of each turn,get another. Your Lovesick__Balladists also give Attack.

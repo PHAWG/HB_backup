@@ -7,8 +7,8 @@ namespace HREngine.Bots
 	//附魔 中立 费用：0
 	//Banana Slammed
 	//香蕉猛援
-	//Stats set to {0}/{1}.
-	//属性值变为{0}/{1}。
+	//Attack set to {0}.
+	//攻击力变为{0}。
 	class Sim_BG26_802e : SimTemplate
 	{
 		

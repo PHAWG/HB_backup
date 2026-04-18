@@ -4,7 +4,7 @@ using System.Text;
 
 namespace HREngine.Bots
 {
-	//BATTLEGROUND_TRINKET 中立 费用：0
+	//BATTLEGROUND_TRINKET 中立 费用：4
 	//Nether Pendant
 	//虚空坠饰
 	//[x]Minions in the Tavern have+{1}/+{1}. Improves every 3times your hero takes damage__outside combat. <i>({0} left!)</i>

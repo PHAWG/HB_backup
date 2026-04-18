@@ -4,11 +4,11 @@ using System.Text;
 
 namespace HREngine.Bots
 {
-	//BATTLEGROUND_TRINKET 中立 费用：6
+	//BATTLEGROUND_TRINKET 中立 费用：4
 	//Shark Cannon
 	//鲨鱼火炮
-	//[x]After you spend 12 Gold,give your Pirates+{2}/+{2} and improvethis. <i>({0} left!)</i>
-	//在你花掉12枚铸币后，使你的海盗获得+{2}/+{2}并提升此效果。<i>（还剩{0}枚！）</i>
+	//[x]After you spend {4} Gold,give your Pirates+{2}/+{2} and improvethis. <i>({0} Gold left!)</i>
+	//在你花掉{4}枚铸币后，使你的海盗获得+{2}/+{2}并提升此效果。<i>（还剩{0}枚！）</i>
 	class Sim_BG32_MagicItem_232 : SimTemplate
 	{
 		

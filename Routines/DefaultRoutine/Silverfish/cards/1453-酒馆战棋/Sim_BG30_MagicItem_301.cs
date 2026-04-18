@@ -4,7 +4,7 @@ using System.Text;
 
 namespace HREngine.Bots
 {
-	//BATTLEGROUND_TRINKET 中立 费用：6
+	//BATTLEGROUND_TRINKET 中立 费用：5
 	//Eternal Portrait
 	//永恒肖像
 	//[x]Get an Eternal Knight.<b>Start of Combat:</b> Give yourEternal Knights <b>Taunt</b>and <b>Reborn</b>.

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace HREngine.Bots
 {
-	//BATTLEGROUND_TRINKET 中立 费用：5
+	//BATTLEGROUND_TRINKET 中立 费用：4
 	//Baleful Incense
 	//怨毒熏香
 	//<b>Start of Combat:</b> Give your left- and right-most Undead <b>Reborn</b>.
