@@ -137,7 +137,7 @@ namespace HREngine.Bots
         /// <summary>
         /// 最优行动列表
         /// </summary>
-        public List<Action> bestActions = new List<Action>();
+        public Queue<Action> bestActions = new Queue<Action>();
 
         /// <summary>
         /// 是否进行第二回合模拟
@@ -308,7 +308,7 @@ namespace HREngine.Bots
 #endif
 
             // 清空最优行动列表，清除上次回合的最优操作
-            this.bestActions.Clear();  // 初始化，清除上次回合的最优操作  这是List<Action>
+            this.bestActions.Clear();  // 初始化，清除上次回合的最优操作
             // 重置最优移动
             this.bestmove = null;
 
@@ -321,7 +321,7 @@ namespace HREngine.Bots
             // 遍历最优行动，添加到最优行动列表并打印
             foreach (Action a in bestplay.playactions)
             {
-                this.bestActions.Add(new Action(a));
+                this.bestActions.Enqueue(new Action(a));
                 a.print();
             }
             // 打印最优行动列表结束
@@ -335,8 +335,7 @@ namespace HREngine.Bots
             // 如果有最优行动，设置第一个为当前最优移动，并从列表中移除
             if (this.bestActions.Count >= 1)
             {
-                this.bestmove = this.bestActions[0];
-                this.bestActions.RemoveAt(0);
+                this.bestmove = this.bestActions.Dequeue();
             }
             // 更新最优移动值
             this.bestmoveValue = bestval;
@@ -375,9 +374,8 @@ namespace HREngine.Bots
             this.bestmove = null;
             if (this.bestActions.Count >= 1)
             {
-                //下一步操作
-                this.bestmove = this.bestActions[0];
-                this.bestActions.RemoveAt(0);
+                //这是下一步操作
+                this.bestmove = this.bestActions.Dequeue();
             }
             if (this.nextMoveGuess == null) this.nextMoveGuess = new Playfield();
             else
@@ -700,7 +698,7 @@ namespace HREngine.Bots
                 // 步骤加1
                 step++;
                 // 打印步骤信息
-                help.logg("第" + step + "步:");
+                help.logg($"第{step}步:");
                 // 打印最优移动
                 bestmove.print(false);
                 // 执行最优移动
@@ -731,7 +729,7 @@ namespace HREngine.Bots
                 // 步骤加1
                 step++;
                 // 打印步骤信息
-                help.logg("第" + step + "步:");
+                help.logg($"第{step}步:");
                 // 检查行动是否有效且不是结束回合
                 if (imove != null && imove.actionType != actionEnum.endturn)  // save the guessed move, so we doesnt need to recalc!
                 {
