@@ -1472,11 +1472,11 @@ def Execute():
                 if (target != null)
                 {
                     Log.WarnFormat("使用英雄技能: {0} 目标为 {1} 抉择:{2}    惩罚值：{3}", cardtoplay.Name, target.Name, moveTodo.druidchoice, moveTodo.penalty);
-                    if (moveTodo.druidchoice > 0)
+                    if (moveTodo.druidchoice >= 1)
                     {
                         dirtytarget = moveTodo.target.entitiyID;
                         dirtychoice = moveTodo.druidchoice;
-                          if (moveTodo.hc != null)
+                        if (moveTodo.hc != null)
                         {
                             choiceCardId = moveTodo.hc.card.cardIDenum.ToString();
                         }
@@ -1484,6 +1484,7 @@ def Execute():
                         await Coroutine.Sleep(333);
                         // 执行抉择点击
                         ChooseOneClick(dirtychoice);
+
                     }
                     dirtyTargetSource = 9000;
                     dirtytarget = moveTodo.target.entitiyID;
@@ -1501,15 +1502,9 @@ def Execute():
             }
             else
             {
-                Log.WarnFormat("使用英雄技能: {0} 暂时没有目标    惩罚值：{1}", cardtoplay.Name, moveTodo.penalty);
-                if (moveTodo.druidchoice >= 1)
-                {
-                    dirtychoice = moveTodo.druidchoice;
-                    choiceCardId = moveTodo.hc.card.cardIDenum.ToString();
-                }
-                dirtyTargetSource = -1;
-                dirtytarget = -1;
+                Log.WarnFormat("使用英雄技能: {0} 暂时没有目标 抉择:{1}   惩罚值：{2}", cardtoplay.Name, moveTodo.druidchoice, moveTodo.penalty);
                 await cardtoplay.Pickup();
+                
                 if (moveTodo.druidchoice >= 1)
                 {
                     dirtychoice = moveTodo.druidchoice;
