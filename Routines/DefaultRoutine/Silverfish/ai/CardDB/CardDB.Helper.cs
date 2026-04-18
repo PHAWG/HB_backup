@@ -118,5 +118,32 @@ namespace HREngine.Bots
             if (Enum.TryParse<CardDB.SpellSchool>(spellSchoolNameEn, false, out SpellSchoolEnum)) return SpellSchoolEnum;
             else return CardDB.SpellSchool.PHYSICAL_COMBAT;
         }
+
+        /// <summary>
+        /// 根据卡牌 ID 获取对应的 SimTemplate 实例
+        /// </summary>
+        public static SimTemplate GetCardSimulation(CardDB.cardIDEnum tempCardIdEnum)
+        {
+            // 如需处理英雄皮肤/幸运币映射，在此处放置原 switch 块（略）
+            // 不使用字符串插值，改用传统拼接
+            string className = "Sim_" + tempCardIdEnum.ToString();
+            Type simType = GetTypeByName(className);
+            if (simType != null)
+            {
+                return Activator.CreateInstance(simType) as SimTemplate;
+            }
+            return new SimTemplate(); // 无对应类时返回空模板
+        }
+
+        // 根据类名查找类型
+        private static Type GetTypeByName(string className)
+        {
+            Type t;
+            if (SimTypesDict.TryGetValue(className, out t))
+            {
+                return t;
+            }
+            return null;
+        }
     }
 }

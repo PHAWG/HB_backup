@@ -14,7 +14,26 @@ namespace HREngine.Bots
     {
         private static readonly ILog Log = Logger.GetLoggerInstanceForType();
        
+        // 存储 Sim_* 类的类型字典
+        private static readonly Dictionary<string, Type> SimTypesDict;
 
+        // 静态构造函数：反射填充字典
+        static CardDB()
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            Type baseType = typeof(SimTemplate);
+            // 使用显式委托 + 传统循环代替 LINQ 并行查询（避免隐式类型 lambda 争议）
+            Dictionary<string, Type> dict = new Dictionary<string, Type>();
+            Type[] allTypes = assembly.GetTypes();
+            foreach (Type t in allTypes)
+            {
+                if (t.Namespace == "HREngine.Bots" && t.BaseType == baseType)
+                {
+                    dict[t.Name] = t;
+                }
+            }
+            SimTypesDict = dict;
+        }
         public class Card
         {
             public cardIDEnum cardIDenum = cardIDEnum.None;//cardId
@@ -1901,15 +1920,161 @@ namespace HREngine.Bots
                             foreach (var pr in c.sim_card.GetPlayReqs()) pr.UpdateCardAttr(c);
                         }
 
-                        // foreach (Card c in instance.cardlist)
-                        // {
-                        //         if (!string.IsNullOrWhiteSpace(c.TreatItAsTheSameCard))
-                        //         {
-                        //             Card OriginCard = instance.getCardDataFromDbfID(c.TreatItAsTheSameCard);
-                        //             if (OriginCard != instance.unknownCard && OriginCard.sim_card != null)
-                        //                 c.sim_card = OriginCard.sim_card;
-                        //         }
-                        // }
+                        // 处理「套牌规则视为同一卡牌」的替换逻辑
+foreach (Card c in instance.cardlist)
+                        {
+if (!string.IsNullOrWhiteSpace(c.TreatItAsTheSameCard))
+                        {
+                            Card targetCard = instance.getCardDataFromDbfID(c.TreatItAsTheSameCard);
+                            if (targetCard != instance.unknownCard)
+                                c.sim_card = targetCard.sim_card;   // 替换为关联卡牌的模拟逻辑
+                        }
+                    }  
+
+                    // 统一所有幸运币和技能卡牌的模拟模板
+                    var coinSim = GetCardSimulation(CardDB.cardIDEnum.GAME_005);    // 幸运币
+                    var HERO_01bp = GetCardSimulation(CardDB.cardIDEnum.HERO_01bp); // 战士
+                    var HERO_02bp = GetCardSimulation(CardDB.cardIDEnum.HERO_02bp); // 萨满
+                    var HERO_03bp = GetCardSimulation(CardDB.cardIDEnum.HERO_03bp); // 潜行者
+                    var HERO_04bp = GetCardSimulation(CardDB.cardIDEnum.HERO_04bp); // 圣骑士
+                    var HERO_05bp = GetCardSimulation(CardDB.cardIDEnum.HERO_05bp); // 猎人
+                    var HERO_06bp = GetCardSimulation(CardDB.cardIDEnum.HERO_06bp); // 德鲁伊
+                    var HERO_07bp = GetCardSimulation(CardDB.cardIDEnum.HERO_07bp); // 术士
+                    var HERO_08bp = GetCardSimulation(CardDB.cardIDEnum.HERO_08bp); // 法师
+                    var HERO_09bp = GetCardSimulation(CardDB.cardIDEnum.HERO_09bp); // 牧师
+                    var HERO_10bp = GetCardSimulation(CardDB.cardIDEnum.HERO_10bp); // 恶魔猎手
+                    var HERO_11bp = GetCardSimulation(CardDB.cardIDEnum.HERO_11bp); // 死亡骑士
+                    // 升级后的技能
+                    var HERO_01bp2 = GetCardSimulation(CardDB.cardIDEnum.HERO_01bp2); // 战士
+                    var HERO_02bp2 = GetCardSimulation(CardDB.cardIDEnum.HERO_02bp2); // 萨满
+                    var HERO_03bp2 = GetCardSimulation(CardDB.cardIDEnum.HERO_03bp2); // 潜行者
+                    var HERO_04bp2 = GetCardSimulation(CardDB.cardIDEnum.HERO_04bp2); // 圣骑士
+                    var HERO_05bp2 = GetCardSimulation(CardDB.cardIDEnum.HERO_05bp2); // 猎人
+                    var HERO_06bp2 = GetCardSimulation(CardDB.cardIDEnum.HERO_06bp2); // 德鲁伊
+                    var HERO_07bp2 = GetCardSimulation(CardDB.cardIDEnum.HERO_07bp2); // 术士
+                    var HERO_08bp2 = GetCardSimulation(CardDB.cardIDEnum.HERO_08bp2); // 法师
+                    var HERO_09bp2 = GetCardSimulation(CardDB.cardIDEnum.HERO_09bp2); // 牧师
+                    var HERO_10bp2 = GetCardSimulation(CardDB.cardIDEnum.HERO_10bp2); // 恶魔猎手
+                    var HERO_11bp2 = GetCardSimulation(CardDB.cardIDEnum.HERO_11bp2); // 死亡骑士
+                    //foreach (Card c in instance.cardlist)
+                    //{
+                    //    // 幸运币
+                    //    if (c.coincard && c.cardIDenum != CardDB.cardIDEnum.GAME_005)
+                    //    {
+                    //        c.sim_card = coinSim;
+                    //    }
+                    //    // 战士技能 - 全副武装
+                    //    if (c.nameCN == CardDB.cardNameCN.全副武装 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_01bp)
+                    //    {
+                    //        c.sim_card = HERO_01bp;
+                    //    }
+                    //    // 萨满技能 - 图腾召唤
+                    //    if (c.nameCN == CardDB.cardNameCN.图腾召唤 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_02bp)
+                    //    {
+                    //        c.sim_card = HERO_02bp;
+                    //    }
+                    //    // 潜行者技能 - 匕首精通
+                    //    if (c.nameCN == CardDB.cardNameCN.匕首精通 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_03bp)
+                    //    {
+                    //        c.sim_card = HERO_03bp;
+                    //    }
+                    //    // 圣骑士技能 - 援军
+                    //    if (c.nameCN == CardDB.cardNameCN.援军 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_04bp)
+                    //    {
+                    //        c.sim_card = HERO_04bp;
+                    //    }
+                    //    // 猎人技能 - 稳固射击
+                    //    if (c.nameCN == CardDB.cardNameCN.稳固射击 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_05bp)
+                    //    {
+                    //        c.sim_card = HERO_05bp;
+                    //    }
+                    //    // 德鲁伊技能 - 变形
+                    //    if (c.nameCN == CardDB.cardNameCN.变形 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_06bp)
+                    //    {
+                    //        c.sim_card = HERO_06bp;
+                    //    }
+                    //    // 术士技能 - 生命分流
+                    //    if (c.nameCN == CardDB.cardNameCN.生命分流 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_07bp)
+                    //    {
+                    //        c.sim_card = HERO_07bp;
+                    //    }
+                    //    // 法师技能 - 火焰冲击
+                    //    if (c.nameCN == CardDB.cardNameCN.火焰冲击 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_08bp)
+                    //    {
+                    //        c.sim_card = HERO_08bp;
+                    //    }
+                    //    // 牧师技能 - 次级治疗术
+                    //    if (c.nameCN == CardDB.cardNameCN.次级治疗术 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_09bp)
+                    //    {
+                    //        c.sim_card = HERO_09bp;
+                    //    }
+                    //    // 恶魔猎手技能 - 恶魔之爪
+                    //    if (c.nameCN == CardDB.cardNameCN.恶魔之爪 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_10bp)
+                        //    {
+                    //        c.sim_card = HERO_10bp;
+                    //    }
+                    //    // 死亡骑士技能 - 食尸鬼冲锋
+                    //    if (c.nameCN == CardDB.cardNameCN.食尸鬼冲锋 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_11bp)
+                    //    {
+                    //        c.sim_card = HERO_11bp;
+                    //    }
+
+                    //    // 战士技能 - 坚壁
+                    //    if (c.nameCN == CardDB.cardNameCN.坚壁 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_01bp2)
+                    //    {
+                    //        c.sim_card = HERO_01bp2;
+                    //    }
+                    //    // 萨满技能 - 图腾崇拜
+                    //    if (c.nameCN == CardDB.cardNameCN.图腾崇拜 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_02bp2)
+                    //    {
+                    //        c.sim_card = HERO_02bp2;
+                        //    }
+                    //    // 潜行者技能 - 浸毒匕首
+                    //    if (c.nameCN == CardDB.cardNameCN.浸毒匕首 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_03bp2)
+                    //    {
+                    //        c.sim_card = HERO_03bp2;
+                    //    }
+                    //    // 圣骑士技能 - 白银之手
+                    //    if (c.nameCN == CardDB.cardNameCN.白银之手 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_04bp2)
+                    //    {
+                    //        c.sim_card = HERO_04bp2;
+                    //    }
+                    //    // 猎人技能 - 弩炮射击
+                    //    if (c.nameCN == CardDB.cardNameCN.弩炮射击 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_05bp2)
+                    //    {
+                    //        c.sim_card = HERO_05bp2;
+                    //    }
+                    //    // 德鲁伊技能 - 恐怖变形
+                    //    if (c.nameCN == CardDB.cardNameCN.恐怖变形 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_06bp2)
+                    //    {
+                    //        c.sim_card = HERO_06bp2;
+                    //    }
+                    //    // 术士技能 - 灵魂分流
+                    //    if (c.nameCN == CardDB.cardNameCN.灵魂分流 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_07bp2)
+                    //    {
+                    //        c.sim_card = HERO_07bp2;
+                    //    }
+                    //    // 法师技能 - 二级火焰冲击
+                    //    if (c.nameCN == CardDB.cardNameCN.二级火焰冲击 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_08bp2)
+                    //    {
+                    //        c.sim_card = HERO_08bp2;
+                    //    }
+                    //    // 牧师技能 - 治疗术
+                    //    if (c.nameCN == CardDB.cardNameCN.治疗术 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_09bp2)
+                    //    {
+                    //        c.sim_card = HERO_09bp2;
+                    //    }
+                    //    // 恶魔猎手技能 - 恶魔之咬
+                    //    if (c.nameCN == CardDB.cardNameCN.恶魔之咬 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_10bp2)
+                    //    {
+                    //        c.sim_card = HERO_10bp2;
+                    //    }
+                    //    // 死亡骑士技能 - 食尸鬼狂暴
+                    //    if (c.nameCN == CardDB.cardNameCN.食尸鬼狂暴 && c.type == CardDB.cardtype.HEROPWR && c.cardIDenum != CardDB.cardIDEnum.HERO_11bp2)
+                    //    {
+                    //        c.sim_card = HERO_11bp2;
+                    //    }
+                    //}
 
 
                         Helpfunctions.Instance.ErrorLog("加载完毕,总计用时: " + (DateTime.Now - dt).TotalSeconds + " s");
