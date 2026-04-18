@@ -124,7 +124,7 @@ namespace HREngine.Bots
             foreach (Handmanager.Handcard hc in p.owncards)
             {
                 // 跳过未知卡牌和隐藏费用的卡牌
-                if (hc.card.nameEN == CardDB.cardNameEN.unknown || hc.card.HideCost) continue;
+                if (hc.card.nameEN == CardDB.cardNameEN.unknown || hc.card.HideCost || hc.literallyUnplayable) continue;
 
                 // 随从和地标卡牌需要检查场上随从数量上限（7个）
                 if (hc.card.type == CardDB.cardtype.MOB || hc.card.type == CardDB.cardtype.LOCATION)

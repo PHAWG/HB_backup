@@ -23,7 +23,8 @@ namespace HREngine.Bots
             public int MODULAR_ENTITY_PART_1 = 0;//自定义模块1
             public int MODULAR_ENTITY_PART_2 = 0;//自定义模块2
             public int TAG_ONE_TURN_EFFECT = 0;
-            public int LUNAHIGHLIGHTHINT = 0;
+            public int LUNAHIGHLIGHTHINT = 0;//高亮提示
+            public bool literallyUnplayable = false;//是否无法使用
             public CardDB.cardIDEnum HAS_DARK_GIFT = CardDB.cardIDEnum.None;
             public int scheme = 1;
             public List<CardDB.cardIDEnum> enchs = new List<CardDB.cardIDEnum>();
@@ -113,6 +114,8 @@ namespace HREngine.Bots
                 this.conditionalCount = hc.conditionalCount;
                 //条件卡牌
                 this.conditionalList = hc.conditionalList;
+                //无法使用
+                this.literallyUnplayable = hc.literallyUnplayable;
 
 
             }
@@ -148,59 +151,20 @@ namespace HREngine.Bots
                 this.conditionalCount = hc.conditionalCount;
                 //条件卡牌
                 this.conditionalList = hc.conditionalList;
+                //无法使用
+                this.literallyUnplayable = hc.literallyUnplayable;
+
             }
 
             //读取卡牌法力值
             public int getManaCost(Playfield p)
-            {
-                if (this.enchs.Count > 0)
-                {
-                    foreach (CardDB.cardIDEnum ench in this.enchs)
-                    {
-                        switch (ench)
-                        {
-                            case CardDB.cardIDEnum.SW_052t4e:// TODO 游戏内无法使用 声光干扰器
-                            case CardDB.cardIDEnum.EDR_526e: // TODO 雷弗拉尔，恶念巨蛛
-                            case CardDB.cardIDEnum.TTN_744e1:// TODO 严寒冰封
-                            case CardDB.cardIDEnum.EDR_234e2:// TODO 翡翠厚赠
-                                return 1000;
-                            case CardDB.cardIDEnum.MAW_014e2:// TODO 公诉人梅尔特拉尼克斯
-                                if (this.position != 1 && this.position != p.owncards.Count)
-                                    return 1000;
-                                break;
-                            default:
-                                continue;
-                        }
-                    }
-                }
-
+            {    
                 return this.card.getManaCost(p, this.manacost);
             }
 
             //判定卡牌是否能够使用
             public bool canplayCard(Playfield p, bool own)
             {
-                if (this.enchs.Count > 0)
-                {
-                    foreach (CardDB.cardIDEnum ench in this.enchs)
-                    {
-                        switch (ench)
-                        {
-                            case CardDB.cardIDEnum.SW_052t4e:// TODO 游戏内无法使用 声光干扰器
-                            case CardDB.cardIDEnum.EDR_526e:// TODO 雷弗拉尔，恶念巨蛛
-                            case CardDB.cardIDEnum.TTN_744e1:// TODO 严寒冰封
-                            case CardDB.cardIDEnum.EDR_234e2:// TODO 翡翠厚赠
-                                return false;
-                            case CardDB.cardIDEnum.MAW_014e2:// TODO 公诉人梅尔特拉尼克斯
-                                if (this.position != 1 && this.position != p.owncards.Count)
-                                    return false;
-                                break;
-                            default:
-                                continue;
-                        }
-                    }
-
-                }
                 return this.card.canplayCard(p, this.manacost, own);
 
             }

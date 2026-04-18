@@ -377,6 +377,9 @@ namespace HREngine.Bots
                         // 找到对应的手牌
                         if (hc.entity == a.hc.entity)
                         {
+                            // 如果卡牌无法使用，则返回 false
+                            if (hc.literallyUnplayable)
+                                return actionFound;
                             // 判断法力值是否足够
                             if (p.mana >= hc.card.getManaCost(p, hc.manacost))
                             {
