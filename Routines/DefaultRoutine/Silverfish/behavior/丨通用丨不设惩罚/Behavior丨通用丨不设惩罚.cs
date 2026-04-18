@@ -108,7 +108,7 @@ namespace HREngine.Bots
                     default:
                         continue;
                 }
-                switch (a.card.card.nameCN)
+                switch (a.hc.card.nameCN)
                 {
                     case CardDB.cardNameCN.幸运币:
                         retval -= i;

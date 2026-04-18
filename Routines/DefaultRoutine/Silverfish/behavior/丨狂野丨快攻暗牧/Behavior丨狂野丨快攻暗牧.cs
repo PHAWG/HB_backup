@@ -891,7 +891,7 @@ namespace HREngine.Bots
                     case actionEnum.playcard:
 
                         // 判断具体的卡牌，并根据出牌顺序调整评分  减分早下  加分晚下 分数别太极端 会出毛病
-                        switch (a.card.card.nameCN)
+                        switch (a.hc.card.nameCN)
                         {
                             case CardDB.cardNameCN.幸运币:
                                 retval -= i * 10;
@@ -910,7 +910,7 @@ namespace HREngine.Bots
                 }
 
                 // 如果出牌是海盗或“虚触侍从”
-                if (a.card.card.race == CardDB.Race.PIRATE || a.card.card.nameCN == CardDB.cardNameCN.虚触侍从)
+                if (a.hc.card.race == CardDB.Race.PIRATE || a.hc.card.nameCN == CardDB.cardNameCN.虚触侍从)
                 {
                     // 检查己方随从是否有“船载火炮”
                     foreach (Minion m in p.ownMinions)

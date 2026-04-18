@@ -1318,8 +1318,8 @@ def Execute():
         /// </summary>
         private async Task PlayCard(Action moveTodo)
         {
-            Questmanager.Instance.updatePlayedCardFromHand(moveTodo.card);
-            HSCard cardtoplay = getCardWithNumber(moveTodo.card.entity);
+            Questmanager.Instance.updatePlayedCardFromHand(moveTodo.hc);
+            HSCard cardtoplay = getCardWithNumber(moveTodo.hc.entity);
             if (cardtoplay == null)
             {
                 Log.Error("[提示] 实在支不出招啦");
@@ -1334,7 +1334,7 @@ def Execute():
 
                     await cardtoplay.Pickup();
 
-                    switch (moveTodo.card.card.type)
+                    switch (moveTodo.hc.card.type)
                     {
                         case CardDB.cardtype.MOB:
                         case CardDB.cardtype.LOCATION:
@@ -1355,13 +1355,13 @@ def Execute():
 
                         dirtytarget = moveTodo.target.entitiyID;
                         dirtychoice = moveTodo.druidchoice;
-                        choiceCardId = moveTodo.card.card.cardIDenum.ToString();
+                        choiceCardId = moveTodo.hc.card.cardIDenum.ToString();
                         // 等待一小段时间，确保游戏客户端已进入抉择界面
                         await Coroutine.Sleep(333);
                         // 执行抉择点击
                         ChooseOneClick(dirtychoice);
                     }
-                    dirtyTargetSource = moveTodo.card.entity;
+                    dirtyTargetSource = moveTodo.hc.entity;
                     dirtytarget = moveTodo.target.entitiyID;
 
 
@@ -1394,7 +1394,7 @@ def Execute():
                     dirtychoice = moveTodo.druidchoice;
                     // 记录当前抉择卡牌的ID，用于后续可能的逻辑判断
 
-                    choiceCardId = moveTodo.card.card.cardIDenum.ToString();
+                    choiceCardId = moveTodo.hc.card.cardIDenum.ToString();
                     // 等待一小段时间，确保游戏客户端已进入抉择界面
                     await Coroutine.Sleep(333);
 
@@ -1478,7 +1478,7 @@ def Execute():
                         dirtychoice = moveTodo.druidchoice;
                           if (moveTodo.hc != null)
                         {
-                            choiceCardId = moveTodo.card.card.cardIDenum.ToString();
+                            choiceCardId = moveTodo.hc.card.cardIDenum.ToString();
                         }
                         // 等待一小段时间，确保游戏客户端已进入抉择界面
                         await Coroutine.Sleep(333);
@@ -1505,7 +1505,7 @@ def Execute():
                 if (moveTodo.druidchoice >= 1)
                 {
                     dirtychoice = moveTodo.druidchoice;
-                    choiceCardId = moveTodo.card.card.cardIDenum.ToString();
+                    choiceCardId = moveTodo.hc.card.cardIDenum.ToString();
                 }
                 dirtyTargetSource = -1;
                 dirtytarget = -1;
@@ -1515,7 +1515,7 @@ def Execute():
                     dirtychoice = moveTodo.druidchoice;
                     if (moveTodo.hc != null)
                     {
-                        choiceCardId = moveTodo.card.card.cardIDenum.ToString();
+                        choiceCardId = moveTodo.hc.card.cardIDenum.ToString();
                     }
                     // 等待一小段时间，确保游戏客户端已进入抉择界面
                     await Coroutine.Sleep(333);
@@ -1533,7 +1533,7 @@ def Execute():
         /// </summary>
         private async Task HandleTrade(Action moveTodo)
         {
-            var cardtoTrade = getCardWithNumber(moveTodo.card.entity);
+            var cardtoTrade = getCardWithNumber(moveTodo.hc.entity);
             Log.WarnFormat("交易: {0}    惩罚值：{1}", cardtoTrade.Name, moveTodo.penalty);
             await cardtoTrade.DeckAction();
              await Coroutine.Sleep(300);
@@ -1544,7 +1544,7 @@ def Execute():
         /// </summary>
         private async Task HandleForge(Action moveTodo)
         {
-            var cardtoTrade = getCardWithNumber(moveTodo.card.entity);
+            var cardtoTrade = getCardWithNumber(moveTodo.hc.entity);
             Log.WarnFormat("锻造: {0}    惩罚值：{1}", cardtoTrade.Name, moveTodo.penalty);
             await cardtoTrade.DeckAction();
             // await Coroutine.Sleep(20);
@@ -1711,7 +1711,7 @@ def Execute():
                 int sirFinleyChoice = -1;
                 if (ai.bestmove == null) Log.ErrorFormat("[提示] 没有获得卡牌数据");
                 // 芬利爵士的发现
-                else if (ai.bestmove.actionType == actionEnum.playcard && ai.bestmove.card.card.nameEN == CardDB.cardNameEN.sirfinleymrrgglton)
+                else if (ai.bestmove.actionType == actionEnum.playcard && ai.bestmove.hc.card.nameEN == CardDB.cardNameEN.sirfinleymrrgglton)
                 {
                     sirFinleyChoice = ai.botBase.getSirFinleyPriority(discoverCards);
                 }
@@ -1756,7 +1756,7 @@ def Execute():
                                     try
                                     {
                                         //TODO：这里自定义发现卡牌的选择
-                                        switch (ai.bestmove.card.card.nameEN)
+                                        switch (ai.bestmove.hc.card.nameEN)
                                         {
                                             case CardDB.cardNameEN.eternalservitude:
                                             case CardDB.cardNameEN.freefromamber:

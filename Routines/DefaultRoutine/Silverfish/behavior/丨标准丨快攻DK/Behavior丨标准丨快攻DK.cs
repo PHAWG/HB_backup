@@ -519,7 +519,7 @@ namespace HREngine.Bots
                     default:
                         continue;
                 }
-                if (a.card.card.race == CardDB.Race.PIRATE || a.card.card.nameCN == CardDB.cardNameCN.虚触侍从)
+                if (a.hc.card.race == CardDB.Race.PIRATE || a.hc.card.nameCN == CardDB.cardNameCN.虚触侍从)
                     foreach (Minion m in p.ownMinions)
                     {
                         if (m.handcard.card.nameCN == CardDB.cardNameCN.船载火炮)
@@ -529,7 +529,7 @@ namespace HREngine.Bots
                         }
                     }
                 //// 出牌排序优先
-                switch (a.card.card.nameCN)
+                switch (a.hc.card.nameCN)
                 {
                     
                 }

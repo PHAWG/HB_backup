@@ -41,8 +41,8 @@ namespace HREngine.Bots
             bool useCoinTurnOne = false; // 一上来跳硬币
             if (p.playactions.Count >= 1)
             {
-                if (p.playactions[0].card != null)
-                    if (p.playactions[0].card.card.nameEN == CardDB.cardNameEN.thecoin && p.ownMaxMana == 1)
+                if (p.playactions[0].hc != null)
+                    if (p.playactions[0].hc.card.nameEN == CardDB.cardNameEN.thecoin && p.ownMaxMana == 1)
                         useCoinTurnOne = true;
             }
 
@@ -738,7 +738,7 @@ namespace HREngine.Bots
 
                 if (i == 0) // 第一个动作
                 {
-                    switch (a.card.card.nameEN)
+                    switch (a.hc.card.nameEN)
                     {
                         case CardDB.cardNameEN.arcaneflakmage: //对空奥术法师
                             if (p.enemySecretCount > 0 && p.enemyHeroName == HeroEnum.mage)
@@ -755,14 +755,14 @@ namespace HREngine.Bots
                 }
                 else if (i == count - 1) // 最后打出的牌
                 {
-                    switch (a.card.card.nameEN)
+                    switch (a.hc.card.nameEN)
                     {
                         case CardDB.cardNameEN.thecoin:// CardDB.cardNameCN.幸运币
                             retval -= 10;
                             break;
                     }
                 }
-                switch (a.card.card.nameEN)
+                switch (a.hc.card.nameEN)
                 {
                     case CardDB.cardNameEN.thecoin: // 幸运币
                         usecoin++;

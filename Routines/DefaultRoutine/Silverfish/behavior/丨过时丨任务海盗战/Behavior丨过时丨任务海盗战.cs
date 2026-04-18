@@ -250,7 +250,7 @@ namespace HREngine.Bots
                     default:
                         continue;
                 }
-                switch (a.card.card.nameCN)
+                switch (a.hc.card.nameCN)
                 {
                     // 排序优先
                     case CardDB.cardNameCN.幸运币:

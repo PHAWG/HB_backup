@@ -264,7 +264,7 @@ namespace HREngine.Bots
                     default:
                         continue;
                 }
-                switch (a.card.card.nameCN)
+                switch (a.hc.card.nameCN)
                 {
                     case CardDB.cardNameCN.生命分流:
                         if(p.owncards.Count <= 3)
