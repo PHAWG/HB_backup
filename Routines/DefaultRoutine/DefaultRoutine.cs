@@ -505,25 +505,7 @@ def Execute():
                         Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'SecondTurnAmountTextBox'.");
                         throw new Exception("The SettingsControl could not be created.");
                     }
-
-                    // 快速模式
-                    if (
-                        !Wpf.SetupComboBoxItemsBinding(root, "fastModeComboBox", "AllFastModes",
-                            BindingMode.OneWay, DefaultRoutineSettings.Instance))
-                    {
-                        Log.DebugFormat(
-                            "[SettingsControl] SetupComboBoxItemsBinding failed for 'fastModeComboBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (
-                        !Wpf.SetupComboBoxSelectedItemBinding(root, "fastModeComboBox",
-                            "FastModeString", BindingMode.TwoWay, DefaultRoutineSettings.Instance))
-                    {
-                        Log.DebugFormat(
-                            "[SettingsControl] SetupComboBoxSelectedItemBinding failed for 'fastModeComboBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
+                    
 
                     var openButton = Wpf.FindControlByName<Button>(root, "lastMatch");
                     openButton.Click += LastMatchOnClick;
@@ -912,9 +894,9 @@ def Execute():
                     case 1: TritonHs.ChooseOneClickLeft(); break;
                     default:
                         {
-                            List<Card> friendlyCards = ChoiceCardMgr.Get().GetFriendlyCards();
+                            List<Card> friendlyCards = ChoiceCardMgr.Get()?.GetFriendlyCards();
 
-                            if (friendlyCards.Count > dirty)
+                            if (friendlyCards != null &&friendlyCards.Count > dirty)
                                 Client.LeftClickAt(Client.CardInteractPoint(friendlyCards[dirty]));
                             else
                                 TritonHs.ChooseOneClickRight();//抉择
@@ -1050,7 +1032,7 @@ def Execute():
 
                     Log.WarnFormat("处于回溯状态");
 
-                    if (RewindUIManager.Get().rewindButton == null || RewindUIManager.Get().keepButton == null)
+                    if (RewindUIManager.Get().m_rewindButton == null || RewindUIManager.Get().m_keepButton == null)
                     {
                         Log.WarnFormat("回溯或保持当前时间线按钮位空");
                         return;
@@ -1127,7 +1109,7 @@ def Execute():
             {
                 Log.Info("处于选择模式...");
 
-                await Coroutine.Sleep(222) + makeChoice();
+                await Coroutine.Sleep(222+ makeChoice());
                 switch (dirtychoice)
                 {
                     case 0:
@@ -1489,12 +1471,19 @@ def Execute():
                 HSCard target = getEntityWithNumber(moveTodo.target.entitiyID);
                 if (target != null)
                 {
-                    Log.WarnFormat("使用英雄技能: {0} 目标为 {0}    惩罚值：{2}", cardtoplay.Name, target.Name, moveTodo.penalty);
+                    Log.WarnFormat("使用英雄技能: {0} 目标为 {1} 抉择:{2}    惩罚值：{3}", cardtoplay.Name, target.Name, moveTodo.druidchoice, moveTodo.penalty);
                     if (moveTodo.druidchoice > 0)
                     {
                         dirtytarget = moveTodo.target.entitiyID;
                         dirtychoice = moveTodo.druidchoice;
-                        choiceCardId = moveTodo.card.card.cardIDenum.ToString();
+                          if (moveTodo.hc != null)
+                        {
+                            choiceCardId = moveTodo.card.card.cardIDenum.ToString();
+                        }
+                        // 等待一小段时间，确保游戏客户端已进入抉择界面
+                        await Coroutine.Sleep(333);
+                        // 执行抉择点击
+                        ChooseOneClick(dirtychoice);
                     }
                     dirtyTargetSource = 9000;
                     dirtytarget = moveTodo.target.entitiyID;
@@ -1521,6 +1510,21 @@ def Execute():
                 dirtyTargetSource = -1;
                 dirtytarget = -1;
                 await cardtoplay.Pickup();
+                if (moveTodo.druidchoice >= 1)
+                {
+                    dirtychoice = moveTodo.druidchoice;
+                    if (moveTodo.hc != null)
+                    {
+                        choiceCardId = moveTodo.card.card.cardIDenum.ToString();
+                    }
+                    // 等待一小段时间，确保游戏客户端已进入抉择界面
+                    await Coroutine.Sleep(333);
+                    // 执行抉择点击
+                    ChooseOneClick(dirtychoice);
+
+                }
+                dirtyTargetSource = -1;
+                dirtytarget = -1;
             }
         }
 
