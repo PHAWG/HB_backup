@@ -158,9 +158,10 @@ namespace HREngine.Bots
                         p.endTurn();
                         p.complete = true;
                         p.guessingHeroHP = rootfield.guessingHeroHP;
-                        if (Ai.Instance.botBase.getPlayfieldValue(p) < bestoldval) // want the best enemy-play-> worst for us
+                        float val = Ai.Instance.botBase.getPlayfieldValue(p);
+                        if (val < bestoldval) // want the best enemy-play-> worst for us
                         {
-                            bestoldval = Ai.Instance.botBase.getPlayfieldValue(p);
+                            bestoldval = val;
                             bestold = p;
                         }
                         posmoves.Remove(p);

@@ -448,17 +448,22 @@ namespace HREngine.Bots
             // 如果有游戏状态
             if (posmoves.Count >= 1)  //所有场面根据得分排序，高分排在前面，优先搜索
             {
-                // 按价值降序排序
-                posmoves.Sort((a, b) => botBase.getPlayfieldValue(b).CompareTo(botBase.getPlayfieldValue(a)));
+                // 预计算所有价值（利用缓存机制）
+                for (int i = 0; i < posmoves.Count; i++)
+                {
+                    botBase.getPlayfieldValue(posmoves[i]);
+                }                
+                // 按价值降序排序（直接使用缓存的value字段）
+                posmoves.Sort((a, b) => b.value.CompareTo(a.value));
                 // 初始化最佳游戏状态和价值
                 Playfield bestplay = posmoves[0];
-                float bestval = botBase.getPlayfieldValue(bestplay);
+                float bestval = bestplay.value;
                 int pcount = posmoves.Count;
                 // 遍历所有游戏状态
                 for (int i = 1; i < pcount; i++)
                 {
                     // 计算当前游戏状态的价值
-                    float val = botBase.getPlayfieldValue(posmoves[i]);
+                    float val = posmoves[i].value;
                     // 如果当前价值小于最佳价值，跳出循环
                     if (bestval > val) break;
                     // 如果当前游戏状态的出牌数量大于最佳游戏状态，跳过

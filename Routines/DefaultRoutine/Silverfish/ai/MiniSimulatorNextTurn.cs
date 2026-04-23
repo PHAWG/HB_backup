@@ -193,9 +193,10 @@ namespace HREngine.Bots
                     if (!isLethalCheck) this.startEnemyTurnSim(p, this.simulateSecondTurn, false, playaround, playaroundprob, playaroundprob2);
 
                     // 评估状态价值，更新最佳状态
-                    if (botBase.getPlayfieldValue(p) > bestoldval)
+                    float val = botBase.getPlayfieldValue(p);
+                    if (val > bestoldval)
                     {
-                        bestoldval = botBase.getPlayfieldValue(p);
+                        bestoldval = val;
                         bestold = p;
                     }
 
@@ -235,18 +236,23 @@ namespace HREngine.Bots
             // 寻找最佳状态
             if (posmoves.Count >= 1)
             {
-                // 按价值排序
-                posmoves.Sort((a, b) => botBase.getPlayfieldValue(b).CompareTo(botBase.getPlayfieldValue(a)));
+                // 预计算所有价值（利用缓存机制）
+                for (int i = 0; i < posmoves.Count; i++)
+                {
+                    botBase.getPlayfieldValue(posmoves[i]);
+                }
+                // 按价值排序（直接使用缓存的value字段）
+                posmoves.Sort((a, b) => b.value.CompareTo(a.value));
 
                 // 初始化最佳状态
                 Playfield bestplay = posmoves[0];
-                float bestval = botBase.getPlayfieldValue(bestplay);
+                float bestval = bestplay.value;
                 int pcount = posmoves.Count;
 
                 // 遍历所有状态，寻找最佳状态
                 for (int i = 1; i < pcount; i++)
                 {
-                    float val = botBase.getPlayfieldValue(posmoves[i]);
+                    float val = posmoves[i].value;
                     // 如果价值低于当前最佳，跳出循环
                     if (bestval > val) break;
                     // 如果动作数更多，跳过
