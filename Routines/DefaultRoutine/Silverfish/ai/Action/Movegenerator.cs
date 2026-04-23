@@ -60,6 +60,31 @@ namespace HREngine.Bots
             List<Minion> targets = new List<Minion>();
             List<Minion> minions = own ? p.ownMinions : p.enemyMinions;
 
+            // 单次扫描，计算所有需要的标志位
+            bool hasTradeable = false;
+            bool hasForge = false;
+            bool hasLocation = false;
+            bool hasTitan = false;
+
+            if (own && p.owncards.Count > 0)
+            {
+                int cardCount = p.owncards.Count;
+                for (int i = 0; i < cardCount; i++)
+                {
+                    var hc = p.owncards[i];
+                    if (hc.card.Tradeable) hasTradeable = true;
+                    if (hc.card.Forge) hasForge = true;
+                }
+            }
+
+            int minionCount = minions.Count;
+            for (int i = 0; i < minionCount; i++)
+            {
+                var m = minions[i];
+                if (m.handcard.card.type == CardDB.cardtype.LOCATION) hasLocation = true;
+                if (m.Titan) hasTitan = true;
+            }
+
             // 己方回合才有的动作：打出卡牌、交易、锻造
             if (own)
             {
@@ -69,11 +94,11 @@ namespace HREngine.Bots
                 if (p.owncards.Count > 0)
                 {
                     // 检查是否有可交易的卡牌，生成交易动作
-                    if (p.owncards.Any(hc => hc.card.Tradeable))
+                    if (hasTradeable)
                         this.getTradeActions(p, ref resultAction);
 
                     // 检查是否有可锻造的卡牌，生成锻造动作
-                    if (p.owncards.Any(hc => hc.card.Forge))
+                    if (hasForge)
                         this.getForgeActions(p, ref resultAction);
                 }
             }
@@ -93,11 +118,11 @@ namespace HREngine.Bots
             this.getHeroPowerActions(p, ref resultAction, targets, usePenalityManager, own);
 
             // 检查是否有地标，生成使用地标动作
-            if (minions.Any(m => m.handcard.card.type == CardDB.cardtype.LOCATION))
+            if (hasLocation)
                 this.getLocationActions(p, ref resultAction, targets, usePenalityManager, useCutingTargets, own);
 
             // 检查是否有泰坦随从，生成使用泰坦技能动作
-            if (minions.Any(m => m.Titan))
+            if (hasTitan)
                 this.getTitanActions(p, ref resultAction, targets, usePenalityManager, useCutingTargets, own);
 
             return resultAction;
