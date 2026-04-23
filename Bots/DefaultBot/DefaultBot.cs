@@ -1463,6 +1463,7 @@ namespace Triton.Bot.Logic.Bots.DefaultBot
                     await GameplaySceneBeginMulligan(pegasusScene_0);
                     break;
                 //
+                case TAG_STEP.MAIN_START:
                 case TAG_STEP.MAIN_ACTION:
                     await GameplaySceneMainAction(pegasusScene_0);
                     break;

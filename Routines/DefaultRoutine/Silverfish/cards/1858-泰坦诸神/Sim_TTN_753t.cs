@@ -11,7 +11,23 @@ namespace HREngine.Bots
 	//<b>已锻造</b>对一个随从造成$5点伤害。然后造成$5点伤害，随机分配到所有敌方随从身上。
 	class Sim_TTN_753t : SimTemplate
 	{
-		
-		
-	}
+        public override void onCardPlay(Playfield p, bool ownplay, Minion target, int choice, Handmanager.Handcard hc)
+        {
+            if (target != null)
+            {
+                int dmg = (ownplay) ? p.getSpellDamageDamage(5) : p.getEnemySpellDamageDamage(5);
+                p.minionGetDamageOrHeal(target, dmg);
+                p.allCharsOfASideMinionGetRandomDamage(!ownplay, dmg);
+            }
+        }
+
+        public override PlayReq[] GetPlayReqs()
+        {
+            return new PlayReq[] {
+                new PlayReq(CardDB.ErrorType2.REQ_TARGET_TO_PLAY),
+                new PlayReq(CardDB.ErrorType2.REQ_MINION_TARGET),
+            };
+        }
+
+    }
 }

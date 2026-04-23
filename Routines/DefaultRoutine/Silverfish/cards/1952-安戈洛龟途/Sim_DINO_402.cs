@@ -17,10 +17,8 @@ namespace HREngine.Bots
 			{
 				p.minionSetAttackToX(target, 1);
 				p.minionSetHealthtoX(target, 1);
-				for (int i = 0; i < 7 - p.ownMinions.Count; i++)
-				{
-					p.callKid(target.handcard.card, target.zonepos, target.own);
-				}
+				p.CallMinionCopy(target, ownplay, 6, true);
+				
 			}
 		}
 

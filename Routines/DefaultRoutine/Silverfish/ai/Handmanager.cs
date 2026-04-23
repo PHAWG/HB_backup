@@ -31,7 +31,7 @@ namespace HREngine.Bots
             public bool discovered = false;
             public bool temporary = false;//临时卡牌
             public bool valeeraShadow = false;//瓦莉拉的阴影，这才是临时牌用的tag
-            //条件计数，例如施放过几张法术，英雄技能造成多少伤害等
+                                              //条件计数，例如施放过几张法术，英雄技能造成多少伤害等
             public int conditionalCount = 0;
             //条件卡牌，例如施放的法术牌
             public List<CardDB.cardIDEnum> conditionalList = new List<CardDB.cardIDEnum>();
@@ -66,7 +66,8 @@ namespace HREngine.Bots
             {
                 get
                 {
-                    return "{" + position + "} " + card.nameCN + " [费用: " + manacost + "] (" + (addattack + card.Attack) + "/" + (addHp + card.Health) + ")";
+                    return $"{position} {card.nameCN} [费用: {manacost}] ({addattack + card.Attack}/{addHp + card.Health})";
+                    // return "{" + position + "} " + card.nameCN + " [费用: " + manacost + "] (" + (addattack + card.Attack) + "/" + (addHp + card.Health) + ")";
                 }
             }
 
@@ -151,14 +152,14 @@ namespace HREngine.Bots
                 this.conditionalCount = hc.conditionalCount;
                 //条件卡牌
                 this.conditionalList = hc.conditionalList;
-                //无法使用
+                 //无法使用
                 this.literallyUnplayable = hc.literallyUnplayable;
 
             }
 
             //读取卡牌法力值
             public int getManaCost(Playfield p)
-            {    
+            {
                 return this.card.getManaCost(p, this.manacost);
             }
 
@@ -168,7 +169,7 @@ namespace HREngine.Bots
                 return this.card.canplayCard(p, this.manacost, own);
 
             }
-        }
+    }
 
         public List<Handcard> handCards = new List<Handcard>();
 

@@ -11,7 +11,11 @@ namespace HREngine.Bots
 	//抽两张牌。在本局对战中，你每施放过一个不同派系的法术，本牌的法力值消耗便减少（1）点。
 	class Sim_TTN_085 : SimTemplate
 	{
-		
+        public override void onCardPlay(Playfield p, bool ownplay, Minion target, int choice, Handmanager.Handcard hc)
+        {
+			p.drawACard(CardDB.cardIDEnum.None,ownplay);
+			p.drawACard(CardDB.cardIDEnum.None,ownplay);
+        }
 		
 	}
 }
