@@ -1139,7 +1139,7 @@ namespace HREngine.Bots
             List<Card> Handcards = player.GetHandZone().GetCards();
             if (ControlledByFriendly)
             {
-                anzcards = handCards.Count;
+                anzcards = Handcards.Count;
             }
             else
             {
