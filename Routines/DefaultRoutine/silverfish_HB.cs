@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -24,7 +24,7 @@ namespace HREngine.Bots
 
         public Playfield lastpf;
         private Settings sttngs = Settings.Instance;
-
+        
         private List<Minion> ownMinions = new List<Minion>();
         private List<Minion> enemyMinions = new List<Minion>();
         private List<Handmanager.Handcard> handCards = new List<Handmanager.Handcard>();
@@ -818,10 +818,10 @@ namespace HREngine.Bots
                 this.ownHero.cardClass = (TAG_CLASS)hero.GetClass();
                 this.ownHeroFatigue = player.GetFatigue();
                 this.heroname = hero.GetClass().ToString().ToLower();
-                this.ownHero.Angr = hero.GetATK();
-                this.ownHero.maxHp = hero.GetHealth();
-                this.ownHero.Hp = hero.GetCurrentHealth();
-                this.ownHero.armor = hero.GetArmor();
+                this.ownHero.Angr = hero.m_realTimeAttack;
+                this.ownHero.maxHp = hero.m_realTimeHealth;
+                this.ownHero.Hp = hero.m_realTimeHealth - hero.m_realTimeDamage;
+                this.ownHero.armor = hero.m_realTimeArmor;
                 this.ownHero.frozen = hero.IsFrozen();
                 this.ownHero.stealth = hero.IsStealthed();
                 this.ownHero.windfury = hero.HasWindfury();
@@ -844,10 +844,10 @@ namespace HREngine.Bots
                 this.enemyHero.cardClass = (TAG_CLASS)hero.GetClass();
                 this.enemyHeroFatigue = player.GetFatigue();
                 this.enemyHeroname = hero.GetClass().ToString().ToLower();
-                this.enemyHero.Angr = hero.GetATK();
-                this.enemyHero.maxHp = hero.GetHealth();
-                this.enemyHero.Hp = hero.GetCurrentHealth();
-                this.enemyHero.armor = hero.GetArmor();
+                this.enemyHero.Angr = hero.m_realTimeAttack;
+                this.enemyHero.maxHp = hero.m_realTimeHealth;
+                this.enemyHero.Hp = hero.m_realTimeHealth - hero.m_realTimeDamage;
+                this.enemyHero.armor = hero.m_realTimeArmor;
                 this.enemyHero.frozen = hero.IsFrozen();
                 this.enemyHero.stealth = hero.IsStealthed();
                 this.enemyHero.windfury = hero.HasWindfury();
@@ -990,7 +990,7 @@ namespace HREngine.Bots
                 // Dictionary<int, int> tagMap = entity.GetTags().m_values;
 
                 // tagMap.TryGetValue(263, out int zp);
-                int zp = entity.GetZonePosition();
+                int zp = entity.m_realTimeZonePosition;
 
 
                 if (zp >= 1)
@@ -1009,9 +1009,9 @@ namespace HREngine.Bots
                                    // tagMap.TryGetValue(44, out m.Damage);//最大生命值
                                    // m.Hp = m.maxHp - m.Damage;
                     m.entitiyID = entity.GetEntityId();//实体id
-                    m.Angr = entity.GetATK();
-                    m.maxHp = entity.GetHealth();
-                    m.Hp = entity.GetCurrentHealth();
+                    m.Angr = entity.m_realTimeAttack;
+                    m.maxHp = entity.m_realTimeHealth;
+                    m.Hp = entity.m_realTimeHealth - entity.m_realTimeDamage;
                     if (m.Hp <= 0)
                         continue;
                     m.wounded = m.maxHp > m.Hp;
@@ -1030,17 +1030,17 @@ namespace HREngine.Bots
                     m.taunt = entity.HasTaunt();//嘲讽
                     m.windfury = entity.HasWindfury();//风怒
                     m.megaWindfury = entity.GetTag(GAME_TAG.WINDFURY) == 3;//超级风怒
-                    m.divineshild = entity.HasDivineShield();//圣盾
+                    m.divineshild = entity.m_realTimeDivineShield;//圣盾
                     m.stealth = entity.IsStealthed();//潜行
-                    m.poisonous = entity.IsPoisonous();//剧毒
+                    m.poisonous = entity.m_realTimeIsPoisonous;//剧毒
                     m.lifesteal = entity.HasLifesteal();//吸血
                     m.rush = entity.HasRush() ? 1 : 0;//突袭
                     m.reborn = entity.HasReborn();//复生
                     m.Elusive = entity.HasTag(GAME_TAG.ELUSIVE);//扰魔
                     m.charge = entity.HasCharge() ? 1 : 0;//冲锋
                     m.nonKeyWordCharge = entity.HasTag(GAME_TAG.NON_KEYWORD_CHARGE);//非关键词冲锋
-                    m.immune = entity.HasTag(GAME_TAG.IMMUNE);//免疫
-                    m.immuneWhileAttacking = entity.HasTag(GAME_TAG.IMMUNE_WHILE_ATTACKING);//攻击时免疫
+                    m.immune = entity.m_realTimeIsImmune;//免疫
+                    m.immuneWhileAttacking = entity.m_realTimeIsImmuneWhileAttacking;//攻击时免疫
                     m.untouchable = entity.HasTag(GAME_TAG.UNTOUCHABLE);//无法选择
                     m.silenced = entity.HasTag(GAME_TAG.SILENCED);//沉默的
                     m.cantAttackHeroes = entity.HasTag(GAME_TAG.CANNOT_ATTACK_HEROES);//无法攻击英雄
@@ -1098,9 +1098,9 @@ namespace HREngine.Bots
                     if (m.Titan)
                     {
                         m.handcard.card.TitanAbility = c.TitanAbility;//泰坦技能列表
-                        m.TitanAbilityUsed1 = entity.GetTag(GAME_TAG.TITAN_ABILITY_USED_1) == 1;//泰坦第一技能
-                        m.TitanAbilityUsed2 = entity.GetTag(GAME_TAG.TITAN_ABILITY_USED_2) == 1;//泰坦第二技能
-                        m.TitanAbilityUsed3 = entity.GetTag(GAME_TAG.TITAN_ABILITY_USED_3) == 1;//泰坦第三技能
+                        m.TitanAbilityUsed1 = entity.m_realTimeTitanAbilityUsed1;//泰坦第一技能
+                        m.TitanAbilityUsed2 = entity.m_realTimeTitanAbilityUsed2;//泰坦第二技能
+                        m.TitanAbilityUsed3 = entity.m_realTimeTitanAbilityUsed3;//泰坦第三技能
                     }
                     m.handcard.card.Forge = c.Forge;//锻造
                     m.handcard.card.ForgeCost = c.ForgeCost;//锻造消耗法力值
@@ -1143,9 +1143,10 @@ namespace HREngine.Bots
             }
             else
             {
-                enemyAnzCards = handCards.Count;
+                enemyAnzCards = Handcards.Count;
                 return;
             }
+            
             foreach (Card card in Handcards)
             {
                 Entity entity = card.GetEntity();
@@ -1167,16 +1168,16 @@ namespace HREngine.Bots
                     }
                     hc.position = zp;
                     hc.entity = entity.GetEntityId();
-                    hc.manacost = entity.GetCost();
-                    hc.poweredUp = entity.GetTag(GAME_TAG.POWERED_UP);//手牌高亮
+                    hc.manacost = entity.m_realTimeCost;
+                    hc.poweredUp = entity.m_realTimePoweredUp ? 1 : 0;//手牌高亮
                     hc.SCRIPT_DATA_NUM_1 = entity.GetTag(GAME_TAG.TAG_SCRIPT_DATA_NUM_1);
                     hc.SCRIPT_DATA_NUM_2 = entity.GetTag(GAME_TAG.TAG_SCRIPT_DATA_NUM_2);
                     hc.temporary = entity.GetTag(3630) > 0;
                     hc.valeeraShadow = entity.GetTag(779) > 0;
                     // entity.GetTag(GAME_TAG.LITERALLY_UNPLAYABLE);//无法使用
                     hc.literallyUnplayable = entity.HasTag(GAME_TAG.LITERALLY_UNPLAYABLE);//无法使用
-                    hc.addattack = entity.GetATK() - entity.GetDefATK();
-                    hc.addHp = entity.GetHealth() - entity.GetDefHealth();
+                    hc.addattack = entity.m_realTimeAttack - entity.GetDefATK();
+                    hc.addHp = entity.m_realTimeHealth - entity.GetDefHealth();
                     if (entity.IsEnchanted())
                     {
                         List<Entity> attaches = entity.GetAttachments();//附魔
