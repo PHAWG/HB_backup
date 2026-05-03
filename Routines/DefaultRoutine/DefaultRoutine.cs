@@ -896,7 +896,7 @@ def Execute():
                         {
                             List<Card> friendlyCards = ChoiceCardMgr.Get()?.GetFriendlyCards();
 
-                            if (friendlyCards != null &&friendlyCards.Count > dirty)
+                            if (friendlyCards != null && friendlyCards.Count > dirty)
                                 Client.LeftClickAt(Client.CardInteractPoint(friendlyCards[dirty]));
                             else
                                 TritonHs.ChooseOneClickRight();//抉择
@@ -1407,8 +1407,6 @@ def Execute():
             }
 
             await Coroutine.Sleep(20);
-            // dirtyTargetSource = -1;
-            // dirtytarget = -1;
             // 重置抉择状态
             dirtychoice = -1;
         }
@@ -1472,6 +1470,7 @@ def Execute():
                 if (target != null)
                 {
                     Log.WarnFormat("使用英雄技能: {0} 目标为 {1} 抉择:{2}    惩罚值：{3}", cardtoplay.Name, target.Name, moveTodo.druidchoice, moveTodo.penalty);
+                    await cardtoplay.Pickup();
                     if (moveTodo.druidchoice >= 1)
                     {
                         dirtytarget = moveTodo.target.entitiyID;
@@ -1489,7 +1488,6 @@ def Execute():
                     dirtyTargetSource = 9000;
                     dirtytarget = moveTodo.target.entitiyID;
 
-                    await cardtoplay.Pickup();
                     await cardtoplay.UseOn(target.Card);
                 }
                 else
