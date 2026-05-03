@@ -143,7 +143,6 @@ namespace HREngine.Bots
         /// 是否进行第二回合模拟
         /// </summary>
         public bool secondturnsim = false;
-        // public int secondTurnAmount = 256;
         /// <summary>
         /// 是否防奥秘
         /// </summary>
@@ -232,14 +231,14 @@ namespace HREngine.Bots
             this.mainTurnSimulator.setSecondTurnSimu(EnableTwoTurnSimulation, amount);
             this.secondturnsim = EnableTwoTurnSimulation;
             settings.simulateEnemysTurn = EnableTwoTurnSimulation;
-            settings.secondTurnAmount = amount;
+            settings.twotsamount = amount;
         }
         /// <summary>
         /// 更新两回合测试
         /// </summary>
         public void updateTwoTurnSim()
         {
-            this.mainTurnSimulator.setSecondTurnSimu(settings.simulateEnemysTurn, settings.secondTurnAmount);
+            this.mainTurnSimulator.setSecondTurnSimu(settings.simulateEnemysTurn, settings.twotsamount);
         }
 
         /// <summary>

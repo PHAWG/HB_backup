@@ -455,38 +455,5 @@ namespace HREngine.Bots
                 Log.InfoFormat("[默认策略设置] 打脸奖励 = {0}.", printUtils.enfaceReward);
             }
         }
-           
-        [DefaultValue(false)]
-
-        public bool SetTwoTurnSimulation
-        {
-            get { return Ai.Instance.mainTurnSimulator.getSimulateSecondTurn(); }
-            set
-            {
-                if (!value.Equals(Ai.Instance.mainTurnSimulator.getSimulateSecondTurn()))
-                {
-                    Ai.Instance.setTwoTurnSimulation(value, SecondTurnAmount);
-                    NotifyPropertyChanged(() => SetTwoTurnSimulation);
-                    Log.InfoFormat("[默认策略设置] 设置两回合模拟 = {0} {1}.", Ai.Instance.mainTurnSimulator.getSimulateSecondTurn(), Ai.Instance.mainTurnSimulator.getSecondTurnSimu());
-                }
-            }
-        }
-
-        [DefaultValue(256)]
-        public int SecondTurnAmount
-        {
-            get { return Ai.Instance.mainTurnSimulator.getSecondTurnSimu(); }
-            set
-            {
-                if (!value.Equals(Ai.Instance.mainTurnSimulator.getSecondTurnSimu()))
-                {
-                    Ai.Instance.setTwoTurnSimulation(SetTwoTurnSimulation, value);
-                    NotifyPropertyChanged(() => SecondTurnAmount);
-                }
-                Log.InfoFormat("[默认策略设置] 设置两回合模拟 = {0} {1}.", Ai.Instance.mainTurnSimulator.getSimulateSecondTurn(), Ai.Instance.mainTurnSimulator.getSecondTurnSimu());
-            }
-        }
-
-
     }
 }

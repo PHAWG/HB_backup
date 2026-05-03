@@ -173,11 +173,6 @@ namespace HREngine.Bots
         public bool simulateEnemysTurn = true;
         
         /// <summary>
-        /// 第二回合模拟数量
-        /// </summary>
-        public int secondTurnAmount = 256;
-        
-        /// <summary>
         /// 主路径
         /// </summary>
         public string mainPath = "";
@@ -424,7 +419,6 @@ namespace HREngine.Bots
             Helpfunctions.Instance.logg("logpath = " + Settings.Instance.logpath);
             Helpfunctions.Instance.logg("logfile = " + Settings.Instance.logfile);
             Helpfunctions.Instance.logg("twotsamount = " + Settings.Instance.twotsamount);
-            Helpfunctions.Instance.logg("secondTurnAmount = " + Settings.Instance.secondTurnAmount);
             Helpfunctions.Instance.logg("playaroundprob2 = " + Settings.Instance.playaroundprob2);
             Helpfunctions.Instance.logg("playaroundprob = " + Settings.Instance.playaroundprob);
             Helpfunctions.Instance.logg("nextTurnTotalBoards = " + Settings.Instance.nextTurnTotalBoards);

@@ -18,7 +18,6 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -50,12 +49,8 @@
                     <Label Grid.Row="6" Grid.Column="0" Content="打脸奖励（不建议修改）: "  Margin="3,5,3,1" ToolTipService.ToolTip="鼓励兄弟打脸的程度，越高兄弟越倾向于打脸，可以设置负数鼓励兄弟解场.如果使用的是推荐卡组，强烈不建议设置。"/>
                     <TextBox Name="EnfaceRewardTextBox" Grid.Row="6" Grid.Column="1" Margin="3,5,3,1"/>
 
-                    <Label Grid.Row="7" Grid.Column="0" Content="两回合模拟场面值 : "  Margin="3,5,3,1" ToolTipService.ToolTip="鼓励兄弟打脸的程度，越高兄弟越倾向于打脸，可以设置负数鼓励兄弟解场.如果使用的是推荐卡组，强烈不建议设置。"/>
-                    <CheckBox x:Name="SetTwoTurnSimulationCheckBox" Grid.Row="7" Grid.Column="1" Margin="3"/>
-                    <TextBox Name="SecondTurnAmountTextBox" Grid.Row="7" Grid.Column="2" Margin="10,3,103,3" Width="50"/>
-
-                    <Label Grid.Row="8" Grid.Column="0" Content="不生成日志: "  Margin="3,5,3,1" ToolTipService.ToolTip="别关啊，至少提交个issue再走吧，求求了"/>
-                    <CheckBox x:Name="SetLogCheckBox" Grid.Row="8" Grid.Column="1" Margin="3,5,3,1"/>
+                    <Label Grid.Row="7" Grid.Column="0" Content="不生成日志: "  Margin="3,5,3,1" ToolTipService.ToolTip="别关啊，至少提交个issue再走吧，求求了"/>
+                    <CheckBox x:Name="SetLogCheckBox" Grid.Row="7" Grid.Column="1" Margin="3,5,3,1"/>
                 </Grid>
 
                 <Grid >

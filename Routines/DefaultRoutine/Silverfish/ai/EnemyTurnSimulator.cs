@@ -44,7 +44,7 @@ namespace HREngine.Bots
         /// <param name="firstStep">是否为第一步</param>
         public void setMaxwide(bool firstStep)
         {
-            twotsamount = Settings.Instance.secondTurnAmount;
+            twotsamount = Settings.Instance.twotsamount;
             if (firstStep) maxwide = Settings.Instance.enemyTurnMaxWide;
             else maxwide = Settings.Instance.enemyTurnMaxWideSecondStep;
             berserkIfCanFinishNextTour = Settings.Instance.berserkIfCanFinishNextTour;

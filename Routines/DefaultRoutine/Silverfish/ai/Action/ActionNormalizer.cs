@@ -586,7 +586,7 @@ namespace HREngine.Bots
             // 创建迷你模拟器，用于重新计算最佳动作序列
             MiniSimulator mainTurnSimulator = new MiniSimulator(6, 3000, 0);
             // 设置第二回合模拟参数
-            mainTurnSimulator.setSecondTurnSimu(settings.simulateEnemysTurn, settings.secondTurnAmount);
+            mainTurnSimulator.setSecondTurnSimu(settings.simulateEnemysTurn, settings.twotsamount);
             // 设置防AOE参数
             mainTurnSimulator.setPlayAround(settings.playaround, settings.playaroundprob, settings.playaroundprob2);
 

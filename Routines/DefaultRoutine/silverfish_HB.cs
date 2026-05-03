@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -498,13 +498,13 @@ namespace HREngine.Bots
             botbehave.AppendFormat(" face {0}", ComboBreaker.Instance.attackFaceHP);
             if (Settings.Instance.berserkIfCanFinishNextTour > 0) botbehave.AppendFormat(" berserk:{0}", Settings.Instance.berserkIfCanFinishNextTour);
             if (Settings.Instance.weaponOnlyAttackMobsUntilEnfacehp > 0) botbehave.AppendFormat(" womob:{0}", Settings.Instance.weaponOnlyAttackMobsUntilEnfacehp);
-            if (Settings.Instance.secondTurnAmount > 0)
+            if (Settings.Instance.twotsamount > 0)
             {
                 if (Ai.Instance.nextMoveGuess.mana == -100)
                 {
                     Ai.Instance.updateTwoTurnSim();
                 }
-                botbehave.AppendFormat(" twoturnsim {0} ntss {1} {2} {3}", Settings.Instance.secondTurnAmount, Settings.Instance.nextTurnDeep, Settings.Instance.nextTurnMaxWide, Settings.Instance.nextTurnTotalBoards);
+                botbehave.AppendFormat(" twoturnsim {0} ntss {1} {2} {3}", Settings.Instance.twotsamount, Settings.Instance.nextTurnDeep, Settings.Instance.nextTurnMaxWide, Settings.Instance.nextTurnTotalBoards);
 
             }
 

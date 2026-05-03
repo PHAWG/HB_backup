@@ -486,27 +486,6 @@ def Execute():
                         Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'EnfaceRewardTextBox'.");
                         throw new Exception("The SettingsControl could not be created.");
                     }
-                    // 两回合模拟开关
-                    if (
-                        !Wpf.SetupCheckBoxBinding(root, "SetTwoTurnSimulationCheckBox",
-                            "SetTwoTurnSimulation",
-                            BindingMode.TwoWay, DefaultRoutineSettings.Instance))
-                    {
-                        Log.DebugFormat(
-                            "[SettingsControl] SetupCheckBoxBinding failed for 'SetTwoTurnSimulationCheckBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    // 两回合模拟回合数
-                    if (
-                        !Wpf.SetupTextBoxBinding(root, "SecondTurnAmountTextBox", "SecondTurnAmount",
-                        BindingMode.TwoWay, DefaultRoutineSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'SecondTurnAmountTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-                    
-
                     var openButton = Wpf.FindControlByName<Button>(root, "lastMatch");
                     openButton.Click += LastMatchOnClick;
 
@@ -1025,6 +1004,16 @@ def Execute():
                     playEmote(EmoteType.THANKS);
                 }
             } */
+            // if(TritonHs.GameState.IsTagBlockingInput())
+            // if(TritonHs.GameState.IsResponsePacketBlocked() && TritonHs.GameState.IsGameOver())
+          while(TritonHs.GameState.IsTagBlockingInput())
+
+        //   while(TritonHs.GameState.IsBusy() || TritonHs.GameState.HasPowersToProcess())
+          {
+                Log.WarnFormat("还不能操作，等一会");
+                // Log.WarnFormat("还有数据未更新等待一下");
+                await Coroutine.Sleep(50);
+            }
             if (RewindUIManager.m_isShowingRewindUI)
             {
                 try
@@ -1142,7 +1131,7 @@ def Execute():
             {
                 Log.Error("[AI] 随从没能动起来，再试一次...");
                 await Coroutine.Sleep(222);
-                Thread.Sleep(2000);
+                // Thread.Sleep(2000);
                 templearn = Silverfish.Instance.updateEverything(behave, 1, out sleepRetry);
             }
 
@@ -1222,10 +1211,10 @@ def Execute():
                 }
                 else if (doConcede)
                 {
-                    playEmote(EmoteType.WELL_PLAYED);
+                   // playEmote(EmoteType.WELL_PLAYED);
                     Helpfunctions.Instance.ErrorLog("我方败局已定. 投降...");
                     Helpfunctions.Instance.logg("投降... 败局已定###############################################");
-                    TritonHs.Concede(true);   // 如果需要自动投降，取消注释这行代码
+                    // TritonHs.Concede(true);   // 如果需要自动投降，取消注释这行代码
                     return;
                 }
             }
@@ -1236,7 +1225,6 @@ def Execute():
                 // playEmote(EmoteType.OOPS);
                 Helpfunctions.Instance.ErrorLog("实在支不出招啦. 结束当前回合");
                 await Coroutine.Sleep(500);
-                Thread.Sleep(2000);
                 await TritonHs.EndTurn();
                 return;
             }
@@ -1298,7 +1286,7 @@ def Execute():
         /// <returns></returns>
         private async Task TitanAbilityUseOnTagets()
         {
-            // Log.InfoFormat("处理泰坦技能的使用目标");
+            Log.InfoFormat("处理泰坦技能的使用目标");
             //处理泰坦技能的使用目标
             if (titanAction != null)
             {
@@ -1364,11 +1352,10 @@ def Execute():
                     dirtyTargetSource = moveTodo.hc.entity;
                     dirtytarget = moveTodo.target.entitiyID;
 
-
                 }
                 else
                 {
-                    playEmote(EmoteType.OOPS);
+                    // playEmote(EmoteType.OOPS);
                     Log.Error("[AI] 目标丢失，再试一次...");
                     await Coroutine.Sleep(3000);
                 }
@@ -1379,7 +1366,6 @@ def Execute():
                 // 记录日志，表明当前使用的卡牌没有目标
 
                 Log.WarnFormat("使用: {0} 暂时没有目标", cardtoplay.Name);
-
 
                 await cardtoplay.Pickup();
                 await cardtoplay.UseAt(moveTodo.place);
@@ -1426,7 +1412,7 @@ def Execute():
             }
             else
             {
-                playEmote(EmoteType.OOPS);
+                // playEmote(EmoteType.OOPS);
                 Log.Error("[AI] 随从攻击失败，再次重试...");
                 await Coroutine.Sleep(20);
             }
@@ -1450,7 +1436,7 @@ def Execute():
             }
             else
             {
-                playEmote(EmoteType.OOPS);
+                // playEmote(EmoteType.OOPS);
                 Log.Error("[AI] 英雄攻击目标丢失，再次重试...");
                 await Coroutine.Sleep(20);
             }
@@ -1502,7 +1488,7 @@ def Execute():
             {
                 Log.WarnFormat("使用英雄技能: {0} 暂时没有目标 抉择:{1}   惩罚值：{2}", cardtoplay.Name, moveTodo.druidchoice, moveTodo.penalty);
                 await cardtoplay.Pickup();
-                
+
                 if (moveTodo.druidchoice >= 1)
                 {
                     dirtychoice = moveTodo.druidchoice;
@@ -1529,7 +1515,7 @@ def Execute():
             var cardtoTrade = getCardWithNumber(moveTodo.hc.entity);
             Log.WarnFormat("交易: {0}    惩罚值：{1}", cardtoTrade.Name, moveTodo.penalty);
             await cardtoTrade.DeckAction();
-             await Coroutine.Sleep(300);
+            await Coroutine.Sleep(300);
         }
 
         /// <summary>
@@ -1623,11 +1609,13 @@ def Execute():
         {
             if (dirtychoice < 1)
             {
-                var ccm = ChoiceCardMgr.Get();
+                ChoiceCardMgr ccm = ChoiceCardMgr.Get();
                 var lscc = ccm.m_lastShownChoiceState;
                 GAME_TAG choiceMode = GAME_TAG.CHOOSE_ONE;
                 int sourceEntityId = -1;
                 CardDB.cardIDEnum sourceEntityCId = CardDB.cardIDEnum.None;
+                // ChoiceCardMgr.ChoiceState ChoiceState = ccm.GetLastChoiceState();
+
                 if (lscc != null)
                 {
                     sourceEntityId = lscc.m_sourceEntityId;
@@ -1639,8 +1627,8 @@ def Execute():
                         var sourceCard = entity.GetCard();
                         if (sourceCard != null)
                         {
-                            Entity sourceEnttiy =sourceCard.GetEntity();
-                            
+                            Entity sourceEnttiy = sourceCard.GetEntity();
+
                             //发现
                             if (sourceEnttiy.HasTag(GAME_TAG.DISCOVER))
                             {
