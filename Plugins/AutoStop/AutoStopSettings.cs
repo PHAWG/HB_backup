@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using log4net;
@@ -48,13 +48,75 @@ namespace AutoStop
         private int _stopWinCount;
         private int _stopLossCount;
         private int _concedeMinutesCount;
-
+        private bool _dynamicFacePenaltyEnabled;
+        private int _dynamicFacePenaltyMinutes;
+        private int _facePenaltyBeforeTime;
+        private int _facePenaltyAfterTime;
 
 
 
         private int _wins;
         private int _losses;
 
+        [DefaultValue(false)]
+        public bool DynamicFacePenaltyEnabled
+        {
+            get { return _dynamicFacePenaltyEnabled; }
+            set
+            {
+                if (!value.Equals(_dynamicFacePenaltyEnabled))
+                {
+                    _dynamicFacePenaltyEnabled = value;
+                    NotifyPropertyChanged(() => DynamicFacePenaltyEnabled);
+                }
+                Log.InfoFormat("[自动停止设置] 动态打脸惩罚启用 = {0}", _dynamicFacePenaltyEnabled);
+            }
+        }
+
+        [DefaultValue(30)]
+        public int DynamicFacePenaltyMinutes
+        {
+            get { return _dynamicFacePenaltyMinutes; }
+            set
+            {
+                if (!value.Equals(_dynamicFacePenaltyMinutes))
+                {
+                    _dynamicFacePenaltyMinutes = value;
+                    NotifyPropertyChanged(() => DynamicFacePenaltyMinutes);
+                }
+                Log.InfoFormat("[自动停止设置] 打脸切换时间 = {0} 分钟", _dynamicFacePenaltyMinutes);
+            }
+        }
+
+        [DefaultValue(-2000)]
+        public int FacePenaltyBeforeTime
+        {
+            get { return _facePenaltyBeforeTime; }
+            set
+            {
+                if (!value.Equals(_facePenaltyBeforeTime))
+                {
+                    _facePenaltyBeforeTime = value;
+                    NotifyPropertyChanged(() => FacePenaltyBeforeTime);
+                }
+                Log.InfoFormat("[自动停止设置] 时间前打脸惩罚 = {0}", _facePenaltyBeforeTime);
+            }
+        }
+
+        [DefaultValue(1000)]
+        public int FacePenaltyAfterTime
+        {
+            get { return _facePenaltyAfterTime; }
+            set
+            {
+                if (!value.Equals(_facePenaltyAfterTime))
+                {
+                    _facePenaltyAfterTime = value;
+                    NotifyPropertyChanged(() => FacePenaltyAfterTime);
+                }
+                Log.InfoFormat("[自动停止设置] 时间后打脸惩罚 = {0}", _facePenaltyAfterTime);
+            }
+        }
 
         public void Reset()
         {

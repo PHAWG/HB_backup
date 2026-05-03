@@ -10,6 +10,7 @@ using Triton.Bot.Settings;
 using Triton.Common;
 using Triton.Game;
 using Logger = Triton.Common.LogUtilities.Logger;
+using HREngine.Bots;
 
 namespace AutoStop
 {
@@ -22,6 +23,8 @@ namespace AutoStop
         private UserControl _control;
         private DateTime _gameStartTime;
         private System.Timers.Timer _concedeTimer;
+        private int _originalEnfaceReward;
+        private bool _facePenaltySwitched;
 
         /// <summary> The name of the plugin. </summary>
         public string Name
@@ -65,6 +68,8 @@ namespace AutoStop
             _concedeTimer.AutoReset = true;
             _concedeTimer.Enabled = true;
             AutoStopSettings.Instance.ReloadFile();
+            _originalEnfaceReward = printUtils.enfaceReward;
+            _facePenaltySwitched = false;
         }
 
         /// <summary> The plugin tick callback. Do any update logic here. </summary>
@@ -202,6 +207,41 @@ namespace AutoStop
                         throw new Exception("The SettingsControl could not be created.");
                     }
 
+                    // DynamicFacePenaltyEnabled
+                    if (
+                        !Wpf.SetupCheckBoxBinding(root, "DynamicFacePenaltyEnabledCheckBox",
+                            "DynamicFacePenaltyEnabled",
+                            BindingMode.TwoWay, AutoStopSettings.Instance))
+                    {
+                        Log.DebugFormat(
+                            "[SettingsControl] SetupCheckBoxBinding failed for 'DynamicFacePenaltyEnabledCheckBox'.");
+                        throw new Exception("The SettingsControl could not be created.");
+                    }
+
+                    // DynamicFacePenaltyMinutes
+                    if (!Wpf.SetupTextBoxBinding(root, "DynamicFacePenaltyMinutesTextBox", "DynamicFacePenaltyMinutes",
+                        BindingMode.TwoWay, AutoStopSettings.Instance))
+                    {
+                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'DynamicFacePenaltyMinutesTextBox'.");
+                        throw new Exception("The SettingsControl could not be created.");
+                    }
+
+                    // FacePenaltyBeforeTime
+                    if (!Wpf.SetupTextBoxBinding(root, "FacePenaltyBeforeTimeTextBox", "FacePenaltyBeforeTime",
+                        BindingMode.TwoWay, AutoStopSettings.Instance))
+                    {
+                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'FacePenaltyBeforeTimeTextBox'.");
+                        throw new Exception("The SettingsControl could not be created.");
+                    }
+
+                    // FacePenaltyAfterTime
+                    if (!Wpf.SetupTextBoxBinding(root, "FacePenaltyAfterTimeTextBox", "FacePenaltyAfterTime",
+                        BindingMode.TwoWay, AutoStopSettings.Instance))
+                    {
+                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'FacePenaltyAfterTimeTextBox'.");
+                        throw new Exception("The SettingsControl could not be created.");
+                    }
+
                     // Your settings event handlers here.
                     var resetButton = Wpf.FindControlByName<Button>(root, "ResetButton");
                     resetButton.Click += ResetButtonOnClick;
@@ -230,7 +270,15 @@ namespace AutoStop
                     if (TritonHs.GameState != null && _gameStartTime == DateTime.MinValue)
                     {
                         _gameStartTime = DateTime.Now;
+                        _facePenaltySwitched = false;
                         Log.InfoFormat("[自动停止] 游戏开始时间记录: {0}", _gameStartTime.ToString("HH:mm:ss"));
+                        
+                        if (AutoStopSettings.Instance.DynamicFacePenaltyEnabled)
+                        {
+                            _originalEnfaceReward = printUtils.enfaceReward;
+                            printUtils.enfaceReward = AutoStopSettings.Instance.FacePenaltyBeforeTime;
+                            Log.InfoFormat("[自动停止] 动态打脸惩罚启用，设置打脸惩罚为 {0}（时间前）", AutoStopSettings.Instance.FacePenaltyBeforeTime);
+                        }
                     }
                 }
             }
@@ -244,7 +292,7 @@ namespace AutoStop
         {
             try
             {
-                if (!AutoStopSettings.Instance.ConcedeAfterXMinutes || _gameStartTime == DateTime.MinValue)
+                if (_gameStartTime == DateTime.MinValue)
                 {
                     return;
                 }
@@ -257,6 +305,25 @@ namespace AutoStop
                     }
 
                     TimeSpan gameTime = DateTime.Now - _gameStartTime;
+
+                    if (AutoStopSettings.Instance.DynamicFacePenaltyEnabled && !_facePenaltySwitched)
+                    {
+                        int facePenaltyMinutes = AutoStopSettings.Instance.DynamicFacePenaltyMinutes;
+                        if (gameTime.TotalMinutes >= facePenaltyMinutes)
+                        {
+                            int oldReward = printUtils.enfaceReward;
+                            printUtils.enfaceReward = AutoStopSettings.Instance.FacePenaltyAfterTime;
+                            _facePenaltySwitched = true;
+                            Log.InfoFormat("[自动停止] 游戏已进行 {0:0.0} 分钟，打脸惩罚从 {1} 切换为 {2}（时间后）",
+                                gameTime.TotalMinutes, oldReward, AutoStopSettings.Instance.FacePenaltyAfterTime);
+                        }
+                    }
+
+                    if (!AutoStopSettings.Instance.ConcedeAfterXMinutes)
+                    {
+                        return;
+                    }
+
                     int minutesLimit = AutoStopSettings.Instance.ConcedeMinutesCount;
                     
                     if (gameTime.TotalMinutes >= minutesLimit)
@@ -294,6 +361,12 @@ namespace AutoStop
 
         private void GameEventManagerOnGameOver(object sender, GameOverEventArgs gameOverEventArgs)
         {
+            if (AutoStopSettings.Instance.DynamicFacePenaltyEnabled)
+            {
+                printUtils.enfaceReward = _originalEnfaceReward;
+                Log.InfoFormat("[自动停止] 游戏结束，恢复打脸惩罚为 {0}", _originalEnfaceReward);
+            }
+            _facePenaltySwitched = false;
             _gameStartTime = DateTime.MinValue;
             
             if (gameOverEventArgs.Result == GameOverFlag.Victory)
