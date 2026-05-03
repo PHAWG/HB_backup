@@ -417,7 +417,7 @@ namespace Triton.Bot.Logic.Bots.DefaultBot
                 foreach (MonoEnum item in statusEnums)
                 {
                     PresenceStatus presenceStatus = item.AsEnum<PresenceStatus>();
-                    TritonHs.smethod_4(presenceMgr, ref presenceStatus);
+                    TritonHs.FixWelcomeQuestPresenceStatus(presenceMgr, ref presenceStatus);
                     switch (presenceStatus)
                     {
                         case PresenceStatus.HUB:
@@ -536,7 +536,7 @@ namespace Triton.Bot.Logic.Bots.DefaultBot
                     }
                     try
                     {
-                        Utility.smethod_4();
+                        Utility.CacheCustomDecks();
                     }
                     catch (Exception arg)
                     {
@@ -556,7 +556,7 @@ namespace Triton.Bot.Logic.Bots.DefaultBot
                         }
                         if (!collectionManager.GetDeck(deckID).m_netContentsLoaded)
                         {
-                            if (Utility.smethod_2(deckID, text, formatType))
+                            if (Utility.IsDeckNotCached(deckID, text, formatType))
                             {
                                 ilog_0.InfoFormat("[卡组缓存] 保存卡组...");
                                 list.Add(deckBox);
@@ -602,7 +602,7 @@ namespace Triton.Bot.Logic.Bots.DefaultBot
                     MainSettings.Instance.LastDeckCachePid = TritonHs.Memory.Process.Id;
                     MainSettings.Instance.Save();
                     DefaultBotSettings.Instance.NeedsToCacheCustomDecks = false;
-                    GameEventManager.Instance.method_8();
+                    GameEventManager.Instance.RaiseCustomDecksCached();
                     stopwatch.Reset();
                 }
                 else
@@ -643,7 +643,7 @@ namespace Triton.Bot.Logic.Bots.DefaultBot
                 foreach (MonoEnum item in statusEnums)
                 {
                     PresenceStatus presenceStatus = item.AsEnum<PresenceStatus>();
-                    TritonHs.smethod_4(presenceMgr, ref presenceStatus);
+                    TritonHs.FixWelcomeQuestPresenceStatus(presenceMgr, ref presenceStatus);
                     switch (presenceStatus)
                     {
                         case PresenceStatus.COLLECTION:
@@ -796,7 +796,7 @@ namespace Triton.Bot.Logic.Bots.DefaultBot
         //卡组选择界面
         private async Task DeckPickerProc(TournamentScene tournamentScene_0)
         {
-            GameEventManager.Instance.method_6();
+            GameEventManager.Instance.RaisePreStartingNewGame();
             await Coroutine.Yield();
             if (DefaultBotSettings.Instance.NeedsToCacheCustomDecks)
             {
@@ -804,7 +804,7 @@ namespace Triton.Bot.Logic.Bots.DefaultBot
                 await ClickBackButton(tournamentScene_0);
                 return;
             }
-            GameEventManager.Instance.method_7();
+            GameEventManager.Instance.RaiseStartingNewGame();
             await Coroutine.Yield();
 
             //异常处理
@@ -1012,7 +1012,7 @@ namespace Triton.Bot.Logic.Bots.DefaultBot
                 foreach (MonoEnum item in statusEnums)
                 {
                     PresenceStatus presenceStatus = item.AsEnum<PresenceStatus>();
-                    TritonHs.smethod_4(presenceMgr, ref presenceStatus);
+                    TritonHs.FixWelcomeQuestPresenceStatus(presenceMgr, ref presenceStatus);
                     // ilog_0.DebugFormat("[卡组选择] 当前状态:{0}", presenceStatus);
                     switch (presenceStatus)
                     {
@@ -1186,7 +1186,7 @@ namespace Triton.Bot.Logic.Bots.DefaultBot
                 {
                     ilog_0.ErrorFormat("[对战准备] 准备完成.");
                 }
-                GameEventManager.Instance.method_1();
+                GameEventManager.Instance.RaiseMulliganConfirm();
                 Client.LeftClickAt(position);
                 await Coroutine.Sleep(2500);
             }
@@ -1410,7 +1410,7 @@ namespace Triton.Bot.Logic.Bots.DefaultBot
                 {
                     if (realClassName == "VictoryScreen")
                     {
-                        GameEventManager.Instance.method_5(GameOverFlag.Victory, bool_0: false);
+                        GameEventManager.Instance.RaiseGameOver(GameOverFlag.Victory, bool_0: false);
                     }
                     else if (realClassName == "DefeatScreen")
                     {
@@ -1420,7 +1420,7 @@ namespace Triton.Bot.Logic.Bots.DefaultBot
                             flag = true;
                             bool_4 = false;
                         }
-                        GameEventManager.Instance.method_5(GameOverFlag.Defeat, flag);
+                        GameEventManager.Instance.RaiseGameOver(GameOverFlag.Defeat, flag);
                     }
                 }
                 await Coroutine.Yield();
@@ -1503,12 +1503,12 @@ namespace Triton.Bot.Logic.Bots.DefaultBot
                 if (num < statusEnums.Count)
                 {
                     PresenceStatus presenceStatus = statusEnums[num].AsEnum<PresenceStatus>();
-                    TritonHs.smethod_4(presenceMgr, ref presenceStatus);
+                    TritonHs.FixWelcomeQuestPresenceStatus(presenceMgr, ref presenceStatus);
                     if (presenceStatus == PresenceStatus.PLAY_QUEUE)
                     {
                         presenceStatus = PresenceStatus.PLAY_GAME;
                     }
-                    GameEventManager.Instance.method_0(presenceStatus);
+                    GameEventManager.Instance.SetGamePresenceStatus(presenceStatus);
                     switch (presenceStatus)
                     {
                         case PresenceStatus.PLAY_GAME:
