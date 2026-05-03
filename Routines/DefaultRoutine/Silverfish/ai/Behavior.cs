@@ -178,10 +178,6 @@ namespace HREngine.Bots
                 switch (a.hc.card.nameCN)
                 {
                     // 排序优先
-                    case CardDB.cardNameCN.雷霆绽放:
-                        usecoin += 2;
-                        if (i == count - 1) retval -= 100;
-                        break;
                     case CardDB.cardNameCN.激活:
                     case CardDB.cardNameCN.幸运币:
                         usecoin++;
@@ -320,8 +316,8 @@ namespace HREngine.Bots
             // 溢出武器伤害
             retval -= p.lostWeaponDamage;
 
-            //if (p.ownMinions.Count == 0) retval -= 20;
-            //if (p.enemyMinions.Count == 0) retval += 20;
+            if (p.ownMinions.Count == 0) retval -= 20;
+            if (p.enemyMinions.Count == 0) retval += 20;
             // 已斩杀
             if (p.enemyHero.Hp <= 0)
             {
@@ -343,7 +339,7 @@ namespace HREngine.Bots
             // 濒死
             if (p.ownHero.Hp <= 0) retval -= 20000;
 
-            //retval += getCantAcceptPenality(p);
+            // retval += getCantAcceptPenality(p);
 
             return retval;
         }
@@ -598,8 +594,8 @@ namespace HREngine.Bots
         public virtual int enemyTurnPen(Playfield p)
         {
             int pen = 0;
-            List<Minion> enemyMinions = new List<Minion>(p.enemyMinions.ToArray());
-            List<Minion> ownMinions = new List<Minion>(p.ownMinions.ToArray());
+            List<Minion> enemyMinions = new List<Minion>(p.enemyMinions);
+            List<Minion> ownMinions = new List<Minion>(p.ownMinions);
             enemyMinions.Sort((a, b) => -(a.poisonous ? 10000 : a.Angr + (a.untouchable ? -100 : 0)).CompareTo(b.poisonous ? 10000 : b.Angr + (b.untouchable ? -100 : 0)));
             ownMinions.Sort((a, b) => -(getMyMinionValue(a, p) + (a.taunt ? 1000 : 0) + (a.Hp > 5 || a.untouchable || a.divineshild || a.stealth ? -100 : 0)).CompareTo(getMyMinionValue(b, p)) + (b.taunt ? 1000 : 0) + (b.Hp > 5 || b.untouchable || b.divineshild || b.stealth ? -100 : 0));
             int minCnt = enemyMinions.Count > ownMinions.Count ? ownMinions.Count : enemyMinions.Count;
