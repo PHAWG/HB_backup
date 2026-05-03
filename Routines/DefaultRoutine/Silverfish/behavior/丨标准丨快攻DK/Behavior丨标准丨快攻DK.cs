@@ -529,10 +529,10 @@ namespace HREngine.Bots
                         }
                     }
                 //// 出牌排序优先
-                switch (a.hc.card.nameCN)
-                {
+                //switch (a.hc.card.nameCN)
+                //{
                     
-                }
+                //}
             }
             // 对手基本随从交换模拟
             retval -= p.lostDamage;
