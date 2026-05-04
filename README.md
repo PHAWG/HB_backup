@@ -22,7 +22,21 @@ Hearthbuddy_backed/
 │           ├── ActionNormalizer.cs    # 动作规范化
 │           ├── CardDB.cs              # 卡牌数据库
 │           ├── PenalityManager.cs     # 惩罚管理器
-│           ├── Playfield.cs           # 场景模拟
+│           ├── Playfield/             # 场景模拟（Partial 类拆分）
+│           │   ├── Playfield.cs             # 核心状态与构造
+│           │   ├── Playfield.Turn.cs        # 回合管理
+│           │   ├── Playfield.CardPlay.cs    # 出牌与手牌
+│           │   ├── Playfield.Attack.cs      # 攻击与武器
+│           │   ├── Playfield.Trigger.cs     # 触发器与亡语
+│           │   ├── Playfield.Secret.cs      # 奥秘系统
+│           │   ├── Playfield.Aura.cs        # 光环与增益
+│           │   ├── Playfield.Minion.cs      # 随从管理
+│           │   ├── Playfield.DamageHeal.cs  # 伤害与治疗
+│           │   ├── Playfield.Lethal.cs      # 致命与敌方模拟
+│           │   ├── Playfield.Compare.cs     # 比较与哈希
+│           │   ├── Playfield.Search.cs      # 搜索与评估
+│           │   ├── Playfield.SpecialMechanics.cs  # 特殊机制
+│           │   └── Playfield.Debug.cs       # 调试与工具
 │           └── silverfish_HB.cs       # 主入口
 ├── Plugins/                 # 插件实现
 │   ├── AutoStop/            # 自动停止插件
@@ -106,6 +120,67 @@ Hearthbuddy_backed/
 ### 数据绑定修复
 
 所有 ViewModel 已正确转发 Settings 的 `PropertyChanged` 事件，确保 UI 实时更新。
+
+## Playfield Partial 类拆分 ✅ 已完成 (2026-05-04)
+
+### 背景
+
+Playfield 类是 Silverfish AI 引擎的核心战场状态类，原文件超过 **13,000 行**，是一个典型的"上帝类"（God Class），承担了战场状态存储、操作模拟、触发器系统、奥秘系统、亡语处理、光环管理、敌方模拟、致命计算等几乎所有 AI 引擎核心职责。
+
+### 拆分原则
+
+- 使用 `partial` 关键字将类拆分为多个文件，**不改变任何公共 API、方法签名或运行时行为**
+- **所有字段声明保留在主文件**，不分散到 partial 文件，确保字段查找只需查看一个文件
+- 每个文件对应一个明确的职责域，文件命名格式：`Playfield.{职责域}.cs`
+
+### 拆分结果
+
+| # | 文件名 | 职责域 | 包含内容 | 方法数 |
+|---|---|---|---|---|
+| 1 | `Playfield.cs` | 核心状态与构造 | 所有字段声明（~340个）、两个构造函数、`triggerCounter`/`IDEnumOwner`/`RaceUtils` | 0（仅构造函数） |
+| 2 | `Playfield.Turn.cs` | 回合管理 | `onOwnTurnStart`、`onEnemyTurnStart`、`onEnemyTurnEnd`、`endTurn`、`startTurn`、`unlockMana`、回合触发器（`triggerEndTurn`/`triggerStartTurn`及其私有辅助方法）、`triggerAHeroGotArmor`、`triggerCardsChanged`、`triggerInspire` | 19 |
+| 3 | `Playfield.CardPlay.cs` | 出牌与手牌 | `PlayACard`及私有辅助方法、`PlayHeroPower`、手牌/牌库管理（`drawACard`、`removeCard`、`discardCards`、`renumHandCards`、`AddToDeck`、`RemoveFromDeck`、`AddToEnemyHand`、`RemoveFromEnemyHand`、`drawTemporaryCard`、`removeTemporaryCards`）、卡牌价值计算辅助方法 | 28 |
+| 4 | `Playfield.Attack.cs` | 攻击与武器 | `doAction`、`minionAttacksMinion`、`attackWithWeapon`、攻击处理链（`HandleMinionAttack`、`HandleHeroAttack`、武器伤害调整、武器特殊效果、防御者/攻击者受伤效果、过杀/荣誉击杀等）、`equipWeapon`、`lowerWeaponDurability`、武器破碎处理、`FindMinionByEntityId`、`FindHandCard` | 25 |
+| 5 | `Playfield.Trigger.cs` | 触发器与亡语 | 所有触发器方法（`doDmgTriggers`、`triggerACharGotHealed`、`triggerAMinionGotHealed`、`triggerAMinionGotDmg`、`triggerAMinionLosesDivineShield`、`triggerAMinionDied`、`triggerAMinionIsGoingToAttack`、`triggerAMinionDealedDmg`、`triggerACardWillBePlayed`、`triggerAMinionIsSummoned`、`triggerAMinionWasSummoned`）、`doDeathrattles`、灌注（Infuse）相关方法 | 20 |
+| 6 | `Playfield.Secret.cs` | 奥秘系统 | `getMergedSecretItem`、所有 `secretTrigger_*` 方法、`getSecretTriggersByType`、`UpdateTargetBasedOnSecret`、`EnemyUpdateTargetBasedOnSecret`、`HandleCounterspellOrSpellbender` | 11 |
+| 7 | `Playfield.Aura.cs` | 光环与增益 | `updateBoards`、`minionGetOrEraseAllAreaBuffs`、`handleRaceSpecificBuffs`、`updateAdjacentBuffs`、`handleSpiritClaws` | 5 |
+| 8 | `Playfield.Minion.cs` | 随从管理 | 随从创建/放置（`createNewMinion`、`placeAmobSomewhere`、`addMinionToBattlefield`、`callKid`、`callKidAndReturn`、`CallMinionCopy`）、随从状态修改（冻结、沉默、消灭、回手、回牌库、变形、换控、磁力、增益/减益、圣盾/嘲讽/风怒/冲锋/突袭/吸血、设置攻击力/生命值等） | 35 |
+| 9 | `Playfield.DamageHeal.cs` | 伤害与治疗 | 伤害/治疗计算方法（`getSpellDamageDamage`、`getSpellHeal`、`getMinionHeal`、`getHeroPowerDamage`等及敌方版本）、群体伤害/治疗（`allMinionOfASideGetDamage`、`allCharsOfASideGetDamage`、`allCharsGetDamage`等）、`minionGetDamageOrHeal`、`applySpellLifesteal`、`HealHero` | 19 |
+| 10 | `Playfield.Lethal.cs` | 致命与敌方模拟 | `lethalMissing`、`nextTurnWin`、`calDirectDmg`、`ownHeroHasDirectLethal`、`guessEnemyHeroLethalMissing`、`guessHeroDamage`、敌方模拟（`enemyPlaysAoe`、`EnemyCardPlaying`、`EnemyPlaysACard`、`EnemyplaysACard`、`EnemyHandleEnemyMinionPlay`）、陷阱模拟（`simulateTrapsStartEnemyTurn`、`simulateTrapsEndEnemyTurn`） | 14 |
+| 11 | `Playfield.Compare.cs` | 比较与哈希 | `isEqual`、`isEqualf`、`GetPHash`、`copyValuesFrom`、`addMinionsReal`、`addCardsReal` | 6 |
+| 12 | `Playfield.Search.cs` | 搜索与评估 | `GetAttackTargets`、`getBestPlace`、`getBestAdapt`、`searchRandomMinion`、`searchRandomMinionByMaxHP`、`searchRandomMinionInHand`、`getEnemyCharTargetForRandomSingleDamage`、`calTotalAngr`、`calEnemyTotalAngr`、`getNextEntity`、`getHandcardsByType`、`getRandomCardForManaMinion`、`CheckTurnDeckForType`、`CheckTurnDeckExists` | 14 |
+| 13 | `Playfield.SpecialMechanics.cs` | 特殊机制 | 尸体/海盗（`addCorpses`、`summonPirate`、`corpseConsumption`、`getCorpseCount`）、发掘（`handleExcavation`、`getTreasurePool`、`getLegendaryTreasure`等）、地标/泰坦（`useLocation`、`useTitanAbility`）、`setNewHeroPower`、`Magnetic`、`getNextJadeGolem` | 13 |
+| 14 | `Playfield.Debug.cs` | 调试与工具 | `debugMinions`、`printBoard`、`printBoardString`、`printBoardDebug`、`getNextAction`、`printActions`、`printActionforDummies`、`getRandomNumber`、`CountSpellSchoolsPlayed`、`hasMinionsInDeck`、`RandomEnemyMinionsAttackEachOther`、`getPosition`、`anyRaceCardInHand`、`RemoveQuickDrawStatus` | 14 |
+
+### 拆分收益
+
+| 指标 | 拆分前 | 拆分后 |
+|------|--------|--------|
+| 主文件行数 | 13,286 行 | ~1,600 行 |
+| 文件数量 | 1 个 | 14 个 |
+| 单文件最大行数 | 13,286 行 | ~2,500 行 |
+| 代码导航效率 | 低（需在超大文件中滚动） | 高（按职责快速定位） |
+| 代码可维护性 | 低（职责混杂） | 高（职责清晰分离） |
+
+### 修复的问题
+
+拆分过程中发现并修复了以下问题：
+
+1. **重复定义修复**: `UpdateTargetBasedOnSecret` 方法在 CardPlay.cs 和 Secret.cs 中重复定义，已移除 CardPlay.cs 中的重复定义
+2. **拼写错误修复**: `handleRaceSpecificBuffs` 方法参数类型拼写错误（`Mion` → `Minion`）
+3. **遗漏方法补充**: 补充了5个在原始文件中存在但拆分时遗漏的方法：
+   - `FindHandCard` — 查找手牌（添加到 Attack.cs）
+   - `getRandomCardForManaMinion` — 按费用获取随机随从（添加到 Search.cs）
+   - `CheckTurnDeckForType` — 按类型检查牌库（添加到 Search.cs）
+   - `CheckTurnDeckExists` — 按种族检查牌库（添加到 Search.cs）
+   - `getNextJadeGolem` — 获取下一个青玉魔像（添加到 SpecialMechanics.cs）
+4. **API 可见性调整**: 将 `CardDB.cardlist` 字段从 `private` 改为 `public`，以支持 `getRandomCardForManaMinion` 实现
+
+### 编译验证
+
+- ✅ 项目编译通过，0 个错误
+- ✅ 63 个警告（均为项目原有警告，非本次拆分引入）
+- ✅ 所有方法签名与拆分前完全一致，无公共 API 变更
 
 ## 构建
 

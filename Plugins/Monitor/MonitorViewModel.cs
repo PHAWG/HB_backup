@@ -34,145 +34,95 @@ namespace Monitor
         {
             _settings = settings;
             ResetCommand = new RelayCommand(ExecuteReset);
+
+            _settings.PropertyChanged += Settings_PropertyChanged;
+        }
+
+        /// <summary>
+        /// 转发 Settings 的 PropertyChanged 事件到 UI
+        /// </summary>
+        private void Settings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            OnPropertyChanged(e.PropertyName);
         }
 
         /// <summary>
         /// 获取或设置当前等级
         /// </summary>
-        public int Level
-        {
-            get => _settings.Level;
-            set { _settings.Level = value; OnPropertyChanged(); }
-        }
+        public int Level { get => _settings.Level; set { _settings.Level = value; } }
 
         /// <summary>
         /// 获取或设置当前经验值
         /// </summary>
-        public int Xp
-        {
-            get => _settings.Xp;
-            set { _settings.Xp = value; OnPropertyChanged(); }
-        }
+        public int Xp { get => _settings.Xp; set { _settings.Xp = value; } }
 
         /// <summary>
         /// 获取或设置升级所需经验值
         /// </summary>
-        public int XpNeeded
-        {
-            get => _settings.XpNeeded;
-            set { _settings.XpNeeded = value; OnPropertyChanged(); }
-        }
+        public int XpNeeded { get => _settings.XpNeeded; set { _settings.XpNeeded = value; } }
 
         /// <summary>
         /// 获取或设置累计获得的总经验值
         /// </summary>
-        public int AllXp
-        {
-            get => _settings.AllXp;
-            set { _settings.AllXp = value; OnPropertyChanged(); }
-        }
+        public int AllXp { get => _settings.AllXp; set { _settings.AllXp = value; } }
 
         /// <summary>
         /// 获取或设置满级所需的总经验值
         /// </summary>
-        public int AllXpNeeded
-        {
-            get => _settings.AllXpNeeded;
-            set { _settings.AllXpNeeded = value; OnPropertyChanged(); }
-        }
+        public int AllXpNeeded { get => _settings.AllXpNeeded; set { _settings.AllXpNeeded = value; } }
 
         /// <summary>
         /// 获取或设置总运行时间文本
         /// <para>格式化的时间字符串，如 "2小时30分钟"</para>
         /// </summary>
-        public string AllRunTimeText
-        {
-            get => _settings.AllRunTimeText;
-            set { _settings.AllRunTimeText = value; OnPropertyChanged(); }
-        }
+        public string AllRunTimeText { get => _settings.AllRunTimeText; set { _settings.AllRunTimeText = value; } }
 
         /// <summary>
         /// 获取或设置累计获得的经验值（长整型）
         /// </summary>
-        public long AllGetXp
-        {
-            get => _settings.AllGetXp;
-            set { _settings.AllGetXp = value; OnPropertyChanged(); }
-        }
+        public long AllGetXp { get => _settings.AllGetXp; set { _settings.AllGetXp = value; } }
 
         /// <summary>
         /// 获取或设置每小时经验值文本
         /// <para>显示经验获取速率</para>
         /// </summary>
-        public string PerHourXpStr
-        {
-            get => _settings.PerHourXpStr;
-            set { _settings.PerHourXpStr = value; OnPropertyChanged(); }
-        }
+        public string PerHourXpStr { get => _settings.PerHourXpStr; set { _settings.PerHourXpStr = value; } }
 
         /// <summary>
         /// 获取或设置满级所需经验值
         /// </summary>
-        public int FullXpNeeded
-        {
-            get => _settings.FullXpNeeded;
-            set { _settings.FullXpNeeded = value; OnPropertyChanged(); }
-        }
+        public int FullXpNeeded { get => _settings.FullXpNeeded; set { _settings.FullXpNeeded = value; } }
 
         /// <summary>
         /// 获取或设置满级预估时间
         /// </summary>
-        public string FullTimeNeeded
-        {
-            get => _settings.FullTimeNeeded;
-            set { _settings.FullTimeNeeded = value; OnPropertyChanged(); }
-        }
+        public string FullTimeNeeded { get => _settings.FullTimeNeeded; set { _settings.FullTimeNeeded = value; } }
 
         /// <summary>
         /// 获取或设置收藏品信息
         /// <para>显示卡牌收藏进度</para>
         /// </summary>
-        public string Collection
-        {
-            get => _settings.Collection;
-            set { _settings.Collection = value; OnPropertyChanged(); }
-        }
+        public string Collection { get => _settings.Collection; set { _settings.Collection = value; } }
 
         /// <summary>
         /// 获取或设置旅店通票到期时间
         /// </summary>
-        public string PassportEnd
-        {
-            get => _settings.PassportEnd;
-            set { _settings.PassportEnd = value; OnPropertyChanged(); }
-        }
+        public string PassportEnd { get => _settings.PassportEnd; set { _settings.PassportEnd = value; } }
 
         /// <summary>
         /// 获取或设置扭曲模式信息
         /// </summary>
-        public string TwistInfo
-        {
-            get => _settings.TwistInfo;
-            set { _settings.TwistInfo = value; OnPropertyChanged(); }
-        }
+        public string TwistInfo { get => _settings.TwistInfo; set { _settings.TwistInfo = value; } }
 
         /// <summary>
         /// 获取或设置标准模式信息
         /// </summary>
-        public string StandardInfo
-        {
-            get => _settings.StandardInfo;
-            set { _settings.StandardInfo = value; OnPropertyChanged(); }
-        }
+        public string StandardInfo { get => _settings.StandardInfo; set { _settings.StandardInfo = value; } }
 
         /// <summary>
         /// 获取或设置狂野模式信息
         /// </summary>
-        public string WildInfo
-        {
-            get => _settings.WildInfo;
-            set { _settings.WildInfo = value; OnPropertyChanged(); }
-        }
+        public string WildInfo { get => _settings.WildInfo; set { _settings.WildInfo = value; } }
 
         /// <summary>
         /// 获取重置统计命令
