@@ -69,8 +69,9 @@ namespace AutoStop
             _concedeTimer.AutoReset = true;
             _concedeTimer.Enabled = true;
             AutoStopSettings.Instance.ReloadFile();
-            _originalEnfaceReward = printUtils.enfaceReward;
+            _originalEnfaceReward = DefaultRoutineSettings.Instance.EnfaceReward;
             _facePenaltySwitched = false;
+            Log.InfoFormat("[自动停止] 保存原始打脸惩罚值: {0}", _originalEnfaceReward);
         }
 
         /// <summary> The plugin tick callback. Do any update logic here. </summary>
@@ -145,7 +146,6 @@ namespace AutoStop
                         
                         if (AutoStopSettings.Instance.DynamicFacePenaltyEnabled)
                         {
-                            _originalEnfaceReward = printUtils.enfaceReward;
                             printUtils.enfaceReward = AutoStopSettings.Instance.FacePenaltyBeforeTime;
                             Log.InfoFormat("[自动停止] 动态打脸惩罚启用，设置打脸惩罚为 {0}（时间前）", AutoStopSettings.Instance.FacePenaltyBeforeTime);
                         }
@@ -234,6 +234,7 @@ namespace AutoStop
             if (AutoStopSettings.Instance.DynamicFacePenaltyEnabled)
             {
                 printUtils.enfaceReward = _originalEnfaceReward;
+                DefaultRoutineSettings.Instance.EnfaceReward = _originalEnfaceReward;
                 Log.InfoFormat("[自动停止] 游戏结束，恢复打脸惩罚为 {0}", _originalEnfaceReward);
             }
             _facePenaltySwitched = false;

@@ -29,7 +29,14 @@ namespace HREngine.Bots
             : base(GetSettingsFilePath(Configuration.Instance.Name,
                 string.Format("{0}.json", "DefaultRoutine")))
         {
-
+            Ai.Instance.setMaxWide(_maxWide);
+            Ai.Instance.setMaxDeep(_maxDeep);
+            Ai.Instance.setMaxCal(_maxCal);
+            Helpfunctions.Instance.writelogg = !_setLog;
+            printUtils.emoteMode = _defaultEmote;
+            printUtils.printNextMove = _usePrintNextMove;
+            printUtils.printPentity = _usePrintPenalties;
+            printUtils.enfaceReward = _enfaceReward;
         }
 
         public void ReloadFile()
@@ -44,7 +51,7 @@ namespace HREngine.Bots
             printUtils.printNextMove = _usePrintNextMove;
             printUtils.printPentity = _usePrintPenalties;
             printUtils.enfaceReward = _enfaceReward;
-            NotifyPropertyChanged(string.Empty);
+            OnPropertyChanged(string.Empty);
             if (CommandLine.Arguments.Exists("behavior"))
             {
                 string[] name =
