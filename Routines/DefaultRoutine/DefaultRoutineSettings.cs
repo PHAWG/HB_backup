@@ -9,41 +9,22 @@ using Triton.Game.Mapping;
 using Logger = Triton.Common.LogUtilities.Logger;
 
 using Triton.Bot;
-//using Triton.Common;
 using Triton.Game;
 using Triton.Game.Data;
 
 namespace HREngine.Bots
 {
-    /// <summary>
-    /// 默认策略设置类
-    /// <para>存储 DefaultRoutine（Silverfish AI）的所有配置和运行时数据</para>
-    /// <para>继承自 JsonSettings，支持 JSON 序列化/反序列化和属性变更通知</para>
-    /// </summary>
-    /// <remarks>
-    /// 主要功能：
-    /// <list type="bullet">
-    ///     <item><description>AI 行为模式选择（控制/节奏/打脸等）</description></item>
-    ///     <item><description>自动表情选择</description></item>
-    ///     <item><description>搜索深度和宽度设置</description></item>
-    ///     <item><description>斩杀奖励计算设置</description></item>
-    ///     <item><description>日志和调试选项</description></item>
-    ///     <item><description>竞技场职业优先选择</description></item>
-    /// </list>
-    /// </remarks>
     public class DefaultRoutineSettings : JsonSettings
     {
         private static readonly ILog Log = Logger.GetLoggerInstanceForType();
 
         private static DefaultRoutineSettings _instance;
 
-        /// <summary>The current instance for this class. </summary>
         public static DefaultRoutineSettings Instance
         {
             get { return _instance ?? (_instance = new DefaultRoutineSettings()); }
         }
 
-        /// <summary>The default ctor. Will use the settings path "DefaultRoutine".</summary>
         public DefaultRoutineSettings()
             : base(GetSettingsFilePath(Configuration.Instance.Name,
                 string.Format("{0}.json", "DefaultRoutine")))
@@ -55,6 +36,15 @@ namespace HREngine.Bots
         {
             Reload(GetSettingsFilePath(Configuration.Instance.Name,
                 string.Format("{0}.json", "DefaultRoutine" + GetMyHashCode())));
+            Ai.Instance.setMaxWide(_maxWide);
+            Ai.Instance.setMaxDeep(_maxDeep);
+            Ai.Instance.setMaxCal(_maxCal);
+            Helpfunctions.Instance.writelogg = !_setLog;
+            printUtils.emoteMode = _defaultEmote;
+            printUtils.printNextMove = _usePrintNextMove;
+            printUtils.printPentity = _usePrintPenalties;
+            printUtils.enfaceReward = _enfaceReward;
+            NotifyPropertyChanged(string.Empty);
             if (CommandLine.Arguments.Exists("behavior"))
             {
                 string[] name =
@@ -86,9 +76,6 @@ namespace HREngine.Bots
         private TAG_CLASS _arenaPreferredClass5;
         private string _defaultBehavior;
 
-        /// <summary>
-        /// The first hero choice for arena if present.
-        /// </summary>
         [DefaultValue(TAG_CLASS.HUNTER)]
         public TAG_CLASS ArenaPreferredClass1
         {
@@ -101,13 +88,9 @@ namespace HREngine.Bots
                     NotifyPropertyChanged(() => ArenaPreferredClass1);
 
                 }
-                //Log.InfoFormat("[默认策略设置] 竞技场优先种族1 = {0}.", _arenaPreferredClass1);
             }
         }
 
-        /// <summary>
-        /// The second hero choice for arena if present.
-        /// </summary>
         [DefaultValue(TAG_CLASS.WARLOCK)]
         public TAG_CLASS ArenaPreferredClass2
         {
@@ -119,13 +102,9 @@ namespace HREngine.Bots
                     _arenaPreferredClass2 = value;
                     NotifyPropertyChanged(() => ArenaPreferredClass2);
                 }
-                //Log.InfoFormat("[默认策略设置] 竞技场优先种族2 = {0}.", _arenaPreferredClass2);
             }
         }
 
-        /// <summary>
-        /// The third hero choice for arena if present.
-        /// </summary>
         [DefaultValue(TAG_CLASS.PRIEST)]
         public TAG_CLASS ArenaPreferredClass3
         {
@@ -137,13 +116,9 @@ namespace HREngine.Bots
                     _arenaPreferredClass3 = value;
                     NotifyPropertyChanged(() => ArenaPreferredClass3);
                 }
-                //Log.InfoFormat("[默认策略设置] 竞技场优先种族3 = {0}.", _arenaPreferredClass3);
             }
         }
 
-        /// <summary>
-        /// The fourth hero choice for arena if present.
-        /// </summary>
         [DefaultValue(TAG_CLASS.ROGUE)]
         public TAG_CLASS ArenaPreferredClass4
         {
@@ -155,13 +130,9 @@ namespace HREngine.Bots
                     _arenaPreferredClass4 = value;
                     NotifyPropertyChanged(() => ArenaPreferredClass4);
                 }
-                //Log.InfoFormat("[默认策略设置] 竞技场优先种族4 = {0}.", _arenaPreferredClass4);
             }
         }
 
-        /// <summary>
-        /// The fifth hero choice for arena if present.
-        /// </summary>
         [DefaultValue(TAG_CLASS.WARRIOR)]
         public TAG_CLASS ArenaPreferredClass5
         {
@@ -173,13 +144,11 @@ namespace HREngine.Bots
                     _arenaPreferredClass5 = value;
                     NotifyPropertyChanged(() => ArenaPreferredClass5);
                 }
-                //Log.InfoFormat("[默认策略设置] 竞技场优先种族5 = {0}.", _arenaPreferredClass5);
             }
         }
 
         private ObservableCollection<TAG_CLASS> _allClasses;
 
-        /// <summary>All enum values for this type.</summary>
         [JsonIgnore]
         public ObservableCollection<TAG_CLASS> AllClasses
         {
@@ -202,7 +171,6 @@ namespace HREngine.Bots
             }
         }
 
-        // Behavior choice.
         [DefaultValue("丨通用丨不设惩罚")]
         public string DefaultBehavior
         {
@@ -214,22 +182,13 @@ namespace HREngine.Bots
                     _defaultBehavior = value;
                     NotifyPropertyChanged(() => DefaultBehavior);
                 }
-                /*
-                Log.InfoFormat("#############################################", _defaultBehavior);                
-                Log.InfoFormat("#############################################", _defaultBehavior);                
-                Log.InfoFormat(@"酸小明牛通");
-                Log.InfoFormat("#############################################", _defaultBehavior);                
-                Log.InfoFormat("#############################################", _defaultBehavior);                */
                 Log.InfoFormat("[默认策略设置] 天梯对战策略 = {0}.", _defaultBehavior);
             }
         }
 
         private ObservableCollection<string> _allBehav;
 
-        /// <summary>All enum values for this type.</summary>
         [JsonIgnore]
-        // [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-
         public ObservableCollection<string> AllBehav
         {
             get
@@ -238,17 +197,16 @@ namespace HREngine.Bots
             }
         }
 
-
-
-        // Emote choice.
+        private string _defaultEmote = "无";
         [DefaultValue("无")]
         public string DefaultEmote
         {
-            get { return printUtils.emoteMode; }
+            get { return _defaultEmote; }
             set
             {
-                if (!value.Equals(printUtils.emoteMode))
+                if (!value.Equals(_defaultEmote))
                 {
+                    _defaultEmote = value;
                     printUtils.emoteMode = value;
                     NotifyPropertyChanged(() => DefaultEmote);
                 }
@@ -257,7 +215,6 @@ namespace HREngine.Bots
 
         private ObservableCollection<string> AllEmotes;
 
-        /// <summary>All enum values for this type.</summary>
         [JsonIgnore]
         public ObservableCollection<string> AllEmote
         {
@@ -275,69 +232,62 @@ namespace HREngine.Bots
             get { return _questIdsToCancel; }
         }
 
-        private int _maxWide;
+        private int _maxWide = 3000;
 
-        /// <summary>
-        /// AI值.
-        /// </summary>
         [DefaultValue(3000)]
         public int MaxWide
         {
-            get { return Ai.Instance.maxwide; }
+            get { return _maxWide; }
             set
             {
-                if (!value.Equals(Ai.Instance.maxwide))
+                if (!value.Equals(_maxWide))
                 {
+                    _maxWide = value;
                     Ai.Instance.setMaxWide(value);
                     NotifyPropertyChanged(() => MaxWide);
                 }
-                Log.InfoFormat("[默认策略设置] AI值 = {0}.", Ai.Instance.maxwide);
+                Log.InfoFormat("[默认策略设置] AI值 = {0}.", _maxWide);
             }
         }
 
+        private int _maxDeep = 12;
 
-        /// <summary>
-        /// 最大考虑步数
-        /// </summary>
         [DefaultValue(12)]
         public int MaxDeep
         {
-            get { return Ai.Instance.maxdeep; }
+            get { return _maxDeep; }
             set
             {
-                if (!value.Equals(Ai.Instance.maxdeep))
+                if (!value.Equals(_maxDeep))
                 {
+                    _maxDeep = value;
                     Ai.Instance.setMaxDeep(value);
-                    NotifyPropertyChanged(() => MaxWide);
+                    NotifyPropertyChanged(() => MaxDeep);
                 }
-                Log.InfoFormat("[默认策略设置] 最大考虑步数 = {0}.", Ai.Instance.maxdeep);
+                Log.InfoFormat("[默认策略设置] 最大考虑步数 = {0}.", _maxDeep);
             }
         }
 
+        private int _maxCal = 60;
 
-        /// <summary>
-        /// 每步最大保留场面数
-        /// </summary>
         [DefaultValue(60)]
         public int MaxCal
         {
-            get { return Ai.Instance.maxCal; }
+            get { return _maxCal; }
             set
             {
-                if (!value.Equals(Ai.Instance.maxCal))
+                if (!value.Equals(_maxCal))
                 {
+                    _maxCal = value;
                     Ai.Instance.setMaxCal(value);
-                    NotifyPropertyChanged(() => MaxWide);
+                    NotifyPropertyChanged(() => MaxCal);
                 }
-                Log.InfoFormat("[默认策略设置] 每步最大保留场面数 = {0}.", Ai.Instance.maxCal);
+                Log.InfoFormat("[默认策略设置] 每步最大保留场面数 = {0}.", _maxCal);
             }
         }
 
         private bool _useSecretsPlayAround;
 
-        /// <summary>
-        /// 是否开启防奥秘.
-        /// </summary>
         [DefaultValue(false)]
         public bool UseSecretsPlayAround
         {
@@ -354,66 +304,62 @@ namespace HREngine.Bots
             }
         }
 
-        /// <summary>
-        /// 是否开启生成日志.
-        /// </summary>
+        private bool _setLog = true;
+
         [DefaultValue(true)]
         public bool SetLog
         {
-            get { return !Helpfunctions.Instance.writelogg; }
+            get { return _setLog; }
             set
             {
-                if (!value.Equals(!Helpfunctions.Instance.writelogg))
+                if (!value.Equals(_setLog))
                 {
+                    _setLog = value;
                     Helpfunctions.Instance.writelogg = !value;
-                    NotifyPropertyChanged(() => Helpfunctions.Instance.writelogg);
+                    NotifyPropertyChanged(() => SetLog);
                 }
-                Log.InfoFormat("[默认策略设置] 不生成对战日志 = {0}.", !Helpfunctions.Instance.writelogg);
+                Log.InfoFormat("[默认策略设置] 不生成对战日志 = {0}.", !_setLog);
             }
         }
 
-        /// <summary>
-        /// 是否打印出牌惩罚.
-        /// </summary>
+        private bool _usePrintNextMove;
+
         [DefaultValue(false)]
         public bool UsePrintNextMove
         {
-            get { return printUtils.printNextMove; }
+            get { return _usePrintNextMove; }
             set
             {
-                if (!value.Equals(printUtils.printNextMove))
+                if (!value.Equals(_usePrintNextMove))
                 {
+                    _usePrintNextMove = value;
                     printUtils.printNextMove = value;
-                    NotifyPropertyChanged(() => UsePrintPenalties);
+                    NotifyPropertyChanged(() => UsePrintNextMove);
                 }
-                Log.InfoFormat("[默认策略设置] 打印出牌惩罚 = {0}.", printUtils.printNextMove);
+                Log.InfoFormat("[默认策略设置] 打印出牌惩罚 = {0}.", _usePrintNextMove);
             }
         }
 
-        /// <summary>
-        /// 是否打印自定义惩罚.
-        /// </summary>
+        private bool _usePrintPenalties;
+
         [DefaultValue(false)]
         public bool UsePrintPenalties
         {
-            get { return printUtils.printPentity; }
+            get { return _usePrintPenalties; }
             set
             {
-                if (!value.Equals(printUtils.printPentity))
+                if (!value.Equals(_usePrintPenalties))
                 {
+                    _usePrintPenalties = value;
                     printUtils.printPentity = value;
                     NotifyPropertyChanged(() => UsePrintPenalties);
                 }
-                Log.InfoFormat("[默认策略设置] 是否打印自定义惩罚 = {0}.", printUtils.printPentity);
+                Log.InfoFormat("[默认策略设置] 是否打印自定义惩罚 = {0}.", _usePrintPenalties);
             }
         }
 
-
         private bool _berserkIfCanFinishNextTour;
 
-        /// <summary>
-        /// 是否开启下回合斩杀本回合打脸.
-        /// </summary>
         [DefaultValue(false)]
         public bool BerserkIfCanFinishNextTour
         {
@@ -430,11 +376,8 @@ namespace HREngine.Bots
             }
         }
 
+        private int _enfacehp = 27;
 
-        private int _enfacehp;
-        /// <summary>
-        /// 打脸阈值.
-        /// </summary>
         [DefaultValue(27)]
         public int Enfacehp
         {
@@ -451,23 +394,22 @@ namespace HREngine.Bots
             }
         }
 
+        private int _enfaceReward;
 
-        /// <summary>
-        /// 打脸奖励.
-        /// </summary>
         [DefaultValue(0)]
         public int EnfaceReward
         {
-            get { return printUtils.enfaceReward; }
+            get { return _enfaceReward; }
             set
             {
-                if (!value.Equals(printUtils.enfaceReward))
+                if (!value.Equals(_enfaceReward))
                 {
+                    _enfaceReward = value;
                     printUtils.enfaceReward = value;
-                    NotifyPropertyChanged(() => Enfacehp);
+                    NotifyPropertyChanged(() => EnfaceReward);
 
                 }
-                Log.InfoFormat("[默认策略设置] 打脸奖励 = {0}.", printUtils.enfaceReward);
+                Log.InfoFormat("[默认策略设置] 打脸奖励 = {0}.", _enfaceReward);
             }
         }
     }
