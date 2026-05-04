@@ -9,6 +9,7 @@ using log4net;
 using Triton.Bot;
 using Triton.Bot.Settings;
 using Triton.Common;
+using Triton.Common.Mvvm;
 using Triton.Game;
 using Triton.Game.Mapping;
 using Logger = Triton.Common.LogUtilities.Logger;
@@ -95,89 +96,10 @@ namespace Stats
                 using (var fs = new FileStream(@"Plugins\Stats\SettingsGui.xaml", FileMode.Open))
                 {
                     var root = (UserControl)XamlReader.Load(fs);
-
-                    // Your settings binding here.
-
-                    if (!Wpf.SetupTextBoxBinding(root, "WinsTextBox", "Wins",
-                        BindingMode.TwoWay, StatsSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'WinsTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    Wpf.SetupTextBoxBinding(root, "WinsTextBox1", "Wins1", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "WinsTextBox2", "Wins2", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "WinsTextBox3", "Wins3", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "WinsTextBox4", "Wins4", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "WinsTextBox5", "Wins5", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "WinsTextBox6", "Wins6", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "WinsTextBox7", "Wins7", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "WinsTextBox8", "Wins8", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "WinsTextBox9", "Wins9", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "WinsTextBox10", "Wins10", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "WinsTextBox11", "Wins11", BindingMode.TwoWay, StatsSettings.Instance);
-
-                    if (!Wpf.SetupTextBoxBinding(root, "LossesTextBox", "Losses",
-                        BindingMode.TwoWay, StatsSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'LossesTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-                    Wpf.SetupTextBoxBinding(root, "LossesTextBox1", "Losses1", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "LossesTextBox2", "Losses2", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "LossesTextBox3", "Losses3", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "LossesTextBox4", "Losses4", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "LossesTextBox5", "Losses5", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "LossesTextBox6", "Losses6", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "LossesTextBox7", "Losses7", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "LossesTextBox8", "Losses8", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "LossesTextBox9", "Losses9", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "LossesTextBox10", "Losses10", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "LossesTextBox11", "Losses11", BindingMode.TwoWay, StatsSettings.Instance);
-
-                    if (!Wpf.SetupTextBoxBinding(root, "WinrateTextBox", "Winrate",
-                        BindingMode.TwoWay, StatsSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'WinrateTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-                    Wpf.SetupTextBoxBinding(root, "WinrateTextBox1", "Winrate1", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "WinrateTextBox2", "Winrate2", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "WinrateTextBox3", "Winrate3", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "WinrateTextBox4", "Winrate4", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "WinrateTextBox5", "Winrate5", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "WinrateTextBox6", "Winrate6", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "WinrateTextBox7", "Winrate7", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "WinrateTextBox8", "Winrate8", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "WinrateTextBox9", "Winrate9", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "WinrateTextBox10", "Winrate10", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "WinrateTextBox11", "Winrate11", BindingMode.TwoWay, StatsSettings.Instance);
-
-                    if (!Wpf.SetupTextBoxBinding(root, "environmentTextBox", "environment",
-                         BindingMode.TwoWay, StatsSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'environmentTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-                    Wpf.SetupTextBoxBinding(root, "environmentTextBox1", "environment1", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "environmentTextBox2", "environment2", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "environmentTextBox3", "environment3", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "environmentTextBox4", "environment4", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "environmentTextBox5", "environment5", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "environmentTextBox6", "environment6", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "environmentTextBox7", "environment7", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "environmentTextBox8", "environment8", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "environmentTextBox9", "environment9", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "environmentTextBox10", "environment10", BindingMode.TwoWay, StatsSettings.Instance);
-                    Wpf.SetupTextBoxBinding(root, "environmentTextBox11", "environment11", BindingMode.TwoWay, StatsSettings.Instance);
-
-                    // Your settings event handlers here.
-
-                    var resetButton = Wpf.FindControlByName<Button>(root, "ResetButton");
-                    resetButton.Click += ResetButtonOnClick;
-
+                    var viewModel = new StatsViewModel(StatsSettings.Instance);
+                    viewModel.RequestReset += ResetButtonOnClick;
+                    root.DataContext = viewModel;
                     UpdateMainGuiStats();
-
                     _control = root;
                 }
 
@@ -279,7 +201,7 @@ namespace Stats
             //Log.ErrorFormat("[统计插件]----------------------------------");
         }
 
-        private void ResetButtonOnClick(object sender, RoutedEventArgs routedEventArgs)
+        private void ResetButtonOnClick()
         {
             StatsSettings.Instance.Wins = 0;
             StatsSettings.Instance.Wins1 = 0;
@@ -351,14 +273,13 @@ namespace Stats
         {
             Application.Current.Dispatcher.BeginInvoke(new Action(() =>
             {
-                var leftControl = Wpf.FindControlByName<Label>(Application.Current.MainWindow, "StatusBarLeftLabel");//StatusBarLeftLabel
-                var rightControl = Wpf.FindControlByName<Label>(Application.Current.MainWindow, "StatusBarRightLabel");//StatusBarRightLabel
+                var statusBar = Triton.Common.Mvvm.ViewModelLocator.GetSingleton<Triton.Common.Mvvm.StatusBarViewModel>();
 
                 if (StatsSettings.Instance.Wins + StatsSettings.Instance.Losses == 0)
                 {
                     if (StatsSettings.Instance.Winrate == "0")
                     {
-                        rightControl.Content = string.Format("(没有对局信息)");
+                        statusBar.RightText = string.Format("(没有对局信息)");
                     }
 
                 }
@@ -389,25 +310,20 @@ namespace Stats
                     StatsSettings.Instance.environment9 = EM(StatsSettings.Instance.Wins9, StatsSettings.Instance.Losses9, StatsSettings.Instance.Wins, StatsSettings.Instance.Losses);
                     StatsSettings.Instance.environment10 = EM(StatsSettings.Instance.Wins10, StatsSettings.Instance.Losses10, StatsSettings.Instance.Wins, StatsSettings.Instance.Losses);
                     StatsSettings.Instance.environment11 = EM(StatsSettings.Instance.Wins11, StatsSettings.Instance.Losses11, StatsSettings.Instance.Wins, StatsSettings.Instance.Losses);
-
-                    //rightControl.Content = string.Format("{0} 胜场/ {1} 总场数(胜率:{2:0.00})", StatsSettings.Instance.Wins, StatsSettings.Instance.Wins + StatsSettings.Instance.Losses, StatsSettings.Instance.Winrate);
-                    //Log.InfoFormat("[统计插件] 合计: {0}", rightControl.Content);
                 }
 
-                // Force a save all.
                 Configuration.Instance.SaveAll();
             }));
         }
 
         private void TritonHsOnOnGuiTick(object sender, GuiTickEventArgs guiTickEventArgs)
         {
-            // Only update if we're actually enabled.
             if (IsEnabled)
             {
                 Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    var leftControl = Wpf.FindControlByName<Label>(Application.Current.MainWindow, "StatusBarLeftLabel");////StatusBarLeftLabel
-                    leftControl.Content = string.Format("运行时间: {0}", TritonHs.Runtime.Elapsed.ToString("h'小时 'm'分 's'秒'"));
+                    var statusBar = Triton.Common.Mvvm.ViewModelLocator.GetSingleton<Triton.Common.Mvvm.StatusBarViewModel>();
+                    statusBar.LeftText = string.Format("运行时间: {0}", TritonHs.Runtime.Elapsed.ToString("h'小时 'm'分 's'秒'"));
                 }));
             }
         }

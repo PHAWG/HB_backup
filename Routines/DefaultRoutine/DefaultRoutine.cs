@@ -16,6 +16,7 @@ using log4net;
 using Microsoft.Scripting.Hosting;
 using Triton.Bot;
 using Triton.Common;
+using Triton.Common.Mvvm;
 using Triton.Game;
 using Triton.Game.Data;
 
@@ -240,264 +241,20 @@ def Execute():
         {
             get
             {
-
-
                 using (var fs = new FileStream(@"Routines\DefaultRoutine\SettingsGui.xaml", FileMode.Open))
                 {
                     var root = (UserControl)XamlReader.Load(fs);
-
-                    // Your settings binding here.
-
-                    // ArenaPreferredClass1
-                    // if (
-                    //     !Wpf.SetupComboBoxItemsBinding(root, "ArenaPreferredClass1ComboBox", "AllClasses",
-                    //         BindingMode.OneWay, DefaultRoutineSettings.Instance))
-                    // {
-                    //     Log.DebugFormat(
-                    //         "[SettingsControl] SetupComboBoxItemsBinding failed for 'ArenaPreferredClass1ComboBox'.");
-                    //     throw new Exception("The SettingsControl could not be created.");
-                    // }
-
-                    // if (
-                    //     !Wpf.SetupComboBoxSelectedItemBinding(root, "ArenaPreferredClass1ComboBox",
-                    //         "ArenaPreferredClass1", BindingMode.TwoWay, DefaultRoutineSettings.Instance))
-                    // {
-                    //     Log.DebugFormat(
-                    //         "[SettingsControl] SetupComboBoxSelectedItemBinding failed for 'ArenaPreferredClass1ComboBox'.");
-                    //     throw new Exception("The SettingsControl could not be created.");
-                    // }
-
-                    // // ArenaPreferredClass2
-                    // if (
-                    //     !Wpf.SetupComboBoxItemsBinding(root, "ArenaPreferredClass2ComboBox", "AllClasses",
-                    //         BindingMode.OneWay, DefaultRoutineSettings.Instance))
-                    // {
-                    //     Log.DebugFormat(
-                    //         "[SettingsControl] SetupComboBoxItemsBinding failed for 'ArenaPreferredClass2ComboBox'.");
-                    //     throw new Exception("The SettingsControl could not be created.");
-                    // }
-
-                    // if (
-                    //     !Wpf.SetupComboBoxSelectedItemBinding(root, "ArenaPreferredClass2ComboBox",
-                    //         "ArenaPreferredClass2", BindingMode.TwoWay, DefaultRoutineSettings.Instance))
-                    // {
-                    //     Log.DebugFormat(
-                    //         "[SettingsControl] SetupComboBoxSelectedItemBinding failed for 'ArenaPreferredClass2ComboBox'.");
-                    //     throw new Exception("The SettingsControl could not be created.");
-                    // }
-
-                    // // ArenaPreferredClass3
-                    // if (
-                    //     !Wpf.SetupComboBoxItemsBinding(root, "ArenaPreferredClass3ComboBox", "AllClasses",
-                    //         BindingMode.OneWay, DefaultRoutineSettings.Instance))
-                    // {
-                    //     Log.DebugFormat(
-                    //         "[SettingsControl] SetupComboBoxItemsBinding failed for 'ArenaPreferredClass3ComboBox'.");
-                    //     throw new Exception("The SettingsControl could not be created.");
-                    // }
-
-                    // if (
-                    //     !Wpf.SetupComboBoxSelectedItemBinding(root, "ArenaPreferredClass3ComboBox",
-                    //         "ArenaPreferredClass3", BindingMode.TwoWay, DefaultRoutineSettings.Instance))
-                    // {
-                    //     Log.DebugFormat(
-                    //         "[SettingsControl] SetupComboBoxSelectedItemBinding failed for 'ArenaPreferredClass3ComboBox'.");
-                    //     throw new Exception("The SettingsControl could not be created.");
-                    // }
-
-                    // // ArenaPreferredClass4
-                    // if (
-                    //     !Wpf.SetupComboBoxItemsBinding(root, "ArenaPreferredClass4ComboBox", "AllClasses",
-                    //         BindingMode.OneWay, DefaultRoutineSettings.Instance))
-                    // {
-                    //     Log.DebugFormat(
-                    //         "[SettingsControl] SetupComboBoxItemsBinding failed for 'ArenaPreferredClass4ComboBox'.");
-                    //     throw new Exception("The SettingsControl could not be created.");
-                    // }
-
-                    // if (
-                    //     !Wpf.SetupComboBoxSelectedItemBinding(root, "ArenaPreferredClass4ComboBox",
-                    //         "ArenaPreferredClass4", BindingMode.TwoWay, DefaultRoutineSettings.Instance))
-                    // {
-                    //     Log.DebugFormat(
-                    //         "[SettingsControl] SetupComboBoxSelectedItemBinding failed for 'ArenaPreferredClass4ComboBox'.");
-                    //     throw new Exception("The SettingsControl could not be created.");
-                    // }
-
-                    // // ArenaPreferredClass5
-                    // if (
-                    //     !Wpf.SetupComboBoxItemsBinding(root, "ArenaPreferredClass5ComboBox", "AllClasses",
-                    //         BindingMode.OneWay, DefaultRoutineSettings.Instance))
-                    // {
-                    //     Log.DebugFormat(
-                    //         "[SettingsControl] SetupComboBoxItemsBinding failed for 'ArenaPreferredClass5ComboBox'.");
-                    //     throw new Exception("The SettingsControl could not be created.");
-                    // }
-
-                    // if (
-                    //     !Wpf.SetupComboBoxSelectedItemBinding(root, "ArenaPreferredClass5ComboBox",
-                    //         "ArenaPreferredClass5", BindingMode.TwoWay, DefaultRoutineSettings.Instance))
-                    // {
-                    //     Log.DebugFormat(
-                    //         "[SettingsControl] SetupComboBoxSelectedItemBinding failed for 'ArenaPreferredClass5ComboBox'.");
-                    //     throw new Exception("The SettingsControl could not be created.");
-                    // }
-
-                    // defaultBehaviorComboBox1
-                    if (
-                        !Wpf.SetupComboBoxItemsBinding(root, "defaultBehaviorComboBox1", "AllBehav",
-                            BindingMode.OneWay, DefaultRoutineSettings.Instance))
-                    {
-                        Log.DebugFormat(
-                            "[SettingsControl] SetupComboBoxItemsBinding failed for 'defaultBehaviorComboBox1'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-
-
-                    if (
-                        !Wpf.SetupComboBoxSelectedItemBinding(root, "defaultBehaviorComboBox1",
-                            "DefaultBehavior", BindingMode.TwoWay, DefaultRoutineSettings.Instance))
-                    {
-                        Log.DebugFormat(
-                            "[SettingsControl] SetupComboBoxSelectedItemBinding failed for 'defaultBehaviorComboBox1'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    // 表情
-                    if (
-                        !Wpf.SetupComboBoxItemsBinding(root, "emoteComboBox", "AllEmote",
-                            BindingMode.OneWay, DefaultRoutineSettings.Instance))
-                    {
-                        Log.DebugFormat(
-                            "[SettingsControl] SetupComboBoxItemsBinding failed for 'emoteComboBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (
-                        !Wpf.SetupComboBoxSelectedItemBinding(root, "emoteComboBox",
-                            "DefaultEmote", BindingMode.TwoWay, DefaultRoutineSettings.Instance))
-                    {
-                        Log.DebugFormat(
-                            "[SettingsControl] SetupComboBoxSelectedItemBinding failed for 'emoteComboBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-                    // Your settings event handlers here.
-
-                    // MaxWide
-                    if (
-                        !Wpf.SetupTextBoxBinding(root, "MaxWideTextBox", "MaxWide",
-                        BindingMode.TwoWay, DefaultRoutineSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'MaxWideTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    // MaxDeep
-                    if (
-                        !Wpf.SetupTextBoxBinding(root, "MaxDeepTextBox", "MaxDeep",
-                        BindingMode.TwoWay, DefaultRoutineSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'MaxDeepTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    // MaxCal
-                    if (
-                        !Wpf.SetupTextBoxBinding(root, "MaxCalTextBox", "MaxCal",
-                        BindingMode.TwoWay, DefaultRoutineSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'MaxCalTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-
-                    // UseSecretsPlayAround
-                    if (
-                        !Wpf.SetupCheckBoxBinding(root, "UseSecretsPlayAroundCheckBox",
-                            "UseSecretsPlayAround",
-                            BindingMode.TwoWay, DefaultRoutineSettings.Instance))
-                    {
-                        Log.DebugFormat(
-                            "[SettingsControl] SetupCheckBoxBinding failed for 'UseSecretsPlayAroundCheckBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    // SetLogCheckBox
-                    if (
-                        !Wpf.SetupCheckBoxBinding(root, "SetLogCheckBox",
-                            "SetLog",
-                            BindingMode.TwoWay, DefaultRoutineSettings.Instance))
-                    {
-                        Log.DebugFormat(
-                            "[SettingsControl] SetupCheckBoxBinding failed for 'SetLogCheckBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    // 打印自定义惩罚值
-                    if (
-                        !Wpf.SetupCheckBoxBinding(root, "PrintPenaltiesCheckBox",
-                            "UsePrintPenalties",
-                            BindingMode.TwoWay, DefaultRoutineSettings.Instance))
-                    {
-                        Log.DebugFormat(
-                            "[SettingsControl] SetupCheckBoxBinding failed for 'PrintPenaltiesCheckBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    // 打印最终出牌
-                    if (
-                        !Wpf.SetupCheckBoxBinding(root, "PrintNextMoveCheckBox",
-                            "UsePrintNextMove",
-                            BindingMode.TwoWay, DefaultRoutineSettings.Instance))
-                    {
-                        Log.DebugFormat(
-                            "[SettingsControl] SetupCheckBoxBinding failed for 'PrintNextMoveCheckBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-
-
-                    // BerserkIfCanFinishNextTour
-                    if (
-                        !Wpf.SetupCheckBoxBinding(root, "BerserkIfCanFinishNextTourCheckBox",
-                            "BerserkIfCanFinishNextTour",
-                            BindingMode.TwoWay, DefaultRoutineSettings.Instance))
-                    {
-                        Log.DebugFormat(
-                            "[SettingsControl] SetupCheckBoxBinding failed for 'BerserkIfCanFinishNextTourCheckBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    // 打脸阈值
-                    if (
-                        !Wpf.SetupTextBoxBinding(root, "EnfacehpTextBox", "Enfacehp",
-                        BindingMode.TwoWay, DefaultRoutineSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'EnfacehpTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    // 打脸奖励
-                    if (
-                        !Wpf.SetupTextBoxBinding(root, "EnfaceRewardTextBox", "EnfaceReward",
-                        BindingMode.TwoWay, DefaultRoutineSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'EnfaceRewardTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-                    var openButton = Wpf.FindControlByName<Button>(root, "lastMatch");
-                    openButton.Click += LastMatchOnClick;
-
-                    var clearLogButton = Wpf.FindControlByName<Button>(root, "clearLogButton");
-                    clearLogButton.Click += clearLog;
-
+                    var viewModel = new DefaultRoutineViewModel(DefaultRoutineSettings.Instance);
+                    viewModel.RequestOpenLastMatch += LastMatchOnClick;
+                    viewModel.RequestClearLog += ClearLog;
+                    viewModel.RequestReset += ResetSettings;
+                    root.DataContext = viewModel;
                     return root;
                 }
             }
         }
 
-        private void LastMatchOnClick(object sender, RoutedEventArgs routedEventArgs)
+        private void LastMatchOnClick()
         {
             if (printUtils.recordPath != null)
             {
@@ -505,13 +262,18 @@ def Execute():
             }
         }
 
-        private void clearLog(object sender, RoutedEventArgs routedEventArgs)
+        private void ResetSettings()
         {
-            string pLocalFilePath = @".\Routines\delLog.bat";//要复制的文件路径
-            string pSaveFilePath = @".\delLog.bat";//指定存储的路径
-            if (File.Exists(pLocalFilePath))//必须判断要复制的文件是否存在
+            DefaultRoutineSettings.Instance.ReloadFile();
+        }
+
+        private void ClearLog()
+        {
+            string pLocalFilePath = @".\Routines\delLog.bat";
+            string pSaveFilePath = @".\delLog.bat";
+            if (File.Exists(pLocalFilePath))
             {
-                File.Copy(pLocalFilePath, pSaveFilePath, true);//三个参数分别是源文件路径，存储路径，若存储路径有相同文件是否替换
+                File.Copy(pLocalFilePath, pSaveFilePath, true);
             }
             Process proc = null;
             try

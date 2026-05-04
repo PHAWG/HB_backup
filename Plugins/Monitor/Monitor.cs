@@ -17,6 +17,7 @@ using log4net;
 using Triton.Bot;
 using Triton.Bot.Settings;
 using Triton.Common;
+using Triton.Common.Mvvm;
 using Triton.Game;
 using Logger1 = Triton.Common.LogUtilities.Logger;
 using System.ServiceModel;
@@ -143,115 +144,9 @@ namespace Monitor
                 using (var fs = new FileStream(@"Plugins\Monitor\SettingsGui.xaml", FileMode.Open))
                 {
                     var root = (UserControl)XamlReader.Load(fs);
-
-                    if (!Wpf.SetupTextBoxBinding(root, "LevelTextBox", "Level",
-                        BindingMode.TwoWay, MonitorSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'LevelTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "XpTextBox", "Xp",
-                        BindingMode.TwoWay, MonitorSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'XpTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "XpNeededTextBox", "XpNeeded",
-                        BindingMode.TwoWay, MonitorSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'XpNeededTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "AllXpTextBox", "AllXp",
-                        BindingMode.TwoWay, MonitorSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'AllXpTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "AllXpNeededTextBox", "AllXpNeeded",
-                        BindingMode.TwoWay, MonitorSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'AllXpNeededTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "AllRunTimeTextBox", "AllRunTimeText",
-                        BindingMode.TwoWay, MonitorSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'AllRunTimeTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "AllGetXpTextBox", "AllGetXp",
-                        BindingMode.TwoWay, MonitorSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'AllGetXpTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "PerHourXpStrTextBox", "PerHourXpStr",
-                        BindingMode.TwoWay, MonitorSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'PerHourXpStrTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "FullXpNeededTextBox", "FullXpNeeded",
-                        BindingMode.TwoWay, MonitorSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'FullXpNeededTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "FullTimeNeededTextBox", "FullTimeNeeded",
-                        BindingMode.TwoWay, MonitorSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'FullTimeNeededTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "CollectionTextBox", "Collection",
-                        BindingMode.TwoWay, MonitorSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'CollectionTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "PassportEndTextBox", "PassportEnd",
-                        BindingMode.TwoWay, MonitorSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'PassportEndTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "TwistInfoBox", "TwistInfo",
-                        BindingMode.TwoWay, MonitorSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'TwistInfoBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "StandardInfoBox", "StandardInfo",
-                        BindingMode.TwoWay, MonitorSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'StandardInfoBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "WildInfoBox", "WildInfo", 
-                        BindingMode.TwoWay, MonitorSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'WildInfoBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    var resetButton = Wpf.FindControlByName<Button>(root, "ResetButton");
-                    resetButton.Click += ResetButtonOnClick;
-
+                    var viewModel = new MonitorViewModel(MonitorSettings.Instance);
+                    viewModel.RequestReset += ResetButtonOnClick;
+                    root.DataContext = viewModel;
                     _control = root;
                 }
 
@@ -324,7 +219,7 @@ namespace Monitor
             UpdateMainGuiStats();
         }
 
-        private void ResetButtonOnClick(object sender, RoutedEventArgs routedEventArgs)
+        private void ResetButtonOnClick()
         {
             MonitorSettings.Instance.Wins = 0;
             MonitorSettings.Instance.Losses = 0;
@@ -352,55 +247,47 @@ namespace Monitor
         {
             Application.Current.Dispatcher.BeginInvoke(new Action(() =>
             {
-                var leftControl = Wpf.FindControlByName<Label>(Application.Current.MainWindow, "StatusBarLeftLabel");
-                var rightControl = Wpf.FindControlByName<Label>(Application.Current.MainWindow, "StatusBarRightLabel");
+                var statusBar = Triton.Common.Mvvm.ViewModelLocator.GetSingleton<Triton.Common.Mvvm.StatusBarViewModel>();
 
-                if (rightControl != null)
+                string show = "";
+                if (DefaultBotSettings.Instance.ConstructedGameRule == VisualsFormatType.标准)
                 {
-                    string show = "";
-                    if (DefaultBotSettings.Instance.ConstructedGameRule == VisualsFormatType.标准)
-                    {
-                        show = "标准" + MonitorSettings.Instance.StandardInfo;
-                    }
-                    else if (DefaultBotSettings.Instance.ConstructedGameRule == VisualsFormatType.狂野)
-                    {
-                        show = "狂野" + MonitorSettings.Instance.WildInfo;
-                    }
-                    else if (DefaultBotSettings.Instance.ConstructedGameRule == VisualsFormatType.经典)
-                    {
-                        show = "经典" + MonitorSettings.Instance.ClassicInfo;
-                    }
-                    else if (DefaultBotSettings.Instance.ConstructedGameRule == VisualsFormatType.幻变)
-                    {
-                        show = "幻变" + MonitorSettings.Instance.TwistInfo;
-                    }
-                    else show = "休闲模式";
-                    rightControl.Content = string.Format(
-                        "战令{0}级({1}/{2})({3}/小时) {4} [{5}投] ",
-                            MonitorSettings.Instance.Level,
-                            MonitorSettings.Instance.Xp,
-                            MonitorSettings.Instance.XpNeeded,
-                            MonitorSettings.Instance.PerHourXp,
-                            show,
-                            MonitorSettings.Instance.Concedes);
-                    Log.InfoFormat("[监控插件] 合计: {0}", rightControl.Content);
-                    Configuration.Instance.SaveAll();
+                    show = "标准" + MonitorSettings.Instance.StandardInfo;
                 }
+                else if (DefaultBotSettings.Instance.ConstructedGameRule == VisualsFormatType.狂野)
+                {
+                    show = "狂野" + MonitorSettings.Instance.WildInfo;
+                }
+                else if (DefaultBotSettings.Instance.ConstructedGameRule == VisualsFormatType.经典)
+                {
+                    show = "经典" + MonitorSettings.Instance.ClassicInfo;
+                }
+                else if (DefaultBotSettings.Instance.ConstructedGameRule == VisualsFormatType.幻变)
+                {
+                    show = "幻变" + MonitorSettings.Instance.TwistInfo;
+                }
+                else show = "休闲模式";
+                statusBar.RightText = string.Format(
+                    "战令{0}级({1}/{2})({3}/小时) {4} [{5}投] ",
+                        MonitorSettings.Instance.Level,
+                        MonitorSettings.Instance.Xp,
+                        MonitorSettings.Instance.XpNeeded,
+                        MonitorSettings.Instance.PerHourXp,
+                        show,
+                        MonitorSettings.Instance.Concedes);
+                Log.InfoFormat("[监控插件] 合计: {0}", statusBar.RightText);
+                Configuration.Instance.SaveAll();
             }));
         }
 
         private void TritonHsOnOnGuiTick(object sender, GuiTickEventArgs guiTickEventArgs)
         {
-            // Only update if we're actually enabled.
             if (IsEnabled)
             {
                 Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    var leftControl = Wpf.FindControlByName<Label>(Application.Current.MainWindow, "StatusBarLeftLabel");
-                    if (leftControl != null)
-                    {
-                        leftControl.Content = string.Format("运行时间: {0}", TritonHs.Runtime.Elapsed.ToString("h'小时 'm'分 's'秒'"));
-                    }
+                    var statusBar = Triton.Common.Mvvm.ViewModelLocator.GetSingleton<Triton.Common.Mvvm.StatusBarViewModel>();
+                    statusBar.LeftText = string.Format("运行时间: {0}", TritonHs.Runtime.Elapsed.ToString("h'小时 'm'分 's'秒'"));
                 }));
             }
         }

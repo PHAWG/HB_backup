@@ -15,9 +15,9 @@ namespace Triton.Bot.Logic.Bots.DefaultBot
 {
     public class DefaultBotSettings : JsonSettings
     {
-        private static readonly ILog ilog_0 = Common.LogUtilities.Logger.GetLoggerInstanceForType();
+        private static readonly ILog _log = Common.LogUtilities.Logger.GetLoggerInstanceForType();
 
-        private static DefaultBotSettings defaultBotSettings_0;
+        private static DefaultBotSettings _instance;
 
         public DefaultBotSettings() : base(GetSettingsFilePath(
             Configuration.Instance.Name, string.Format("{0}.json", "DefaultBot")))
@@ -30,9 +30,9 @@ namespace Triton.Bot.Logic.Bots.DefaultBot
             get
             {
                 DefaultBotSettings result;
-                if ((result = defaultBotSettings_0) == null)
+                if ((result = _instance) == null)
                 {
-                    result = (defaultBotSettings_0 = new DefaultBotSettings());
+                    result = (_instance = new DefaultBotSettings());
                 }
                 return result;
             }
@@ -45,36 +45,36 @@ namespace Triton.Bot.Logic.Bots.DefaultBot
             if (CommandLine.Arguments.Exists("rule"))
             {
                 ConstructedGameRule = (VisualsFormatType)(int.Parse(CommandLine.Arguments.Single("rule")) + 1);
-                ilog_0.ErrorFormat("[中控设置] 传统对战模式 = {0}.", ConstructedGameRule);
+                _log.ErrorFormat("[中控设置] 传统对战模式 = {0}.", ConstructedGameRule);
             }
             if (CommandLine.Arguments.Exists("deck"))
             {
                 ConstructedCustomDeck = CommandLine.Arguments.Single("deck");
-                ilog_0.ErrorFormat("[中控设置] 对战卡组名称 = {0}.", ConstructedCustomDeck);
+                _log.ErrorFormat("[中控设置] 对战卡组名称 = {0}.", ConstructedCustomDeck);
             }
             if (CommandLine.Arguments.Exists("width"))
             {
                 ReleaseLimit = true;
                 ReleaseLimitW = int.Parse(CommandLine.Arguments.Single("width"));
-                ilog_0.ErrorFormat("[中控设置] 炉石窗口宽度 = {0}.", ReleaseLimitW);
+                _log.ErrorFormat("[中控设置] 炉石窗口宽度 = {0}.", ReleaseLimitW);
             }
             if (CommandLine.Arguments.Exists("height"))
             {
                 ReleaseLimit = true;
                 ReleaseLimitH = int.Parse(CommandLine.Arguments.Single("height"));
-                ilog_0.ErrorFormat("[中控设置] 炉石窗口高度 = {0}.", ReleaseLimitH);
+                _log.ErrorFormat("[中控设置] 炉石窗口高度 = {0}.", ReleaseLimitH);
             }
         }
 
         //下拉框数据
-        private ObservableCollection<VisualsFormatType> observableCollection_3;
+        private ObservableCollection<VisualsFormatType> _allConstructedRules;
         [JsonIgnore]
         public ObservableCollection<VisualsFormatType> AllConstructedRules
         {
             get
             {
                 ObservableCollection<VisualsFormatType> result;
-                if ((result = observableCollection_3) == null)
+                if ((result = _allConstructedRules) == null)
                 {
                     ObservableCollection<VisualsFormatType> observableCollection = new ObservableCollection<VisualsFormatType>();
                     observableCollection.Add(VisualsFormatType.狂野);
@@ -82,7 +82,7 @@ namespace Triton.Bot.Logic.Bots.DefaultBot
                     observableCollection.Add(VisualsFormatType.经典);
                     observableCollection.Add(VisualsFormatType.休闲);
                     observableCollection.Add(VisualsFormatType.幻变);
-                    observableCollection_3 = observableCollection;
+                    _allConstructedRules = observableCollection;
                     result = observableCollection;
                 }
                 return result;
@@ -90,155 +90,155 @@ namespace Triton.Bot.Logic.Bots.DefaultBot
         }
 
         //当前对战模式
-        private VisualsFormatType visualsFormatType;
+        private VisualsFormatType _constructedGameRule;
         [DefaultValue(VisualsFormatType.狂野)]
         public VisualsFormatType ConstructedGameRule
         {
-            get { return visualsFormatType; }
+            get { return _constructedGameRule; }
             set
             {
-                if (!value.Equals(visualsFormatType))
+                if (!value.Equals(_constructedGameRule))
                 {
-                    visualsFormatType = value;
+                    _constructedGameRule = value;
                     NotifyPropertyChanged(() => ConstructedGameRule);
                 }
-                ilog_0.InfoFormat("[天梯脚本设置] 对战模式 = {0}.", visualsFormatType);
+                _log.InfoFormat("[天梯脚本设置] 对战模式 = {0}.", _constructedGameRule);
             }
         }
 
         //卡组名称
-        private string string_2;
+        private string _constructedCustomDeck;
         [DefaultValue("请选择卡组")]
         public string ConstructedCustomDeck
         {
-            get { return string_2; }
+            get { return _constructedCustomDeck; }
             set
             {
                 string text = value;
                 if (text == null) text = string.Empty;
-                if (!text.Equals(string_2))
+                if (!text.Equals(_constructedCustomDeck))
                 {
-                    string_2 = text;
+                    _constructedCustomDeck = text;
                     NotifyPropertyChanged(() => ConstructedCustomDeck);
                 }
-                ilog_0.InfoFormat("[天梯脚本设置] 卡组名称 = {0}.", string_2);
+                _log.InfoFormat("[天梯脚本设置] 卡组名称 = {0}.", _constructedCustomDeck);
             }
         }
 
         //上次卡组ID
-        private long long_0;
+        private long _lastDeckId;
         public long LastDeckId
         {
-            get { return long_0; }
-            internal set { long_0 = value; }
+            get { return _lastDeckId; }
+            internal set { _lastDeckId = value; }
         }
 
         //开局自动打招呼
-        private bool bool_3;
+        private bool _autoGreet;
         [DefaultValue(false)]
         public bool AutoGreet
         {
-            get { return bool_3; }
+            get { return _autoGreet; }
             set
             {
-                if (!value.Equals(bool_3))
+                if (!value.Equals(_autoGreet))
                 {
-                    bool_3 = value;
+                    _autoGreet = value;
                     NotifyPropertyChanged(() => AutoGreet);
                 }
-                ilog_0.InfoFormat("[天梯脚本设置] 自动打招呼 = {0}.", bool_3);
+                _log.InfoFormat("[天梯脚本设置] 自动打招呼 = {0}.", _autoGreet);
             }
         }
 
         //需要缓存卡组
-        private bool bool_8;
+        private bool _needsToCacheCustomDecks;
         [JsonIgnore]
         [DefaultValue(true)]
         public bool NeedsToCacheCustomDecks
         {
-            get { return bool_8; }
+            get { return _needsToCacheCustomDecks; }
             set
             {
-                if (!value.Equals(bool_8))
+                if (!value.Equals(_needsToCacheCustomDecks))
                 {
-                    bool_8 = value;
+                    _needsToCacheCustomDecks = value;
                     NotifyPropertyChanged(() => NeedsToCacheCustomDecks);
                 }
-                ilog_0.InfoFormat("[天梯脚本设置] 需要缓存卡组 = {0}.", bool_8);
+                _log.InfoFormat("[天梯脚本设置] 需要缓存卡组 = {0}.", _needsToCacheCustomDecks);
             }
         }
 
         //炉石窗口宽度
-        private int int_w = 144;
+        private int _releaseLimitW = 144;
         [DefaultValue(144)]
         public int ReleaseLimitW
         {
-            get { return int_w; }
+            get { return _releaseLimitW; }
             set
             {
-                if (!value.Equals(int_w))
+                if (!value.Equals(_releaseLimitW))
                 {
-                    int_w = value;
-                    if (int_w < 120) int_w = 120;
-                    if (int_w > 1920) int_w = 1920;
-                    if (ReleaseLimitH != (int_w / 4 * 3))
+                    _releaseLimitW = value;
+                    if (_releaseLimitW < 120) _releaseLimitW = 120;
+                    if (_releaseLimitW > 1920) _releaseLimitW = 1920;
+                    if (ReleaseLimitH != (_releaseLimitW / 4 * 3))
                     {
-                        ReleaseLimitH = int_w / 4 * 3;
+                        ReleaseLimitH = _releaseLimitW / 4 * 3;
                     }
                     NotifyPropertyChanged(() => ReleaseLimitW);
                 }
-                ilog_0.InfoFormat("[天梯脚本设置] 炉石窗口宽度 = {0}.", int_w);
+                _log.InfoFormat("[天梯脚本设置] 炉石窗口宽度 = {0}.", _releaseLimitW);
                 try
                 {
                     if (BotManager.IsRunning && ReleaseLimit)
-                        Screen.SetResolution(int_w, int_h, 3, 0);
+                        Screen.SetResolution(_releaseLimitW, _releaseLimitH, 3, 0);
                 }
                 catch (Exception e)
                 {
-                    ilog_0.ErrorFormat("An exception occurred: {0}.", e);
+                    _log.ErrorFormat("An exception occurred: {0}.", e);
                 }
             }
         }
 
         //炉石窗口高度
-        private int int_h = 108;
+        private int _releaseLimitH = 108;
         [DefaultValue(108)]
         public int ReleaseLimitH
         {
-            get { return int_h; }
+            get { return _releaseLimitH; }
             set
             {
-                if (!value.Equals(int_h))
+                if (!value.Equals(_releaseLimitH))
                 {
-                    int_h = value;
-                    if (int_h < 90) int_h = 90;
-                    if (int_h > 1080) int_h = 1080;
+                    _releaseLimitH = value;
+                    if (_releaseLimitH < 90) _releaseLimitH = 90;
+                    if (_releaseLimitH > 1080) _releaseLimitH = 1080;
                     NotifyPropertyChanged(() => ReleaseLimitH);
                 }
-                ilog_0.InfoFormat("[天梯脚本设置] 炉石窗口高度 = {0}.", int_h);
+                _log.InfoFormat("[天梯脚本设置] 炉石窗口高度 = {0}.", _releaseLimitH);
             }
         }
 
         //设置炉石窗口大小
-        private bool bool_33;
+        private bool _releaseLimit;
         [DefaultValue(true)]
         public bool ReleaseLimit
         {
-            get { return bool_33; }
+            get { return _releaseLimit; }
             set
             {
-                if (!value.Equals(bool_33))
+                if (!value.Equals(_releaseLimit))
                 {
-                    bool_33 = value;
+                    _releaseLimit = value;
                     NotifyPropertyChanged(() => ReleaseLimit);
                 }
-                ilog_0.InfoFormat("[天梯脚本设置] 自动设置炉石窗口宽高 = {0}.", bool_33);
+                _log.InfoFormat("[天梯脚本设置] 自动设置炉石窗口宽高 = {0}.", _releaseLimit);
                 try
                 {
-                    if (bool_33)
+                    if (_releaseLimit)
                     {
                         if (BotManager.IsRunning)
-                            Screen.SetResolution(int_w, int_h, 3, 0);
+                            Screen.SetResolution(_releaseLimitW, _releaseLimitH, 3, 0);
                     }
                     else
                     {
@@ -248,25 +248,25 @@ namespace Triton.Bot.Logic.Bots.DefaultBot
                 }
                 catch (Exception e)
                 {
-                    ilog_0.ErrorFormat("An exception occurred: {0}.", e);
+                    _log.ErrorFormat("An exception occurred: {0}.", e);
                 }
             }
         }
 
         //保持排名(赢1投1)
-        private bool bool_4;
+        private bool _autoConcedeAfterConstructedWin;
         [DefaultValue(false)]
         public bool AutoConcedeAfterConstructedWin
         {
-            get { return bool_4; }
+            get { return _autoConcedeAfterConstructedWin; }
             set
             {
-                if (!value.Equals(bool_4))
+                if (!value.Equals(_autoConcedeAfterConstructedWin))
                 {
-                    bool_4 = value;
+                    _autoConcedeAfterConstructedWin = value;
                     NotifyPropertyChanged(() => AutoConcedeAfterConstructedWin);
                 }
-                ilog_0.InfoFormat("[天梯脚本设置] 保持排名(赢{0}投{1}) = {2}.", Numberofwins, Numberoflosses, bool_4);
+                _log.InfoFormat("[天梯脚本设置] 保持排名(赢{0}投{1}) = {2}.", _autoConcedeNumberOfWins, _autoConcedeNumberOfLosses, _autoConcedeAfterConstructedWin);
                 if (AutoConcedeAfterConstructedWin)
                 {
                     if (ForceConcedeAtMulligan) ForceConcedeAtMulligan = false;
@@ -276,61 +276,57 @@ namespace Triton.Bot.Logic.Bots.DefaultBot
             }
         }
 
-        private int Numberofwins = 1;
-        private int Numberoflosses = 1;
+        private int _autoConcedeNumberOfWins = 1;
+        private int _autoConcedeNumberOfLosses = 1;
         public int NowWinGameCount = 0;
         public int NowLoseGameCount = 0;
 
         [DefaultValue(1)]
-
         public int AutoConcedeNumberOfWins
         {
-            get { return Numberofwins; }
+            get { return _autoConcedeNumberOfWins; }
             set
             {
-                if (!value.Equals(Numberofwins))
+                if (!value.Equals(_autoConcedeNumberOfWins))
                 {
-                    Numberofwins = value;
-                    if (Numberofwins < 0) Numberofwins = 1;
+                    _autoConcedeNumberOfWins = value;
+                    if (_autoConcedeNumberOfWins < 0) _autoConcedeNumberOfWins = 1;
                     NotifyPropertyChanged(() => AutoConcedeNumberOfWins);
                 }
-                ilog_0.InfoFormat("[天梯脚本设置] 保持排名(赢{0}投{1}) = 赢{2}.", Numberofwins, Numberoflosses, Numberofwins);
+                _log.InfoFormat("[天梯脚本设置] 保持排名(赢{0}投{1}) = 赢{2}.", _autoConcedeNumberOfWins, _autoConcedeNumberOfLosses, _autoConcedeNumberOfWins);
             }
-
         }
 
         [DefaultValue(1)]
-
         public int AutoConcedeNumberOfLosses
         {
-            get { return Numberoflosses; }
+            get { return _autoConcedeNumberOfLosses; }
             set
             {
-                if (!value.Equals(Numberoflosses))
+                if (!value.Equals(_autoConcedeNumberOfLosses))
                 {
-                    Numberoflosses = value;
-                    if (Numberoflosses < 0) Numberoflosses = 1;
-
+                    _autoConcedeNumberOfLosses = value;
+                    if (_autoConcedeNumberOfLosses < 0) _autoConcedeNumberOfLosses = 1;
                     NotifyPropertyChanged(() => AutoConcedeNumberOfLosses);
                 }
-                ilog_0.InfoFormat("[天梯脚本设置] 保持排名(赢{0}投{1}) = 投{2}.", Numberofwins, Numberoflosses, Numberoflosses);
+                _log.InfoFormat("[天梯脚本设置] 保持排名(赢{0}投{1}) = 投{2}.", _autoConcedeNumberOfWins, _autoConcedeNumberOfLosses, _autoConcedeNumberOfLosses);
             }
         }
 
         //普通互投拿千胜头像
-        private bool bool_12;
+        private bool _normalConcede;
         [DefaultValue(false)]
         public bool NormalConcede
         {
-            get { return bool_12; }
+            get { return _normalConcede; }
             set
             {
-                if (!value.Equals(bool_12))
+                if (!value.Equals(_normalConcede))
                 {
-                    bool_12 = value;
+                    _normalConcede = value;
                     NotifyPropertyChanged(() => NormalConcede);
                 }
-                ilog_0.InfoFormat("[天梯脚本设置] 普通互投拿千胜头像 = {0}.", bool_12);
+                _log.InfoFormat("[天梯脚本设置] 普通互投拿千胜头像 = {0}.", _normalConcede);
                 if (NormalConcede)
                 {
                     if (AutoConcedeAfterConstructedWin) AutoConcedeAfterConstructedWin = false;
@@ -341,19 +337,19 @@ namespace Triton.Bot.Logic.Bots.DefaultBot
         }
 
         //急速投降至互投区
-        private bool bool_11;
+        private bool _forceConcedeAtMulligan;
         [DefaultValue(false)]
         public bool ForceConcedeAtMulligan
         {
-            get { return bool_11; }
+            get { return _forceConcedeAtMulligan; }
             set
             {
-                if (!value.Equals(bool_11))
+                if (!value.Equals(_forceConcedeAtMulligan))
                 {
-                    bool_11 = value;
+                    _forceConcedeAtMulligan = value;
                     NotifyPropertyChanged(() => ForceConcedeAtMulligan);
                 }
-                ilog_0.InfoFormat("[天梯脚本设置] 急速投降至互投区 = {0}.", bool_11);
+                _log.InfoFormat("[天梯脚本设置] 急速投降至互投区 = {0}.", _forceConcedeAtMulligan);
                 if (ForceConcedeAtMulligan)
                 {
                     if (AutoConcedeAfterConstructedWin) AutoConcedeAfterConstructedWin = false;
@@ -368,81 +364,80 @@ namespace Triton.Bot.Logic.Bots.DefaultBot
         }
 
         //判断对面名字投降
-        private bool bool_13;
+        private bool _judgmentOpponentNameConcede;
         [DefaultValue(false)]
         public bool JudgmentOpponentNameConcede
         {
-            get { return bool_13; }
+            get { return _judgmentOpponentNameConcede; }
             set
             {
-                if (!value.Equals(bool_13))
+                if (!value.Equals(_judgmentOpponentNameConcede))
                 {
-                    bool_13 = value;
+                    _judgmentOpponentNameConcede = value;
                     NotifyPropertyChanged(() => JudgmentOpponentNameConcede);
-                    ilog_0.InfoFormat("[天梯脚本设置] 判断对面名字投降 = {0}.", bool_13);
-
+                    _log.InfoFormat("[天梯脚本设置] 判断对面名字投降 = {0}.", _judgmentOpponentNameConcede);
                 }
             }
         }
 
         //内置极速投降参数
-        private bool bool_888;
+        private bool _needNowConcede;
         [DefaultValue(false)]
         [JsonIgnore]
         public bool NeedNowConcede
         {
-            get { return bool_888; }
+            get { return _needNowConcede; }
             set
             {
-                if (!value.Equals(bool_888))
+                if (!value.Equals(_needNowConcede))
                 {
-                    bool_888 = value;
+                    _needNowConcede = value;
                     if (value && !NormalConcede &&
                         !AutoConcedeAfterConstructedWin && !ForceConcedeAtMulligan)
                     {
-                        bool_888 = false;
+                        _needNowConcede = false;
                     }
                     NotifyPropertyChanged(() => NeedNowConcede);
                 }
-                ilog_0.InfoFormat("[天梯脚本设置] 立即投降 = {0}.", bool_888);
+                _log.InfoFormat("[天梯脚本设置] 立即投降 = {0}.", _needNowConcede);
             }
         }
 
         //投降最小延时
-        private int int_0 = 1500;
+        private int _autoConcedeMinDelayMs = 1500;
         [DefaultValue(1500)]
         public int AutoConcedeMinDelayMs
         {
-            get { return int_0; }
+            get { return _autoConcedeMinDelayMs; }
             set
             {
-                if (!value.Equals(int_0))
+                if (!value.Equals(_autoConcedeMinDelayMs))
                 {
-                    int_0 = value;
-                    if (int_0 < 0) int_0 = 0;
-                    if (int_0 > int_1) int_0 = int_1;
+                    _autoConcedeMinDelayMs = value;
+                    if (_autoConcedeMinDelayMs < 0) _autoConcedeMinDelayMs = 0;
+                    if (_autoConcedeMinDelayMs > _autoConcedeMaxDelayMs) _autoConcedeMinDelayMs = _autoConcedeMaxDelayMs;
                     NotifyPropertyChanged(() => AutoConcedeMinDelayMs);
                 }
-                ilog_0.InfoFormat("[天梯脚本设置] 投降最小延时(ms) = {0}.", int_0);
+                _log.InfoFormat("[天梯脚本设置] 投降最小延时(ms) = {0}.", _autoConcedeMinDelayMs);
             }
         }
 
         //投降最大延时
-        private int int_1 = 3000;
+        private int _autoConcedeMaxDelayMs = 3000;
         [DefaultValue(3000)]
         public int AutoConcedeMaxDelayMs
         {
-            get { return int_1; }
+            get { return _autoConcedeMaxDelayMs; }
             set
             {
-                if (!value.Equals(int_1))
+                if (!value.Equals(_autoConcedeMaxDelayMs))
                 {
-                    int_1 = value;
-                    if (int_1 < 0) int_1 = 0;
-                    if (int_1 < int_0) int_1 = int_0;
+                    _autoConcedeMaxDelayMs = value;
+                    if (_autoConcedeMaxDelayMs < 0) _autoConcedeMaxDelayMs = 0;
+                    if (_autoConcedeMaxDelayMs < _autoConcedeMinDelayMs) _autoConcedeMaxDelayMs = _autoConcedeMinDelayMs;
                     NotifyPropertyChanged(() => AutoConcedeMaxDelayMs);
                 }
-                ilog_0.InfoFormat("[天梯脚本设置] 投降最大延时(ms)  = {0}.", int_1);
+                _log.InfoFormat("[天梯脚本设置] 投降最大延时(ms)  = {0}.", _autoConcedeMaxDelayMs);
             }
         }
 

@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿﻿﻿using System;
 using System.IO;
 using System.Threading;
 using System.Windows;
@@ -17,6 +17,7 @@ using log4net;
 using Triton.Bot;
 using Triton.Bot.Settings;
 using Triton.Common;
+using Triton.Common.Mvvm;
 using Triton.Game;
 using Triton.Game.Mapping;
 using Logger = Triton.Common.LogUtilities.Logger;
@@ -30,6 +31,7 @@ namespace Quest
         private bool _enabled;
 
         private UserControl _control;
+        private QuestViewModel _viewModel;
 
         /// <summary> The name of the plugin. </summary>
         public string Name
@@ -104,218 +106,10 @@ namespace Quest
                 using (var fs = new FileStream(@"Plugins\Quest\SettingsGui.xaml", FileMode.Open))
                 {
                     var root = (UserControl) XamlReader.Load(fs);
-
-                    if (!Wpf.SetupTextBoxBinding(root, "ProgressTextBoxDay1", "ProgressDay1",
-                        BindingMode.TwoWay, QuestSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'ProgressDay1'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "ProgressTextBoxDay2", "ProgressDay2",
-                        BindingMode.TwoWay, QuestSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'ProgressDay2'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "ProgressTextBoxDay3", "ProgressDay3",
-                        BindingMode.TwoWay, QuestSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'ProgressDay3'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "ProgressTextBoxWeek1", "ProgressWeek1",
-                        BindingMode.TwoWay, QuestSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'ProgressWeek1'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "ProgressTextBoxWeek2", "ProgressWeek2",
-                        BindingMode.TwoWay, QuestSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'ProgressWeek2'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "ProgressTextBoxWeek3", "ProgressWeek3",
-                        BindingMode.TwoWay, QuestSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'ProgressWeek3'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "QuotaTextBoxDay1", "QuotaDay1",
-                        BindingMode.TwoWay, QuestSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'QuotaDay1'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "QuotaTextBoxDay2", "QuotaDay2",
-                        BindingMode.TwoWay, QuestSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'QuotaDay2'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "QuotaTextBoxDay3", "QuotaDay3",
-                        BindingMode.TwoWay, QuestSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'QuotaDay3'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "QuotaTextBoxWeek1", "QuotaWeek1",
-                        BindingMode.TwoWay, QuestSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'QuotaWeek1'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "QuotaTextBoxWeek2", "QuotaWeek2",
-                        BindingMode.TwoWay, QuestSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'QuotaWeek2'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "QuotaTextBoxWeek3", "QuotaWeek3",
-                        BindingMode.TwoWay, QuestSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'QuotaWeek3'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "XpTextBoxDay1", "XpDay1",
-                        BindingMode.TwoWay, QuestSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'XpDay1'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "XpTextBoxDay2", "XpDay2",
-                        BindingMode.TwoWay, QuestSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'XpDay2'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "XpTextBoxDay3", "XpDay3",
-                        BindingMode.TwoWay, QuestSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'XpDay3'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "XpTextBoxWeek1", "XpWeek1",
-                        BindingMode.TwoWay, QuestSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'XpWeek1'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "XpTextBoxWeek2", "XpWeek2",
-                        BindingMode.TwoWay, QuestSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'XpWeek2'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "XpTextBoxWeek3", "XpWeek3",
-                        BindingMode.TwoWay, QuestSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'XpWeek3'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "DesTextBoxDay1", "DesDay1",
-                        BindingMode.TwoWay, QuestSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'DesDay1'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "DesTextBoxDay2", "DesDay2",
-                        BindingMode.TwoWay, QuestSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'DesDay2'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "DesTextBoxDay3", "DesDay3",
-                        BindingMode.TwoWay, QuestSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'DesDay3'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "DesTextBoxWeek1", "DesWeek1",
-                        BindingMode.TwoWay, QuestSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'DesWeek1'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "DesTextBoxWeek2", "DesWeek2",
-                        BindingMode.TwoWay, QuestSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'DesWeek2'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "DesTextBoxWeek3", "DesWeek3",
-                        BindingMode.TwoWay, QuestSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'DesWeek3'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupCheckBoxBinding(root, "NeedAutoCheckBox", "NeedAuto",
-                        BindingMode.TwoWay, QuestSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupCheckBoxBinding failed for 'NeedAutoCheckBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "RunTimeTextBox", "RunTime",
-                        BindingMode.TwoWay, QuestSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'RunTimeTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    if (!Wpf.SetupTextBoxBinding(root, "IntervalTextBox", "Interval",
-                        BindingMode.TwoWay, QuestSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'IntervalTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    // Your settings event handlers here.
-                    var resetButton = Wpf.FindControlByName<Button>(root, "ResetButton");
-                    resetButton.Click += ResetButtonOnClick;
-
-                    var ButtonRefreshDay1 = Wpf.FindControlByName<Button>(root, "ButtonRefreshDay1");
-                    ButtonRefreshDay1.Click += ButtonRefreshDay1OnClick;
-
-                    var ButtonRefreshDay2 = Wpf.FindControlByName<Button>(root, "ButtonRefreshDay2");
-                    ButtonRefreshDay2.Click += ButtonRefreshDay2OnClick;
-
-                    var ButtonRefreshDay3 = Wpf.FindControlByName<Button>(root, "ButtonRefreshDay3");
-                    ButtonRefreshDay3.Click += ButtonRefreshDay3OnClick;
-
-                    var ButtonRefreshWeek1 = Wpf.FindControlByName<Button>(root, "ButtonRefreshWeek1");
-                    ButtonRefreshWeek1.Click += ButtonRefreshWeek1OnClick;
-
-                    var ButtonRefreshWeek2 = Wpf.FindControlByName<Button>(root, "ButtonRefreshWeek2");
-                    ButtonRefreshWeek2.Click += ButtonRefreshWeek2OnClick;
-
-                    var ButtonRefreshWeek3 = Wpf.FindControlByName<Button>(root, "ButtonRefreshWeek3");
-                    ButtonRefreshWeek3.Click += ButtonRefreshWeek3OnClick;
-
+                    _viewModel = new QuestViewModel(QuestSettings.Instance);
+                    _viewModel.RequestRefreshQuest += OnRefreshQuest;
+                    _viewModel.RequestReset += ResetButtonOnClick;
+                    root.DataContext = _viewModel;
                     _control = root;
                 }
 
@@ -323,91 +117,43 @@ namespace Quest
             }
         }
 
-        private void ButtonRefreshDay1OnClick(object sender, RoutedEventArgs routedEventArgs)
+        private void OnRefreshQuest(int index, string type)
         {
             QuestManager quest = QuestManager.Get();
-            if (quest != null)
+            if (quest == null) return;
+
+            int questId = 0;
+            if (type == "day")
             {
-                if (QuestSettings.Instance.QuestIdDay1 > 0)
+                switch (index)
                 {
-                    quest.RerollQuest(QuestSettings.Instance.QuestIdDay1);
-                    UpdateGui(true);
+                    case 1: questId = QuestSettings.Instance.QuestIdDay1; break;
+                    case 2: questId = QuestSettings.Instance.QuestIdDay2; break;
+                    case 3: questId = QuestSettings.Instance.QuestIdDay3; break;
                 }
-                else Log.ErrorFormat("任务无效，不可切换");
+            }
+            else
+            {
+                switch (index)
+                {
+                    case 1: questId = QuestSettings.Instance.QuestIdWeek1; break;
+                    case 2: questId = QuestSettings.Instance.QuestIdWeek2; break;
+                    case 3: questId = QuestSettings.Instance.QuestIdWeek3; break;
+                }
+            }
+
+            if (questId > 0)
+            {
+                quest.RerollQuest(questId);
+                UpdateGui(true);
+            }
+            else
+            {
+                Log.ErrorFormat("任务无效，不可切换");
             }
         }
 
-        private void ButtonRefreshDay2OnClick(object sender, RoutedEventArgs routedEventArgs)
-        {
-            QuestManager quest = QuestManager.Get();
-            if (quest != null)
-            {
-                if (QuestSettings.Instance.QuestIdDay2 > 0)
-                {
-                    quest.RerollQuest(QuestSettings.Instance.QuestIdDay2);
-                    UpdateGui(true);
-                }
-                else Log.ErrorFormat("任务无效，不可切换");
-            }
-        }
-
-        private void ButtonRefreshDay3OnClick(object sender, RoutedEventArgs routedEventArgs)
-        {
-            QuestManager quest = QuestManager.Get();
-            if (quest != null)
-            {
-                if (QuestSettings.Instance.QuestIdDay3 > 0)
-                {
-                    quest.RerollQuest(QuestSettings.Instance.QuestIdDay3);
-                    UpdateGui(true);
-                }
-                else Log.ErrorFormat("任务无效，不可切换");
-            }
-        }
-
-        private void ButtonRefreshWeek1OnClick(object sender, RoutedEventArgs routedEventArgs)
-        {
-            QuestManager quest = QuestManager.Get();
-            if (quest != null)
-            {
-                if (QuestSettings.Instance.QuestIdWeek1 > 0)
-                {
-                    quest.RerollQuest(QuestSettings.Instance.QuestIdWeek1);
-                    UpdateGui(true);
-                }
-                else Log.ErrorFormat("任务无效，不可切换");
-            }
-        }
-
-        private void ButtonRefreshWeek2OnClick(object sender, RoutedEventArgs routedEventArgs)
-        {
-            QuestManager quest = QuestManager.Get();
-            if (quest != null)
-            {
-                if (QuestSettings.Instance.QuestIdWeek2 > 0)
-                {
-                    quest.RerollQuest(QuestSettings.Instance.QuestIdWeek2);
-                    UpdateGui(true);
-                }
-                else Log.ErrorFormat("任务无效，不可切换");
-            }
-        }
-
-        private void ButtonRefreshWeek3OnClick(object sender, RoutedEventArgs routedEventArgs)
-        {
-            QuestManager quest = QuestManager.Get();
-            if (quest != null)
-            {
-                if (QuestSettings.Instance.QuestIdWeek3 > 0)
-                {
-                    quest.RerollQuest(QuestSettings.Instance.QuestIdWeek3);
-                    UpdateGui(true);
-                }
-                else Log.ErrorFormat("任务无效，不可切换");
-            }
-        }
-
-        private void ResetButtonOnClick(object sender, RoutedEventArgs routedEventArgs)
+        private void ResetButtonOnClick()
         {
             QuestSettings.Instance.Reset();
             UpdateGui(false);
@@ -466,21 +212,15 @@ namespace Quest
             {
                 try
                 {
-                    //禁用所有更换按钮
-                    var ButtonRefreshDay1 = Wpf.FindControlByName<Button>(_control, "ButtonRefreshDay1");
-                    ButtonRefreshDay1.IsEnabled = false;
-                    var ButtonRefreshDay2 = Wpf.FindControlByName<Button>(_control, "ButtonRefreshDay2");
-                    ButtonRefreshDay2.IsEnabled = false;
-                    var ButtonRefreshDay3 = Wpf.FindControlByName<Button>(_control, "ButtonRefreshDay3");
-                    ButtonRefreshDay3.IsEnabled = false;
-                    var ButtonRefreshWeek1 = Wpf.FindControlByName<Button>(_control, "ButtonRefreshWeek1");
-                    ButtonRefreshWeek1.IsEnabled = false;
-                    var ButtonRefreshWeek2 = Wpf.FindControlByName<Button>(_control, "ButtonRefreshWeek2");
-                    ButtonRefreshWeek2.IsEnabled = false;
-                    var ButtonRefreshWeek3 = Wpf.FindControlByName<Button>(_control, "ButtonRefreshWeek3");
-                    ButtonRefreshWeek3.IsEnabled = false;
+                    if (_viewModel == null) return;
 
-                    //刷新任务最新数据
+                    _viewModel.CanRefreshDay1 = false;
+                    _viewModel.CanRefreshDay2 = false;
+                    _viewModel.CanRefreshDay3 = false;
+                    _viewModel.CanRefreshWeek1 = false;
+                    _viewModel.CanRefreshWeek2 = false;
+                    _viewModel.CanRefreshWeek3 = false;
+
                     QuestSettings.Instance.ResetQuest();
                     QuestManager quest = QuestManager.Get();
                     if (quest != null)
@@ -503,7 +243,7 @@ namespace Quest
                                         item.QuestId > 0 ? item.Description : item.TimeUntilNextQuest;
                                     if (item.QuestId > 0 && item.RerollCount > 0)
                                     {
-                                        ButtonRefreshDay1.IsEnabled = true;
+                                        _viewModel.CanRefreshDay1 = true;
                                     }
                                 }
                                 else if (i == 1)
@@ -517,7 +257,7 @@ namespace Quest
                                         item.QuestId > 0 ? item.Description : item.TimeUntilNextQuest;
                                     if (item.QuestId > 0 && item.RerollCount > 0)
                                     {
-                                        ButtonRefreshDay2.IsEnabled = true;
+                                        _viewModel.CanRefreshDay2 = true;
                                     }
                                 }
                                 else if (i == 2)
@@ -531,7 +271,7 @@ namespace Quest
                                         item.QuestId > 0 ? item.Description : item.TimeUntilNextQuest;
                                     if (item.QuestId > 0 && item.RerollCount > 0)
                                     {
-                                        ButtonRefreshDay3.IsEnabled = true;
+                                        _viewModel.CanRefreshDay3 = true;
                                     }
                                 }
                                 i++;
@@ -556,7 +296,7 @@ namespace Quest
                                         item.QuestId > 0 ? item.Description : item.TimeUntilNextQuest;
                                     if (item.QuestId > 0 && item.RerollCount > 0)
                                     {
-                                        ButtonRefreshWeek1.IsEnabled = true;
+                                        _viewModel.CanRefreshWeek1 = true;
                                     }
                                 }
                                 else if (i == 1)
@@ -570,7 +310,7 @@ namespace Quest
                                         item.QuestId > 0 ? item.Description : item.TimeUntilNextQuest;
                                     if (item.QuestId > 0 && item.RerollCount > 0)
                                     {
-                                        ButtonRefreshWeek2.IsEnabled = true;
+                                        _viewModel.CanRefreshWeek2 = true;
                                     }
                                 }
                                 else if (i == 2)
@@ -584,7 +324,7 @@ namespace Quest
                                         item.QuestId > 0 ? item.Description : item.TimeUntilNextQuest;
                                     if (item.QuestId > 0 && item.RerollCount > 0)
                                     {
-                                        ButtonRefreshWeek3.IsEnabled = true;
+                                        _viewModel.CanRefreshWeek3 = true;
                                     }
                                 }
                                 i++;

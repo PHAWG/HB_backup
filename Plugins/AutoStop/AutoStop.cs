@@ -8,6 +8,7 @@ using log4net;
 using Triton.Bot;
 using Triton.Bot.Settings;
 using Triton.Common;
+using Triton.Common.Mvvm;
 using Triton.Game;
 using Logger = Triton.Common.LogUtilities.Logger;
 using HREngine.Bots;
@@ -112,140 +113,9 @@ namespace AutoStop
                 using (var fs = new FileStream(@"Plugins\AutoStop\SettingsGui.xaml", FileMode.Open))
                 {
                     var root = (UserControl) XamlReader.Load(fs);
-
-                    // Your settings binding here.
-
-                    // StopAfterXGames
-                    if (
-                        !Wpf.SetupCheckBoxBinding(root, "StopAfterXGamesCheckBox",
-                            "StopAfterXGames",
-                            BindingMode.TwoWay, AutoStopSettings.Instance))
-                    {
-                        Log.DebugFormat(
-                            "[SettingsControl] SetupCheckBoxBinding failed for 'StopAfterXGamesCheckBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    // StopAfterXWins
-                    if (
-                        !Wpf.SetupCheckBoxBinding(root, "StopAfterXWinsCheckBox",
-                            "StopAfterXWins",
-                            BindingMode.TwoWay, AutoStopSettings.Instance))
-                    {
-                        Log.DebugFormat(
-                            "[SettingsControl] SetupCheckBoxBinding failed for 'StopAfterXWinsCheckBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    // StopAfterXLosses
-                    if (
-                        !Wpf.SetupCheckBoxBinding(root, "StopAfterXLossesCheckBox",
-                            "StopAfterXLosses",
-                            BindingMode.TwoWay, AutoStopSettings.Instance))
-                    {
-                        Log.DebugFormat(
-                            "[SettingsControl] SetupCheckBoxBinding failed for 'StopAfterXLossesCheckBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    // StopGameCount
-                    if (!Wpf.SetupTextBoxBinding(root, "StopGameCountTextBox", "StopGameCount",
-                        BindingMode.TwoWay, AutoStopSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'StopGameCountTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    // StopWinCount
-                    if (!Wpf.SetupTextBoxBinding(root, "StopWinCountTextBox", "StopWinCount",
-                        BindingMode.TwoWay, AutoStopSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'StopWinCountTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    // StopLossCount
-                    if (!Wpf.SetupTextBoxBinding(root, "StopLossCountTextBox", "StopLossCount",
-                        BindingMode.TwoWay, AutoStopSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'StopLossCountTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    // Wins
-                    if (!Wpf.SetupTextBoxBinding(root, "WinsTextBox", "Wins",
-                        BindingMode.TwoWay, AutoStopSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'WinsTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    // Losses
-                    if (!Wpf.SetupTextBoxBinding(root, "LossesTextBox", "Losses",
-                        BindingMode.TwoWay, AutoStopSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'LossesTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    // ConcedeAfterXMinutes
-                    if (
-                        !Wpf.SetupCheckBoxBinding(root, "ConcedeAfterXMinutesCheckBox",
-                            "ConcedeAfterXMinutes",
-                            BindingMode.TwoWay, AutoStopSettings.Instance))
-                    {
-                        Log.DebugFormat(
-                            "[SettingsControl] SetupCheckBoxBinding failed for 'ConcedeAfterXMinutesCheckBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    // ConcedeMinutesCount
-                    if (!Wpf.SetupTextBoxBinding(root, "ConcedeMinutesCountTextBox", "ConcedeMinutesCount",
-                        BindingMode.TwoWay, AutoStopSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'ConcedeMinutesCountTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    // DynamicFacePenaltyEnabled
-                    if (
-                        !Wpf.SetupCheckBoxBinding(root, "DynamicFacePenaltyEnabledCheckBox",
-                            "DynamicFacePenaltyEnabled",
-                            BindingMode.TwoWay, AutoStopSettings.Instance))
-                    {
-                        Log.DebugFormat(
-                            "[SettingsControl] SetupCheckBoxBinding failed for 'DynamicFacePenaltyEnabledCheckBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    // DynamicFacePenaltyMinutes
-                    if (!Wpf.SetupTextBoxBinding(root, "DynamicFacePenaltyMinutesTextBox", "DynamicFacePenaltyMinutes",
-                        BindingMode.TwoWay, AutoStopSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'DynamicFacePenaltyMinutesTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    // FacePenaltyBeforeTime
-                    if (!Wpf.SetupTextBoxBinding(root, "FacePenaltyBeforeTimeTextBox", "FacePenaltyBeforeTime",
-                        BindingMode.TwoWay, AutoStopSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'FacePenaltyBeforeTimeTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    // FacePenaltyAfterTime
-                    if (!Wpf.SetupTextBoxBinding(root, "FacePenaltyAfterTimeTextBox", "FacePenaltyAfterTime",
-                        BindingMode.TwoWay, AutoStopSettings.Instance))
-                    {
-                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'FacePenaltyAfterTimeTextBox'.");
-                        throw new Exception("The SettingsControl could not be created.");
-                    }
-
-                    // Your settings event handlers here.
-                    var resetButton = Wpf.FindControlByName<Button>(root, "ResetButton");
-                    resetButton.Click += ResetButtonOnClick;
-
+                    var viewModel = new AutoStopViewModel(AutoStopSettings.Instance);
+                    viewModel.RequestReset += ResetButtonOnClick;
+                    root.DataContext = viewModel;
                     _control = root;
                 }
 
@@ -253,12 +123,12 @@ namespace AutoStop
             }
         }
 
-        private void ResetButtonOnClick(object sender, RoutedEventArgs routedEventArgs)
+        private void ResetButtonOnClick()
         {
-	        using (TritonHs.AcquireFrame())
-	        {
-		        AutoStopSettings.Instance.Reset();
-	        }
+            using (TritonHs.AcquireFrame())
+            {
+                AutoStopSettings.Instance.Reset();
+            }
         }
 
         private void CheckGameStart()
