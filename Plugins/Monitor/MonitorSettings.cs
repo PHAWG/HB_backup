@@ -99,6 +99,9 @@ namespace Monitor
         /// <summary>总运行时间（秒）</summary>
         private long _allRunTime;
 
+        /// <summary>总运行时间文本（如 "25.50" 表示 25.5 小时）</summary>
+        private string allRunTimeText;
+
         /// <summary>累计获得的总经验值</summary>
         private long _allGetXp;
 
