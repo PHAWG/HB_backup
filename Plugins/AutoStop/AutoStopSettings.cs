@@ -325,7 +325,7 @@ namespace AutoStop
         /// <summary>
         /// 获取或设置时间前打脸惩罚值
         /// <para>运行时间未超过 DynamicFacePenaltyMinutes 时使用</para>
-        /// <para>负值表示更倾向于打脸，正值表示更倾向于解场</para>
+        /// <para>负数倾向于不打脸（解场），正值倾向于打脸</para>
         /// </summary>
         [DefaultValue(-2000)]
         public int FacePenaltyBeforeTime
@@ -345,7 +345,7 @@ namespace AutoStop
         /// <summary>
         /// 获取或设置时间后打脸惩罚值
         /// <para>运行时间超过 DynamicFacePenaltyMinutes 后使用</para>
-        /// <para>正值表示更倾向于解场，降低打脸频率</para>
+        /// <para>负数倾向于不打脸（解场），正值倾向于打脸</para>
         /// </summary>
         [DefaultValue(1000)]
         public int FacePenaltyAfterTime
