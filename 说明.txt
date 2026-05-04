@@ -35,3 +35,11 @@ foreach (Card c in this.cardlist)
                     continue;                                               //Todo: 为了确保Test能跑通
 
 
+
+
+useradd -u 3001 -G Sale -c "销售部经理" -p 123 -m LiLei
+useradd -u 3002 -G Sale -p 123 -m HanMeiMei
+useradd -u 4001 -G Product -c "产品部经理" -p 123 -m MengLi
+useradd -u 4002 -G Product -p 123 -m HuFei
+useradd -u 5001 -G Operate -c "运营部经理" -p 123 -m LiuMing
+useradd -u 6001 -G Manage -c "总经理" -p 123 -m WangLei

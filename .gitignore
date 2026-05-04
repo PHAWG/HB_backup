@@ -1,8 +1,18 @@
 # IDE 和开发环境文件
+.trae/
 .trea/
 .vs/
 .vscode/
 开发配置教程/.idea
+
+# 备份文件
+备份/
+
+# 临时计划文件
+*.partial-plan.md
+
+# 调试符号文件
+*.pdb
 
 # 编译输出和构建文件
 bin/
