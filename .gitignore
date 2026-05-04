@@ -19,6 +19,7 @@ bin/
 obj/
 Build/
 CompiledAssemblies/*
+CompilingDLLs/*.dll
 build.log
 
 # 项目特定目录
