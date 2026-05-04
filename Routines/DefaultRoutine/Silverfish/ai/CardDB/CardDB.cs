@@ -1884,7 +1884,7 @@ namespace HREngine.Bots
             }
         }
 
-        List<Card> cardlist = new List<Card>();
+        public List<Card> cardlist = new List<Card>();
         Dictionary<cardIDEnum, Card> cardidToCardList = new Dictionary<cardIDEnum, Card>();
         Dictionary<string, Card> carddbfidToCardList = new Dictionary<string, Card>();
         Dictionary<cardNameCN, Card> cardNameCNToCardList = new Dictionary<cardNameCN, Card>();
