@@ -13,6 +13,21 @@ using GreyMagic;
 
 namespace Triton.Bot.Logic.Bots.DefaultBot
 {
+    /// <summary>
+    /// 默认机器人设置类
+    /// <para>存储 DefaultBot 的所有配置和运行时数据</para>
+    /// <para>继承自 JsonSettings，支持 JSON 序列化/反序列化和属性变更通知</para>
+    /// </summary>
+    /// <remarks>
+    /// 主要功能：
+    /// <list type="bullet">
+    ///     <item><description>对战模式选择（狂野/标准/经典/休闲/幻变）</description></item>
+    ///     <item><description>卡组选择和缓存</description></item>
+    ///     <item><description>自动打招呼设置</description></item>
+    ///     <item><description>窗口大小限制设置</description></item>
+    ///     <item><description>自动投降设置（保持排名/互投/急速投）</description></item>
+    /// </list>
+    /// </remarks>
     public class DefaultBotSettings : JsonSettings
     {
         private static readonly ILog _log = Common.LogUtilities.Logger.GetLoggerInstanceForType();

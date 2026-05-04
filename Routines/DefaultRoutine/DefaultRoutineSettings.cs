@@ -15,7 +15,22 @@ using Triton.Game.Data;
 
 namespace HREngine.Bots
 {
-    /// <summary>Settings for the DefaultRoutine. </summary>
+    /// <summary>
+    /// 默认策略设置类
+    /// <para>存储 DefaultRoutine（Silverfish AI）的所有配置和运行时数据</para>
+    /// <para>继承自 JsonSettings，支持 JSON 序列化/反序列化和属性变更通知</para>
+    /// </summary>
+    /// <remarks>
+    /// 主要功能：
+    /// <list type="bullet">
+    ///     <item><description>AI 行为模式选择（控制/节奏/打脸等）</description></item>
+    ///     <item><description>自动表情选择</description></item>
+    ///     <item><description>搜索深度和宽度设置</description></item>
+    ///     <item><description>斩杀奖励计算设置</description></item>
+    ///     <item><description>日志和调试选项</description></item>
+    ///     <item><description>竞技场职业优先选择</description></item>
+    /// </list>
+    /// </remarks>
     public class DefaultRoutineSettings : JsonSettings
     {
         private static readonly ILog Log = Logger.GetLoggerInstanceForType();
